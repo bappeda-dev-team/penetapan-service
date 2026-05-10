@@ -11,6 +11,10 @@ const Version = "1.0.0"
 type Config struct {
 	Port int
 	Env  string
+
+	DB struct {
+		Dsn string
+	}
 }
 
 // hold application dependencies for

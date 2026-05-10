@@ -31,11 +31,6 @@ Folder: db/migration
 ``` sh
 flyway -user=postgres -password=postgres -url=jdbc:postgresql://localhost:5432/penetapan_service_db -locations="filesystem:./db/migration" migrate
 ```
-atau
-
-``` sh
-make migrate
-```
 
 # Generate Docs
 Swagger
