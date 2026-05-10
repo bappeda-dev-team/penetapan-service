@@ -3,31 +3,31 @@
 
 # HEALTHCHECK
 ## OK
-GET :baseUrl/v1/healthcheck
+GET :baseUrl/healthcheck
 
 ## ERROR METHOD NOT ALLOWED
-POST :baseUrl/v1/healthcheck
+POST :baseUrl/healthcheck
 
 ## ERROR NOT FOUND
-POST :baseUrl/v1/healthcheck/123
+POST :baseUrl/healthcheck/123
 
 
 # OPD
 ## TUJUAN OPD PENETAPAN
-GET :baseUrl/v1/opd/tujuan?kodeOpd=2.55.66&tahun=2026
+GET :baseUrl/opd/tujuan?kodeOpd=2.55.66&tahun=2026
 
 ## SASARAN OPD PENETAPAN
-GET :baseUrl/v1/opd/sasaran?kodeOpd=2.55.66&tahun=2026
+GET :baseUrl/opd/sasaran?kodeOpd=2.55.66&tahun=2026
 
 ## RENJA PENETAPAN
-GET :baseUrl/v1/opd/renja?kodeOpd=2.55.66&tahun=2026
+GET :baseUrl/opd/renja?kodeOpd=2.55.66&tahun=2026
 
 ## RENAKSI OPD
-GET :baseUrl/v1/opd/renaksi?kodeOpd=2.55&tahun=2026
+GET :baseUrl/opd/renaksi?kodeOpd=2.55&tahun=2026
 
 # INVIDIU
 ## REKIN
-GET :baseUrl/v1/individu/rekin?pegawaiId=122333&levelPegawai=5&kodeOpd=2.55&tahun=2026
+GET :baseUrl/individu/rekin?pegawaiId=122333&levelPegawai=5&kodeOpd=2.55&tahun=2026
 
 ## RENAKSI
-GET :baseUrl/v1/individu/renaksi?pegawaiId=122333&levelPegawai=5&kodeOpd=2.55&tahun=2026&bulan=3
+GET :baseUrl/individu/renaksi?pegawaiId=122333&levelPegawai=5&kodeOpd=2.55&tahun=2026&bulan=3

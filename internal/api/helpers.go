@@ -1,15 +1,18 @@
-package main
+package api
 
 import (
 	"encoding/json"
 	"net/http"
 )
 
-// envelope type
-type envelope map[string]any
+func (app *Application) WriteJSON(w http.ResponseWriter, status int, data any, headers http.Header) error {
 
-func (app *application) writeJSON(w http.ResponseWriter, status int, data envelope, headers http.Header) error {
-	js, err := json.MarshalIndent(data, "", "\t")
+	js, err := json.MarshalIndent(
+		data,
+		"",
+		"\t",
+	)
+
 	if err != nil {
 		return err
 	}
@@ -23,6 +26,7 @@ func (app *application) writeJSON(w http.ResponseWriter, status int, data envelo
 	}
 
 	w.Header().Set("Content-Type", "application/json")
+
 	w.WriteHeader(status)
 
 	w.Write(js)

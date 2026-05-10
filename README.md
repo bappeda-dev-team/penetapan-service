@@ -12,16 +12,51 @@ untuk routes dan handler (controller)
 ### http
 digunakan untuk enpoint testing
 
-
 # Running
 
-### simple
 ``` sh
 make run
 ```
-
-### Go
-
+atau
 ``` sh
 go run ./cmd/api
 ```
+
+# Database
+Postgresql
+
+## Migrations
+Folder: db/migration
+
+``` sh
+flyway -user=postgres -password=postgres -url=jdbc:postgresql://localhost:5432/penetapan_service_db -locations="filesystem:./db/migration" migrate
+```
+atau
+
+``` sh
+make migrate
+```
+
+# Generate Docs
+Swagger
+
+``` sh
+swag init -g ./cmd/api/main.go
+```
+atau
+
+``` sh
+make swagger
+```
+
+# Test
+
+``` sh
+go test ./...
+```
+atau
+
+``` sh
+make test
+```
+

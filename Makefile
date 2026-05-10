@@ -1,25 +1,26 @@
 APP_NAME=penetapan-service
 
-.PHONY: all build run myenv clean
+.PHONY: build run clean test swagger migrate
 
-# DEFAULT TARGET
-all: build
+build:
+	go build -o ./bin/$(APP_NAME) ./cmd/api
 
-build: $(APP_NAME)
+run:
+	go run ./cmd/api
 
-$(APP_NAME): ./cmd/api
-	@echo ">>> Building $(APP_NAME)..."
-	@go build -o ./bin/$(APP_NAME) ./cmd/api
-	@echo ">>> SUCCESS..."
+test:
+	go test ./...
 
-run: build myenv
-	@echo ">>> Running $(APP_NAME)..."
-	./bin/$(APP_NAME)
-
-myenv:
-	@echo "REQUIRED ENV"
-	@echo "DB_URL: $(DB_URL)"
+swagger:
+	swag init -g ./cmd/api/main.go
 
 clean:
-	@echo "CLEANING UP"
 	rm -f ./bin/$(APP_NAME)
+
+migrate:
+	flyway \
+	-user=postgres \
+	-password=postgres \
+	-url=jdbc:postgresql://localhost:5432/penetapan_service_db \
+	-locations=filesystem:./db/migration \
+	migrate
