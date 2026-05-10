@@ -9,18 +9,18 @@ const docTemplate = `{
     "info": {
         "description": "{{escape .Description}}",
         "title": "{{.Title}}",
-        "contact": {},
+        "termsOfService": "http://swagger.io/terms/",
+        "contact": {
+            "name": "Kertaskerja Dev Team"
+        },
         "version": "{{.Version}}"
     },
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/v1/healthcheck": {
+        "/healthcheck": {
             "get": {
-                "description": "checking is this service is accessible",
-                "consumes": [
-                    "application/json"
-                ],
+                "description": "checking if this service is accessible",
                 "produces": [
                     "application/json"
                 ],
@@ -30,12 +30,302 @@ const docTemplate = `{
                 "summary": "healthcheck",
                 "responses": {
                     "200": {
-                        "description": "Service is healthy",
+                        "description": "OK",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/web.Response-web_HealthcheckResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
+                }
+            }
+        },
+        "/opd/sasaran": {
+            "get": {
+                "description": "Mengambil data sasaran OPD berdasarkan kode OPD dan tahun penetapan",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "OPD"
+                ],
+                "summary": "Get sasaran OPD penetapan",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Kode OPD",
+                        "name": "kodeOpd",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Tahun Penetapan",
+                        "name": "tahun",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Berhasil mengambil data sasaran OPD",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/web.SasaranPenetapanOpdResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/opd/tujuan": {
+            "get": {
+                "description": "Mengambil data tujuan OPD berdasarkan kode OPD dan tahun penetapan",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "OPD"
+                ],
+                "summary": "Get tujuan OPD penetapan",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Kode OPD",
+                        "name": "kodeOpd",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Tahun Penetapan",
+                        "name": "tahun",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Berhasil mengambil data tujuan OPD",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/web.TujuanPenetapanOpdResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "web.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {}
+            }
+        },
+        "web.HealthcheckResponse": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "string"
+                },
+                "system_info": {
+                    "$ref": "#/definitions/web.HealthcheckSystemInfo"
+                }
+            }
+        },
+        "web.HealthcheckSystemInfo": {
+            "type": "object",
+            "properties": {
+                "environment": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "string"
+                }
+            }
+        },
+        "web.IndikatorSasaranPenetapanResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "indikator": {
+                    "type": "string"
+                },
+                "rumus_perhitungan": {
+                    "type": "string"
+                },
+                "sumber_data": {
+                    "type": "string"
+                },
+                "tahun_aktif": {
+                    "type": "integer"
+                },
+                "target": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/web.TargetIndikatorResponse"
+                    }
+                }
+            }
+        },
+        "web.IndikatorTujuanPenetapanResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "indikator": {
+                    "type": "string"
+                },
+                "rumus_perhitungan": {
+                    "type": "string"
+                },
+                "sumber_data": {
+                    "type": "string"
+                },
+                "tahun_aktif": {
+                    "type": "integer"
+                },
+                "target": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/web.TargetIndikatorResponse"
+                    }
+                }
+            }
+        },
+        "web.Response-web_HealthcheckResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/web.HealthcheckResponse"
+                }
+            }
+        },
+        "web.SasaranPenetapanOpdResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "indikator": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/web.IndikatorSasaranPenetapanResponse"
+                    }
+                },
+                "kode_opd": {
+                    "type": "string"
+                },
+                "kode_sasaran_opd": {
+                    "type": "string"
+                },
+                "periode": {
+                    "type": "string"
+                },
+                "sasaran_opd": {
+                    "type": "string"
+                },
+                "tahun_aktif": {
+                    "type": "integer"
+                }
+            }
+        },
+        "web.TargetIndikatorResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "satuan": {
+                    "type": "string"
+                },
+                "tahun": {
+                    "type": "integer"
+                },
+                "target": {
+                    "type": "number"
+                }
+            }
+        },
+        "web.TujuanPenetapanOpdResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "indikator": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/web.IndikatorTujuanPenetapanResponse"
+                    }
+                },
+                "kode_opd": {
+                    "type": "string"
+                },
+                "kode_tujuan_opd": {
+                    "type": "string"
+                },
+                "periode": {
+                    "type": "string"
+                },
+                "tahun_aktif": {
+                    "type": "integer"
+                },
+                "tujuan_opd": {
+                    "type": "string"
                 }
             }
         }
@@ -44,12 +334,12 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "",
+	Version:          "1.0",
 	Host:             "",
-	BasePath:         "",
-	Schemes:          []string{},
-	Title:            "",
-	Description:      "",
+	BasePath:         "/",
+	Schemes:          []string{"http", "https"},
+	Title:            "Penetapan Service",
+	Description:      "Service snapshot penetapan tujuan, sasaran, renja, rekin untuk pemda, opd, dan individu",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

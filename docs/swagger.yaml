@@ -1,20 +1,218 @@
+basePath: /
+definitions:
+  web.ErrorResponse:
+    properties:
+      error: {}
+    type: object
+  web.HealthcheckResponse:
+    properties:
+      status:
+        type: string
+      system_info:
+        $ref: '#/definitions/web.HealthcheckSystemInfo'
+    type: object
+  web.HealthcheckSystemInfo:
+    properties:
+      environment:
+        type: string
+      version:
+        type: string
+    type: object
+  web.IndikatorSasaranPenetapanResponse:
+    properties:
+      id:
+        type: integer
+      indikator:
+        type: string
+      rumus_perhitungan:
+        type: string
+      sumber_data:
+        type: string
+      tahun_aktif:
+        type: integer
+      target:
+        items:
+          $ref: '#/definitions/web.TargetIndikatorResponse'
+        type: array
+    type: object
+  web.IndikatorTujuanPenetapanResponse:
+    properties:
+      id:
+        type: integer
+      indikator:
+        type: string
+      rumus_perhitungan:
+        type: string
+      sumber_data:
+        type: string
+      tahun_aktif:
+        type: integer
+      target:
+        items:
+          $ref: '#/definitions/web.TargetIndikatorResponse'
+        type: array
+    type: object
+  web.Response-web_HealthcheckResponse:
+    properties:
+      data:
+        $ref: '#/definitions/web.HealthcheckResponse'
+    type: object
+  web.SasaranPenetapanOpdResponse:
+    properties:
+      id:
+        type: integer
+      indikator:
+        items:
+          $ref: '#/definitions/web.IndikatorSasaranPenetapanResponse'
+        type: array
+      kode_opd:
+        type: string
+      kode_sasaran_opd:
+        type: string
+      periode:
+        type: string
+      sasaran_opd:
+        type: string
+      tahun_aktif:
+        type: integer
+    type: object
+  web.TargetIndikatorResponse:
+    properties:
+      id:
+        type: integer
+      satuan:
+        type: string
+      tahun:
+        type: integer
+      target:
+        type: number
+    type: object
+  web.TujuanPenetapanOpdResponse:
+    properties:
+      id:
+        type: integer
+      indikator:
+        items:
+          $ref: '#/definitions/web.IndikatorTujuanPenetapanResponse'
+        type: array
+      kode_opd:
+        type: string
+      kode_tujuan_opd:
+        type: string
+      periode:
+        type: string
+      tahun_aktif:
+        type: integer
+      tujuan_opd:
+        type: string
+    type: object
 info:
-  contact: {}
+  contact:
+    name: Kertaskerja Dev Team
+  description: Service snapshot penetapan tujuan, sasaran, renja, rekin untuk pemda,
+    opd, dan individu
+  termsOfService: http://swagger.io/terms/
+  title: Penetapan Service
+  version: "1.0"
 paths:
-  /v1/healthcheck:
+  /healthcheck:
     get:
-      consumes:
-      - application/json
-      description: checking is this service is accessible
+      description: checking if this service is accessible
       produces:
       - application/json
       responses:
         "200":
-          description: Service is healthy
+          description: OK
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/web.Response-web_HealthcheckResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
       summary: healthcheck
       tags:
       - healthcheck
+  /opd/sasaran:
+    get:
+      consumes:
+      - application/json
+      description: Mengambil data sasaran OPD berdasarkan kode OPD dan tahun penetapan
+      parameters:
+      - description: Kode OPD
+        in: query
+        name: kodeOpd
+        required: true
+        type: string
+      - description: Tahun Penetapan
+        in: query
+        name: tahun
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Berhasil mengambil data sasaran OPD
+          schema:
+            items:
+              $ref: '#/definitions/web.SasaranPenetapanOpdResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get sasaran OPD penetapan
+      tags:
+      - OPD
+  /opd/tujuan:
+    get:
+      consumes:
+      - application/json
+      description: Mengambil data tujuan OPD berdasarkan kode OPD dan tahun penetapan
+      parameters:
+      - description: Kode OPD
+        in: query
+        name: kodeOpd
+        required: true
+        type: string
+      - description: Tahun Penetapan
+        in: query
+        name: tahun
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Berhasil mengambil data tujuan OPD
+          schema:
+            items:
+              $ref: '#/definitions/web.TujuanPenetapanOpdResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get tujuan OPD penetapan
+      tags:
+      - OPD
+schemes:
+- http
+- https
 swagger: "2.0"

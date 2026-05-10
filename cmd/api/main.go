@@ -8,6 +8,13 @@ import (
 	"time"
 )
 
+// @title           Penetapan Service
+// @version         1.0
+// @description     Service snapshot penetapan tujuan, sasaran, renja, rekin untuk pemda, opd, dan individu
+// @termsOfService  http://swagger.io/terms/
+// @contact.name    Kertaskerja Dev Team
+// @schemes http https
+// @BasePath  /
 func main() {
 
 	logger := slog.New(

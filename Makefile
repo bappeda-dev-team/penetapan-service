@@ -12,7 +12,7 @@ test:
 	go test ./...
 
 swagger:
-	swag init -g ./cmd/api/main.go
+	swag init -d cmd/api,internal/api,internal/model/web
 
 clean:
 	rm -f ./bin/$(APP_NAME)

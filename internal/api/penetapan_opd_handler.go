@@ -19,9 +19,9 @@ import (
 // @Param       kodeOpd query string true "Kode OPD"
 // @Param       tahun   query int    true "Tahun Penetapan"
 //
-// @Success     200 {array}  web.TujuanPenetapanOpdResponse "Berhasil mengambil data tujuan OPD"
-// @Failure     400 {object} map[string]string              "Bad Request"
-// @Failure     500 {object} map[string]string              "Internal Server Error"
+// @Success     200 {array}  web.Response[web.TujuanPenetapanOpdResponse] "Berhasil mengambil data tujuan OPD"
+// @Failure     400 {object} web.ErrorResponse               "Bad Request"
+// @Failure     500 {object} web.ErrorResponse               "Internal Server Error"
 //
 // @Router      /opd/tujuan [get]
 func (app *Application) TujuanOpdHandler(
@@ -87,9 +87,9 @@ func (app *Application) TujuanOpdHandler(
 // @Param       kodeOpd query string true "Kode OPD"
 // @Param       tahun   query int    true "Tahun Penetapan"
 //
-// @Success     200 {array}  web.SasaranPenetapanOpdResponse "Berhasil mengambil data sasaran OPD"
-// @Failure     400 {object} map[string]string               "Bad Request"
-// @Failure     500 {object} map[string]string               "Internal Server Error"
+// @Success     200 {array}  web.Response[web.SasaranPenetapanOpdResponse] "Berhasil mengambil data sasaran OPD"
+// @Failure     400 {object} web.ErrorResponse               "Bad Request"
+// @Failure     500 {object} web.ErrorResponse               "Internal Server Error"
 //
 // @Router      /opd/sasaran [get]
 func (app *Application) SasaranOpdHandler(
