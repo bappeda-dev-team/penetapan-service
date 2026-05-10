@@ -24,15 +24,16 @@ func loadConfig(logger *slog.Logger) api.Config {
 		"development",
 	)
 
+	cfg.Port = getIntEnv(
+		"APP_PORT",
+		4000,
+	)
+
 	cfg.DB.Dsn = getRequiredEnv(
 		logger,
 		"DB_DSN",
 	)
 
-	cfg.Port = getIntEnv(
-		"APP_PORT",
-		4000,
-	)
 
 	return cfg
 }
