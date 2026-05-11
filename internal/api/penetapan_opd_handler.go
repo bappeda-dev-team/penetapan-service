@@ -37,27 +37,28 @@ func (app *Application) TujuanOpdHandler(
 		Tahun:   tahun,
 	}
 
-	validationErrors := map[string]string{}
+	errors := map[string]string{}
 
 	if request.KodeOpd == "" {
-		validationErrors["kode_opd"] = "required"
+		errors["kode_opd"] = "required"
 	}
+
 	if request.Tahun == "" {
-
-		validationErrors["tahun"] = "required"
-
+		errors["tahun"] = "required"
 	} else {
 		_, err := strconv.Atoi(request.Tahun)
 		if err != nil {
-			validationErrors["tahun"] = "tahun tidak valid"
+			errors["tahun"] = "tahun tidak valid"
 		}
 	}
 
-	if len(validationErrors) > 0 {
+	if len(errors) > 0 {
 		app.BadRequestResponse(
 			w,
 			r,
-			validationErrors,
+			web.ValidationErrorResponse{
+				Error: errors,
+			},
 		)
 		return
 	}
@@ -105,27 +106,28 @@ func (app *Application) SasaranOpdHandler(
 		Tahun:   tahun,
 	}
 
-	validationErrors := map[string]string{}
+	errors := map[string]string{}
 
 	if request.KodeOpd == "" {
-		validationErrors["kode_opd"] = "required"
+		errors["kode_opd"] = "required"
 	}
+
 	if request.Tahun == "" {
-
-		validationErrors["tahun"] = "required"
-
+		errors["tahun"] = "required"
 	} else {
 		_, err := strconv.Atoi(request.Tahun)
 		if err != nil {
-			validationErrors["tahun"] = "tahun tidak valid"
+			errors["tahun"] = "tahun tidak valid"
 		}
 	}
 
-	if len(validationErrors) > 0 {
+	if len(errors) > 0 {
 		app.BadRequestResponse(
 			w,
 			r,
-			validationErrors,
+			web.ValidationErrorResponse{
+				Error: errors,
+			},
 		)
 		return
 	}
