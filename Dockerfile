@@ -1,38 +1,22 @@
 ARG GO_VERSION=1.25.0
-ARG APP_NAME=penetapan-service
 
-# =========================
-# Build Stage
-# =========================
-FROM golang:${GO_VERSION}-alpine AS builder
+FROM registry.docker.com/library/golang:$GO_VERSION-alpine AS base
 
+# app lives here
 WORKDIR /app
 
-RUN apk add --no-cache git make
 
-COPY go.mod go.sum ./
-RUN go mod download
+# Throw-away build stage to reduce size of final image
+FROM base AS build
+
+# Install packages needed to build
+RUN apk update -qq && \
+    apk add --no-cache git make
 
 COPY . .
 
-RUN mkdir -p /app/bin
+RUN make build
 
-RUN CGO_ENABLED=0 GOOS=linux go build \
-    -ldflags="-s -w" \
-    -o /app/bin/${APP_NAME} \
-    ./cmd/api
+ENTRYPOINT ["/app/bin/penetapan-service"]
 
-# =========================
-# Runtime Stage
-# =========================
-FROM alpine:latest
-
-ARG APP_NAME=penetapan-service
-
-WORKDIR /app
-
-COPY --from=builder /app/bin/${APP_NAME} /app/${APP_NAME}
-
-EXPOSE 8080
-
-ENTRYPOINT ["/app/penetapan-service"]
+CMD ["app/bin/penetapan-service"]

@@ -1,6 +1,6 @@
 APP_NAME=penetapan-service
 
-.PHONY: build run clean test swagger
+.PHONY: build run clean test swagger build-image
 
 build:
 	go build -o ./bin/$(APP_NAME) ./cmd/api
@@ -16,3 +16,6 @@ swagger:
 
 clean:
 	rm -f ./bin/$(APP_NAME)
+
+build-image:
+	@docker build . -t $(APP_NAME)
