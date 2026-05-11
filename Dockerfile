@@ -15,9 +15,11 @@ RUN go mod download
 
 COPY . .
 
+RUN mkdir -p /app/bin
+
 RUN CGO_ENABLED=0 GOOS=linux go build \
     -ldflags="-s -w" \
-    -o /bin/${APP_NAME} \
+    -o /app/bin/${APP_NAME} \
     ./cmd/api
 
 # =========================
@@ -29,7 +31,7 @@ ARG APP_NAME=penetapan-service
 
 WORKDIR /app
 
-COPY --from=builder /bin/${APP_NAME} /app/${APP_NAME}
+COPY --from=builder /app/bin/${APP_NAME} /app/${APP_NAME}
 
 EXPOSE 8080
 
