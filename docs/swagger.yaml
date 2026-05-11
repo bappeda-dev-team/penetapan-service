@@ -57,6 +57,16 @@ definitions:
       data:
         $ref: '#/definitions/web.HealthcheckResponse'
     type: object
+  web.Response-web_SasaranPenetapanOpdResponse:
+    properties:
+      data:
+        $ref: '#/definitions/web.SasaranPenetapanOpdResponse'
+    type: object
+  web.Response-web_TujuanPenetapanOpdResponse:
+    properties:
+      data:
+        $ref: '#/definitions/web.TujuanPenetapanOpdResponse'
+    type: object
   web.SasaranPenetapanOpdResponse:
     properties:
       id:
@@ -155,20 +165,16 @@ paths:
           description: Berhasil mengambil data sasaran OPD
           schema:
             items:
-              $ref: '#/definitions/web.SasaranPenetapanOpdResponse'
+              $ref: '#/definitions/web.Response-web_SasaranPenetapanOpdResponse'
             type: array
         "400":
           description: Bad Request
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/web.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/web.ErrorResponse'
       summary: Get sasaran OPD penetapan
       tags:
       - OPD
@@ -195,20 +201,16 @@ paths:
           description: Berhasil mengambil data tujuan OPD
           schema:
             items:
-              $ref: '#/definitions/web.TujuanPenetapanOpdResponse'
+              $ref: '#/definitions/web.Response-web_TujuanPenetapanOpdResponse'
             type: array
         "400":
           description: Bad Request
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/web.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/web.ErrorResponse'
       summary: Get tujuan OPD penetapan
       tags:
       - OPD

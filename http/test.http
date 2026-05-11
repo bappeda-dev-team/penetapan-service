@@ -11,6 +11,9 @@ POST :baseUrl/healthcheck
 ## ERROR NOT FOUND
 POST :baseUrl/healthcheck/123
 
+# SWAGGER
+GET :baseUrl/v3/api-docs
+
 
 # OPD
 ## TUJUAN OPD PENETAPAN

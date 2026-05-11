@@ -79,26 +79,20 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/web.SasaranPenetapanOpdResponse"
+                                "$ref": "#/definitions/web.Response-web_SasaranPenetapanOpdResponse"
                             }
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -139,26 +133,20 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/web.TujuanPenetapanOpdResponse"
+                                "$ref": "#/definitions/web.Response-web_TujuanPenetapanOpdResponse"
                             }
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/web.ErrorResponse"
                         }
                     }
                 }
@@ -251,6 +239,22 @@ const docTemplate = `{
             "properties": {
                 "data": {
                     "$ref": "#/definitions/web.HealthcheckResponse"
+                }
+            }
+        },
+        "web.Response-web_SasaranPenetapanOpdResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/web.SasaranPenetapanOpdResponse"
+                }
+            }
+        },
+        "web.Response-web_TujuanPenetapanOpdResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/web.TujuanPenetapanOpdResponse"
                 }
             }
         },
