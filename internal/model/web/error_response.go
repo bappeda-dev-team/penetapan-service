@@ -5,5 +5,5 @@ type ErrorResponse struct {
 }
 
 type ValidationErrorResponse struct {
-	Error map[string]string `json:"error"`
+	Error map[string]string `json:"error" example:"kodeOpd:required,tahun:required"`
 }

@@ -20,8 +20,8 @@ import (
 // @Param       tahun   query int    true "Tahun Penetapan"
 //
 // @Success     200 {array}  web.Response[web.TujuanPenetapanOpdResponse] "Berhasil mengambil data tujuan OPD"
-// @Failure     400 {object} web.ErrorResponse               "Bad Request"
-// @Failure     500 {object} web.ErrorResponse               "Internal Server Error"
+// @Failure     400 {object} web.ValidationErrorResponse                  "Bad Request"
+// @Failure     500 {object} web.ErrorResponse                            "Internal Server Error"
 //
 // @Router      /opd/tujuan [get]
 func (app *Application) TujuanOpdHandler(
@@ -40,7 +40,7 @@ func (app *Application) TujuanOpdHandler(
 	errors := map[string]string{}
 
 	if request.KodeOpd == "" {
-		errors["kode_opd"] = "required"
+		errors["kodeOpd"] = "required"
 	}
 
 	if request.Tahun == "" {
@@ -89,8 +89,8 @@ func (app *Application) TujuanOpdHandler(
 // @Param       tahun   query int    true "Tahun Penetapan"
 //
 // @Success     200 {array}  web.Response[web.SasaranPenetapanOpdResponse] "Berhasil mengambil data sasaran OPD"
-// @Failure     400 {object} web.ErrorResponse               "Bad Request"
-// @Failure     500 {object} web.ErrorResponse               "Internal Server Error"
+// @Failure     400 {object} web.ValidationErrorResponse                   "Bad Request"
+// @Failure     500 {object} web.ErrorResponse                             "Internal Server Error"
 //
 // @Router      /opd/sasaran [get]
 func (app *Application) SasaranOpdHandler(

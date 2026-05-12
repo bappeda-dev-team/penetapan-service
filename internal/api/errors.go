@@ -65,5 +65,10 @@ func (app *Application) MethodNotAllowedResponse(w http.ResponseWriter, r *http.
 // the badRequestResponse() method will be used to send a 400 Bad Request
 // status code and JSON response to the client
 func (app *Application) BadRequestResponse(w http.ResponseWriter, r *http.Request, message any) {
-	app.errorResponse(w, r, http.StatusBadRequest, message)
+	status := http.StatusBadRequest
+	err := app.WriteJSON(w, status, message, nil)
+	if err != nil {
+		app.logError(r, err)
+		w.WriteHeader(http.StatusInternalServerError)
+	}
 }

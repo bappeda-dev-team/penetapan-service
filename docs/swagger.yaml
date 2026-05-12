@@ -38,14 +38,19 @@ definitions:
   web.IndikatorTujuanPenetapanResponse:
     properties:
       id:
+        example: 1
         type: integer
       indikator:
+        example: Indikator kepuasa publik
         type: string
       rumus_perhitungan:
+        example: indeks kepuasan masyarakat
         type: string
       sumber_data:
+        example: bps
         type: string
       tahun_aktif:
+        example: 2025
         type: integer
       target:
         items:
@@ -89,32 +94,52 @@ definitions:
   web.TargetIndikatorResponse:
     properties:
       id:
+        example: 1
         type: integer
       satuan:
+        example: '%'
         type: string
       tahun:
+        example: 2025
         type: integer
       target:
+        example: 100
         type: number
     type: object
   web.TujuanPenetapanOpdResponse:
     properties:
       id:
+        example: 1
         type: integer
       indikator:
         items:
           $ref: '#/definitions/web.IndikatorTujuanPenetapanResponse'
         type: array
       kode_opd:
+        example: 1.02.0.00.0.00.01.0000
         type: string
       kode_tujuan_opd:
+        example: TUJ-001
         type: string
       periode:
+        example: 2025-2029
         type: string
       tahun_aktif:
+        example: 2025
         type: integer
       tujuan_opd:
+        example: Meningkatkan kualitas pelayanan publik
         type: string
+    type: object
+  web.ValidationErrorResponse:
+    properties:
+      error:
+        additionalProperties:
+          type: string
+        example:
+          kodeOpd: required
+          tahun: required
+        type: object
     type: object
 info:
   contact:
@@ -170,7 +195,7 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/web.ErrorResponse'
+            $ref: '#/definitions/web.ValidationErrorResponse'
         "500":
           description: Internal Server Error
           schema:

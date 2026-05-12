@@ -86,7 +86,7 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/web.ErrorResponse"
+                            "$ref": "#/definitions/web.ValidationErrorResponse"
                         }
                     },
                     "500": {
@@ -212,19 +212,24 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "indikator": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Indikator kepuasa publik"
                 },
                 "rumus_perhitungan": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "indeks kepuasan masyarakat"
                 },
                 "sumber_data": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "bps"
                 },
                 "tahun_aktif": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 2025
                 },
                 "target": {
                     "type": "array",
@@ -291,16 +296,20 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "satuan": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "%"
                 },
                 "tahun": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 2025
                 },
                 "target": {
-                    "type": "number"
+                    "type": "number",
+                    "example": 100
                 }
             }
         },
@@ -308,7 +317,8 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "indikator": {
                     "type": "array",
@@ -317,19 +327,39 @@ const docTemplate = `{
                     }
                 },
                 "kode_opd": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "1.02.0.00.0.00.01.0000"
                 },
                 "kode_tujuan_opd": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "TUJ-001"
                 },
                 "periode": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "2025-2029"
                 },
                 "tahun_aktif": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 2025
                 },
                 "tujuan_opd": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Meningkatkan kualitas pelayanan publik"
+                }
+            }
+        },
+        "web.ValidationErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "kodeOpd": "required",
+                        "tahun": "required"
+                    }
                 }
             }
         }
