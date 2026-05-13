@@ -92,29 +92,41 @@ func (app *Application) TujuanOpdHandler(
 	w http.ResponseWriter,
 	r *http.Request,
 ) {
-	// query
+
 	query := r.URL.Query()
+
 	errors := map[string]string{}
 
 	kodeOpd := query.Get("kodeOpd")
-	tahun, err := strconv.Atoi(query.Get("tahun"))
-	if err != nil {
-		errors["tahun"] = "tahun tidak valid"
-	}
-	request := domain.PenetapanOpdRequest{
-		KodeOpd: kodeOpd,
-		Tahun:   tahun,
+
+	tahunStr := query.Get("tahun")
+
+	var tahun int
+
+	if kodeOpd == "" {
+		errors["kode_opd"] = "required"
 	}
 
-	if request.KodeOpd == "" {
-		errors["kodeOpd"] = "required"
-	}
+	if tahunStr == "" {
 
-	if request.Tahun == 0 {
 		errors["tahun"] = "required"
+
+	} else {
+
+		parsedTahun, err := strconv.Atoi(tahunStr)
+
+		if err != nil {
+
+			errors["tahun"] = "tahun tidak valid"
+
+		} else {
+
+			tahun = parsedTahun
+		}
 	}
 
 	if len(errors) > 0 {
+
 		app.BadRequestResponse(
 			w,
 			r,
@@ -122,20 +134,43 @@ func (app *Application) TujuanOpdHandler(
 				Error: errors,
 			},
 		)
+
 		return
 	}
 
-	result, err := app.PenetapanOpdService.FindTujuan(r.Context(), request)
+	request := domain.PenetapanOpdRequest{
+		KodeOpd: kodeOpd,
+		Tahun:   tahun,
+	}
+
+	result, err := app.PenetapanOpdService.FindTujuan(
+		r.Context(),
+		request,
+	)
+
 	if err != nil {
+
 		app.ServerErrorResponse(w, r, err)
+
+		return
 	}
 
 	response := web.Response[[]web.TujuanPenetapanOpdResponse]{
 		Data: result,
 	}
-	err = app.WriteJSON(w, http.StatusOK, response, nil)
+
+	err = app.WriteJSON(
+		w,
+		http.StatusOK,
+		response,
+		nil,
+	)
+
 	if err != nil {
+
 		app.ServerErrorResponse(w, r, err)
+
+		return
 	}
 }
 

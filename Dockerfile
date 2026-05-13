@@ -15,6 +15,8 @@ RUN apk update -qq && \
 
 COPY . .
 
+RUN make clean
+
 RUN make build
 
 ENTRYPOINT ["/app/bin/penetapan-service"]
