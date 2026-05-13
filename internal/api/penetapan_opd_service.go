@@ -213,8 +213,8 @@ func (s *PenetapanOpdService) SyncPenetapanOpd(
 		ProcessedAt:    processedAt,
 		ProcessedSummary: web.SyncPenetapanOpdSummary{
 			Tujuan:    &jumlahTujuan,
-			Indikator: 3,
-			Target:    1,
+			Indikator: jumlahIndikator,
+			Target:    jumlahTarget,
 		},
 	}, nil
 }
