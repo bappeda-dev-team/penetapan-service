@@ -15,9 +15,8 @@ CREATE TABLE tb_tujuan_penetapan_opd (
 
     last_modified_date TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
-    created_by VARCHAR(100),
+    created_by VARCHAR(100)
 
-    UNIQUE(kode_opd, kode_tujuan_opd, tahun_aktif)
 );
 
 CREATE INDEX idx_tujuan_penetapan_opd_kode_tahun
@@ -30,6 +29,8 @@ CREATE TABLE tb_indikator_tujuan_penetapan_opd (
 
     id_tujuan_opd BIGINT NOT NULL,
 
+    kode_indikator VARCHAR(255),
+
     kode_opd VARCHAR(50) NOT NULL,
 
     indikator TEXT NOT NULL,
@@ -37,6 +38,8 @@ CREATE TABLE tb_indikator_tujuan_penetapan_opd (
     rumus_perhitungan TEXT,
 
     sumber_data TEXT,
+
+    definisi_operasional TEXT,
 
     tahun_aktif INTEGER NOT NULL,
 
@@ -50,6 +53,7 @@ CREATE TABLE tb_indikator_tujuan_penetapan_opd (
         FOREIGN KEY(id_tujuan_opd)
         REFERENCES tb_tujuan_penetapan_opd(id)
         ON DELETE CASCADE
+
 );
 
 CREATE INDEX idx_indikator_tujuan_penetapan_parent
@@ -84,6 +88,7 @@ CREATE TABLE tb_target_indikator_tujuan_penetapan_opd (
 
     CONSTRAINT uq_target_tujuan_tahun
         UNIQUE(indikator_tujuan_id, tahun)
+
 );
 
 CREATE INDEX idx_target_indikator_tujuan_parent
@@ -108,9 +113,8 @@ CREATE TABLE tb_sasaran_penetapan_opd (
 
     last_modified_date TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
-    created_by VARCHAR(100),
+    created_by VARCHAR(100)
 
-    UNIQUE(kode_opd, kode_sasaran_opd, tahun_aktif)
 );
 
 CREATE INDEX idx_sasaran_penetapan_opd_kode_tahun
@@ -122,6 +126,8 @@ CREATE TABLE tb_indikator_sasaran_penetapan_opd (
     id BIGSERIAL PRIMARY KEY NOT NULL,
 
     id_sasaran_opd BIGINT NOT NULL,
+
+    kode_indikator VARCHAR(255),
 
     kode_opd VARCHAR(50) NOT NULL,
 
@@ -143,6 +149,7 @@ CREATE TABLE tb_indikator_sasaran_penetapan_opd (
         FOREIGN KEY(id_sasaran_opd)
         REFERENCES tb_sasaran_penetapan_opd(id)
         ON DELETE CASCADE
+
 );
 
 CREATE INDEX idx_indikator_sasaran_penetapan_parent

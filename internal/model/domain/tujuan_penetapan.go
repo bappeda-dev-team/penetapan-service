@@ -12,4 +12,7 @@ type TujuanPenetapanOpd struct {
 	CreatedDate      time.Time
 	LastModifiedDate time.Time
 	CreatedBy        *string
+	PenetapanId      int64
+	Versi            int
+	Indikator        []IndikatorTujuanPenetapanOpd
 }

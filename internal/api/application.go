@@ -15,6 +15,16 @@ type Config struct {
 	DB struct {
 		Dsn string
 	}
+
+	Services struct {
+		Perencanaan ServiceConfig
+	}
+}
+
+// ServiceConfig used for external services
+type ServiceConfig struct {
+	BaseURL string
+	ApiPath string
 }
 
 // hold application dependencies for

@@ -3,8 +3,12 @@ package main
 import (
 	"database/sql"
 	"log/slog"
+	"time"
 
 	"github.com/bappeda-dev-team/penetapan-service/internal/api"
+	"github.com/bappeda-dev-team/penetapan-service/internal/client/perencanaan"
+
+	"net/http"
 )
 
 // buildApplication adalah fungsi untuk injeksi repo dan service
@@ -20,9 +24,19 @@ func buildApplication(
 		DB: db,
 	}
 
+	// external service
+	// perencanaan
+	perencanaan := perencanaan.NewPerencanaanClient(
+		cfg.Services.Perencanaan.BaseURL,
+		cfg.Services.Perencanaan.ApiPath,
+		&http.Client{Timeout: 60 * time.Second},
+	)
+
 	// service
 	penetapanOpdService := &api.PenetapanOpdService{
-		Repo: penetapanOpdRepo,
+		Repo:        penetapanOpdRepo,
+		Perencanaan: perencanaan,
+		Logger:      logger,
 	}
 
 	// application

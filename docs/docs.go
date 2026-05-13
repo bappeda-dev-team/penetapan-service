@@ -98,6 +98,65 @@ const docTemplate = `{
                 }
             }
         },
+        "/opd/sync_penetapan": {
+            "post": {
+                "description": "Sinkron data penetapan OPD berdasarkan kode OPD, tahun dan jenis penetapan dari perencanaan",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sync",
+                    "Opd"
+                ],
+                "summary": "Sync Penetapan OPD",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Kode OPD",
+                        "name": "kode_opd",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Tahun Penetapan",
+                        "name": "tahun",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Jenis Penetapan",
+                        "name": "jenis_penetapan",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Berhasil mengambil data tujuan OPD",
+                        "schema": {
+                            "$ref": "#/definitions/web.Response-web_SyncPenetapanOpdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/web.ValidationErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/web.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/opd/tujuan": {
             "get": {
                 "description": "Mengambil data tujuan OPD berdasarkan kode OPD dan tahun penetapan",
@@ -140,7 +199,7 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/web.ErrorResponse"
+                            "$ref": "#/definitions/web.ValidationErrorResponse"
                         }
                     },
                     "500": {
@@ -211,9 +270,17 @@ const docTemplate = `{
         "web.IndikatorTujuanPenetapanResponse": {
             "type": "object",
             "properties": {
+                "definisi_operasional": {
+                    "type": "string",
+                    "example": "definisi abc"
+                },
                 "id": {
                     "type": "integer",
                     "example": 1
+                },
+                "id_tujuan_opd": {
+                    "type": "integer",
+                    "example": 12
                 },
                 "indikator": {
                     "type": "string",
@@ -255,6 +322,14 @@ const docTemplate = `{
                 }
             }
         },
+        "web.Response-web_SyncPenetapanOpdResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/web.SyncPenetapanOpdResponse"
+                }
+            }
+        },
         "web.Response-web_TujuanPenetapanOpdResponse": {
             "type": "object",
             "properties": {
@@ -292,12 +367,71 @@ const docTemplate = `{
                 }
             }
         },
+        "web.SyncPenetapanOpdResponse": {
+            "type": "object",
+            "properties": {
+                "jenis_penetapan": {
+                    "type": "string",
+                    "example": "tujuan"
+                },
+                "kode_opd": {
+                    "type": "string",
+                    "example": "1.22.33"
+                },
+                "processed_at": {
+                    "type": "string"
+                },
+                "processed_summary": {
+                    "$ref": "#/definitions/web.SyncPenetapanOpdSummary"
+                },
+                "status": {
+                    "type": "string",
+                    "example": "SUCCESS"
+                },
+                "sync_id": {
+                    "type": "integer",
+                    "example": 155
+                },
+                "tahun": {
+                    "type": "integer",
+                    "example": 2025
+                }
+            }
+        },
+        "web.SyncPenetapanOpdSummary": {
+            "type": "object",
+            "properties": {
+                "indikator": {
+                    "type": "integer",
+                    "example": 3
+                },
+                "renja": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "sasaran": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "target": {
+                    "type": "integer",
+                    "example": 4
+                },
+                "tujuan": {
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
         "web.TargetIndikatorResponse": {
             "type": "object",
             "properties": {
                 "id": {
                     "type": "integer",
                     "example": 1
+                },
+                "indikator_id": {
+                    "type": "integer"
                 },
                 "satuan": {
                     "type": "string",
@@ -345,6 +479,10 @@ const docTemplate = `{
                 "tujuan_opd": {
                     "type": "string",
                     "example": "Meningkatkan kualitas pelayanan publik"
+                },
+                "versi": {
+                    "type": "integer",
+                    "example": 1
                 }
             }
         },

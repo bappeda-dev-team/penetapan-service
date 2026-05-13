@@ -37,8 +37,14 @@ definitions:
     type: object
   web.IndikatorTujuanPenetapanResponse:
     properties:
+      definisi_operasional:
+        example: definisi abc
+        type: string
       id:
         example: 1
+        type: integer
+      id_tujuan_opd:
+        example: 12
         type: integer
       indikator:
         example: Indikator kepuasa publik
@@ -67,6 +73,11 @@ definitions:
       data:
         $ref: '#/definitions/web.SasaranPenetapanOpdResponse'
     type: object
+  web.Response-web_SyncPenetapanOpdResponse:
+    properties:
+      data:
+        $ref: '#/definitions/web.SyncPenetapanOpdResponse'
+    type: object
   web.Response-web_TujuanPenetapanOpdResponse:
     properties:
       data:
@@ -91,10 +102,52 @@ definitions:
       tahun_aktif:
         type: integer
     type: object
+  web.SyncPenetapanOpdResponse:
+    properties:
+      jenis_penetapan:
+        example: tujuan
+        type: string
+      kode_opd:
+        example: 1.22.33
+        type: string
+      processed_at:
+        type: string
+      processed_summary:
+        $ref: '#/definitions/web.SyncPenetapanOpdSummary'
+      status:
+        example: SUCCESS
+        type: string
+      sync_id:
+        example: 155
+        type: integer
+      tahun:
+        example: 2025
+        type: integer
+    type: object
+  web.SyncPenetapanOpdSummary:
+    properties:
+      indikator:
+        example: 3
+        type: integer
+      renja:
+        example: 1
+        type: integer
+      sasaran:
+        example: 1
+        type: integer
+      target:
+        example: 4
+        type: integer
+      tujuan:
+        example: 1
+        type: integer
+    type: object
   web.TargetIndikatorResponse:
     properties:
       id:
         example: 1
+        type: integer
+      indikator_id:
         type: integer
       satuan:
         example: '%'
@@ -130,6 +183,9 @@ definitions:
       tujuan_opd:
         example: Meningkatkan kualitas pelayanan publik
         type: string
+      versi:
+        example: 1
+        type: integer
     type: object
   web.ValidationErrorResponse:
     properties:
@@ -203,6 +259,47 @@ paths:
       summary: Get sasaran OPD penetapan
       tags:
       - OPD
+  /opd/sync_penetapan:
+    post:
+      consumes:
+      - application/json
+      description: Sinkron data penetapan OPD berdasarkan kode OPD, tahun dan jenis
+        penetapan dari perencanaan
+      parameters:
+      - description: Kode OPD
+        in: query
+        name: kode_opd
+        required: true
+        type: string
+      - description: Tahun Penetapan
+        in: query
+        name: tahun
+        required: true
+        type: integer
+      - description: Jenis Penetapan
+        in: query
+        name: jenis_penetapan
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Berhasil mengambil data tujuan OPD
+          schema:
+            $ref: '#/definitions/web.Response-web_SyncPenetapanOpdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/web.ValidationErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+      summary: Sync Penetapan OPD
+      tags:
+      - Sync
+      - Opd
   /opd/tujuan:
     get:
       consumes:
@@ -231,7 +328,7 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/web.ErrorResponse'
+            $ref: '#/definitions/web.ValidationErrorResponse'
         "500":
           description: Internal Server Error
           schema:

@@ -20,10 +20,13 @@ func (app *Application) Routes() http.Handler {
 	router.Handler(http.MethodGet, "/swagger/*filepath", httpSwagger.WrapHandler)
 
 	router.HandlerFunc(http.MethodGet, "/v3/api-docs", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "docs/swagger.json")
+		http.ServeFile(w, r, "./docs/swagger.json")
 	})
 
 	router.HandlerFunc(http.MethodGet, "/healthcheck", app.HealthcheckHandler)
+
+	// sync penetapan dari perencanaan
+	router.HandlerFunc(http.MethodPost, "/opd/sync_penetapan", app.SyncPenetapanOpdHandler)
 
 	// penetapan opd
 	router.HandlerFunc(http.MethodGet, "/opd/tujuan", app.TujuanOpdHandler)

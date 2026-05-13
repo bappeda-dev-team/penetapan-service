@@ -7,5 +7,6 @@ type TujuanPenetapanOpdResponse struct {
 	TujuanOpd     string                             `json:"tujuan_opd" example:"Meningkatkan kualitas pelayanan publik"`
 	Periode       string                             `json:"periode" example:"2025-2029"`
 	TahunAktif    int                                `json:"tahun_aktif" example:"2025"`
+	Versi         int                                `json:"versi" example:"1"`
 	Indikator     []IndikatorTujuanPenetapanResponse `json:"indikator"`
 }

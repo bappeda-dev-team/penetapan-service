@@ -13,6 +13,31 @@ func ToTujuanOpdResponse(tujuanOpd domain.TujuanPenetapanOpd) web.TujuanPenetapa
 		TujuanOpd:     tujuanOpd.TujuanOpd,
 		Periode:       tujuanOpd.Periode,
 		TahunAktif:    tujuanOpd.TahunAktif,
+		Versi:         tujuanOpd.Versi,
+		Indikator:     []web.IndikatorTujuanPenetapanResponse{},
+	}
+}
+
+func ToIndikatorTujuanOpdResponse(indikator domain.IndikatorTujuanPenetapanOpd) web.IndikatorTujuanPenetapanResponse {
+	return web.IndikatorTujuanPenetapanResponse{
+		Id:                  indikator.Id,
+		IdTujuanOpd:         indikator.IdTujuanOpd,
+		Indikator:           indikator.Indikator,
+		RumusPerhitungan:    indikator.RumusPerhitungan,
+		SumberData:          indikator.SumberData,
+		DefinisiOperasional: indikator.DefinisiOperasional,
+		TahunAktif:          indikator.TahunAktif,
+		Target:              []web.TargetIndikatorResponse{},
+	}
+}
+
+func ToTargetIndikatorTujuanOpdResponse(target domain.TargetIndikatorTujuanPenetapanOpd) web.TargetIndikatorResponse {
+	return web.TargetIndikatorResponse{
+		Id:          target.Id,
+		IndikatorId: target.IndikatorTujuanId,
+		Tahun:       target.Tahun,
+		Target:      target.Target,
+		Satuan:      target.Satuan,
 	}
 }
 

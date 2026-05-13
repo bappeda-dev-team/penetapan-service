@@ -34,6 +34,15 @@ func loadConfig(logger *slog.Logger) api.Config {
 		"DB_DSN",
 	)
 
+	cfg.Services.Perencanaan.BaseURL = getEnv(
+		"SERVICES_PERENCANAAN_BASE_URL",
+		"http://localhost:8080",
+	)
+
+	cfg.Services.Perencanaan.ApiPath = getEnv(
+		"SERVICES_PERENCANAAN_API_PATH",
+		"",
+	)
 
 	return cfg
 }
@@ -60,7 +69,6 @@ func getRequiredEnv(
 	return value
 }
 
-
 // getEnv adalah fungsi untuk mengambil env string
 // dengan default value
 func getEnv(
@@ -76,7 +84,6 @@ func getEnv(
 
 	return value
 }
-
 
 // getIntEnv adalah fungsi untuk mengambil env integer (angka)
 // dengan default value

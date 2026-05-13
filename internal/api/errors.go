@@ -72,3 +72,10 @@ func (app *Application) BadRequestResponse(w http.ResponseWriter, r *http.Reques
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 }
+
+// the FailedValidationResponse() method will be used to send a 400 Bad Request
+// for invalid form submit
+// from post request
+func (app *Application) FailedValidationResponse(w http.ResponseWriter, r *http.Request, errors map[string]string) {
+	app.errorResponse(w, r, http.StatusUnprocessableEntity, errors)
+}

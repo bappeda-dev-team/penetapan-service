@@ -6,7 +6,71 @@ import (
 
 	"github.com/bappeda-dev-team/penetapan-service/internal/model/domain"
 	"github.com/bappeda-dev-team/penetapan-service/internal/model/web"
+	"github.com/bappeda-dev-team/penetapan-service/internal/validator"
 )
+
+// SyncPenetapanOpdHandler godoc
+//
+// @Summary     Sync Penetapan OPD
+// @Description Sinkron data penetapan OPD berdasarkan kode OPD, tahun dan jenis penetapan dari perencanaan
+// @Tags        Sync,Opd
+// @Accept      json
+// @Produce     json
+//
+// @Param       kode_opd query string true "Kode OPD"
+// @Param       tahun   query int    true "Tahun Penetapan"
+// @Param       jenis_penetapan   query string    true "Jenis Penetapan"
+//
+// @Success     200 {object} web.Response[web.SyncPenetapanOpdResponse] "Berhasil mengambil data tujuan OPD"
+// @Failure     400 {object} web.ValidationErrorResponse                "Bad Request"
+// @Failure     500 {object} web.ErrorResponse                          "Internal Server Error"
+//
+// @Router      /opd/sync_penetapan [post]
+func (app *Application) SyncPenetapanOpdHandler(
+	w http.ResponseWriter,
+	r *http.Request,
+) {
+	input := web.SyncPenetapanOpdRequest{}
+	errors := map[string]string{}
+
+	err := app.ReadJSON(w, r, &input)
+	if err != nil {
+		errors["invalid_request"] = err.Error()
+		app.BadRequestResponse(
+			w,
+			r,
+			web.ValidationErrorResponse{
+				Error: errors,
+			},
+		)
+		return
+	}
+
+	request := &web.SyncPenetapanOpdRequest{
+		KodeOpd:        input.KodeOpd,
+		Tahun:          input.Tahun,
+		JenisPenetapan: input.JenisPenetapan,
+	}
+	v := validator.New()
+	if web.ValidateSyncPenetapanRequest(v, request); !v.Valid() {
+		app.FailedValidationResponse(w, r, v.Errors)
+		return
+	}
+
+	result, err := app.PenetapanOpdService.SyncPenetapanOpd(r.Context(), request)
+	if err != nil {
+		app.ServerErrorResponse(w, r, err)
+		return
+	}
+
+	response := web.Response[web.SyncPenetapanOpdResponse]{
+		Data: result,
+	}
+	err = app.WriteJSON(w, http.StatusOK, response, nil)
+	if err != nil {
+		app.ServerErrorResponse(w, r, err)
+	}
+}
 
 // TujuanOpdHandler godoc
 //
@@ -30,26 +94,24 @@ func (app *Application) TujuanOpdHandler(
 ) {
 	// query
 	query := r.URL.Query()
+	errors := map[string]string{}
+
 	kodeOpd := query.Get("kodeOpd")
-	tahun := query.Get("tahun")
+	tahun, err := strconv.Atoi(query.Get("tahun"))
+	if err != nil {
+		errors["tahun"] = "tahun tidak valid"
+	}
 	request := domain.PenetapanOpdRequest{
 		KodeOpd: kodeOpd,
 		Tahun:   tahun,
 	}
 
-	errors := map[string]string{}
-
 	if request.KodeOpd == "" {
 		errors["kodeOpd"] = "required"
 	}
 
-	if request.Tahun == "" {
+	if request.Tahun == 0 {
 		errors["tahun"] = "required"
-	} else {
-		_, err := strconv.Atoi(request.Tahun)
-		if err != nil {
-			errors["tahun"] = "tahun tidak valid"
-		}
 	}
 
 	if len(errors) > 0 {
@@ -99,26 +161,24 @@ func (app *Application) SasaranOpdHandler(
 ) {
 	// query
 	query := r.URL.Query()
+	errors := map[string]string{}
+
 	kodeOpd := query.Get("kodeOpd")
-	tahun := query.Get("tahun")
+	tahun, err := strconv.Atoi(query.Get("tahun"))
+	if err != nil {
+		errors["tahun"] = "tahun tidak valid"
+	}
 	request := domain.PenetapanOpdRequest{
 		KodeOpd: kodeOpd,
 		Tahun:   tahun,
 	}
 
-	errors := map[string]string{}
-
 	if request.KodeOpd == "" {
 		errors["kode_opd"] = "required"
 	}
 
-	if request.Tahun == "" {
+	if request.Tahun == 0 {
 		errors["tahun"] = "required"
-	} else {
-		_, err := strconv.Atoi(request.Tahun)
-		if err != nil {
-			errors["tahun"] = "tahun tidak valid"
-		}
 	}
 
 	if len(errors) > 0 {

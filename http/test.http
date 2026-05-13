@@ -16,11 +16,64 @@ GET :baseUrl/v3/api-docs
 
 
 # OPD
+## SYNC PENETAPAN OPD
+POST :baseUrl/opd/sync_penetapan
+Content-Type: application/json
+
+{
+    "kode_opd": "5.01.5.05.0.00.01.0000",
+    "tahun": 2026,
+    "jenis_penetapan": "tujuan"
+}
+
+## BAD REQUEST SYNC TUJUAN OPD PENETAPAN
+POST :baseUrl/opd/sync_penetapan
+Content-Type: application/json
+
+{
+    "kode_opd": "2.55.66",
+    "tahun": 2006
+}
+
+## BAD REQUEST SYNC TUJUAN OPD PENETAPAN
+POST :baseUrl/opd/sync_penetapan
+Content-Type: application/json
+
+{
+    "kode_opd": "2.55.66",
+    "tahun": 2020,
+    "jenisSync": ""
+}
+
+## BAD REQUEST NO BODY SYNC TUJUAN OPD PENETAPAN
+POST :baseUrl/opd/sync/tujuan
+Content-Type: application/json
+
+
 ## TUJUAN OPD PENETAPAN
-GET :baseUrl/opd/tujuan?kodeOpd=2.55.66&tahun=2026
+### OK
+GET :baseUrl/opd/tujuan?kodeOpd=5.01.5.05.0.00.01.0000&tahun=2026
+
+### BAD REQUEST
+GET :baseUrl/opd/tujuan
+
+### BAD REQUEST TAHUN REQUIRED
+GET :baseUrl/opd/tujuan?kodeOpd=2.55.66
+
+### BAD REQUEST TAHUN INVALID (not int)
+GET :baseUrl/opd/tujuan?kodeOpd=2.55.66&tahun=2026_error
 
 ## SASARAN OPD PENETAPAN
 GET :baseUrl/opd/sasaran?kodeOpd=2.55.66&tahun=2026
+
+### BAD REQUEST
+GET :baseUrl/opd/sasaran
+
+### BAD REQUEST TAHUN REQUIRED
+GET :baseUrl/opd/sasaran?kodeOpd=2.55.66
+
+### BAD REQUEST TAHUN INVALID (not int)
+GET :baseUrl/opd/sasaran?kodeOpd=2.55.66&tahun=2026_error
 
 ## RENJA PENETAPAN
 GET :baseUrl/opd/renja?kodeOpd=2.55.66&tahun=2026

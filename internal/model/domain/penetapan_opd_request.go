@@ -1,6 +1,7 @@
 package domain
 
 type PenetapanOpdRequest struct {
-	KodeOpd string
-	Tahun   string
+	KodeOpd    string
+	Tahun      int
+	SnapshotId int64
 }
