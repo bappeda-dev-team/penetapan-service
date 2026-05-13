@@ -1,9 +1,13 @@
 APP_NAME=penetapan-service
 
-.PHONY: build run clean test swagger build-image
+.PHONY: build run clean test swagger build-image build-docker
 
 build:
 	go build -o ./bin/$(APP_NAME) ./cmd/api
+
+build-docker:
+	CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" \
+	-o ./bin/$(APP_NAME) ./cmd/api
 
 run:
 	go run ./cmd/api

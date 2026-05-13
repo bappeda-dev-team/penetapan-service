@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -261,15 +262,18 @@ func (r *PenetapanOpdRepository) GetActiveSnapshot(
 	kodeOpd string,
 	jenisPenetapan string,
 	tahun int,
-) (int64, error) {
-	query := `SELECT id
-                  FROM penetapan_opd
- 		  WHERE kode_opd = $1
-		    AND jenis_penetapan = $2
-	            AND tahun = $3
-                    AND is_active = TRUE
-                   LIMIT 1
-		`
+) (*int64, error) {
+	query := `
+	    SELECT id
+	    FROM penetapan_opd
+	    WHERE
+	    	kode_opd = $1
+	    	AND jenis_penetapan = $2
+	    	AND tahun = $3
+	    	AND is_active = TRUE
+	    ORDER BY versi DESC
+	    LIMIT 1`
+
 	var id int64
 	err := r.DB.QueryRowContext(
 		ctx,
@@ -279,9 +283,12 @@ func (r *PenetapanOpdRepository) GetActiveSnapshot(
 		tahun,
 	).Scan(&id)
 	if err != nil {
-		return 0, err
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil
+		}
+		return nil, err
 	}
-	return id, nil
+	return &id, nil
 }
 
 func (r *PenetapanOpdRepository) DeactivateOldSnapshot(

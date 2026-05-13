@@ -226,12 +226,17 @@ func (s *PenetapanOpdService) FindTujuan(
 	jenisPenetapan := domain.JenisPenetapanTujuan
 	snapshotActive, err := s.Repo.GetActiveSnapshot(ctx, req.KodeOpd, jenisPenetapan, req.Tahun)
 	if err != nil {
+		s.Logger.Error("GetActiveSnapshot")
 		return nil, err
+	}
+	if snapshotActive == nil {
+		return []web.TujuanPenetapanOpdResponse{}, nil
 	}
 	req.SnapshotId = snapshotActive
 
 	tujuanOpd, err := s.Repo.FindTujuanBySnapshot(ctx, req)
 	if err != nil {
+		s.Logger.Error("FindTujuanBySnapshot")
 		return nil, err
 	}
 	tujuanOpdIds := make([]int64, 0, len(tujuanOpd))
@@ -240,6 +245,7 @@ func (s *PenetapanOpdService) FindTujuan(
 	}
 	indikators, err := s.Repo.FindIndikatorTujuanByTujuanIds(ctx, tujuanOpdIds)
 	if err != nil {
+		s.Logger.Error("FindIndikatorTujuanByTujuanIds")
 		return nil, err
 	}
 	indikatorIds := make([]int64, 0, len(indikators))
@@ -248,6 +254,7 @@ func (s *PenetapanOpdService) FindTujuan(
 	}
 	targets, err := s.Repo.FindTargetIndikatorTujuanByIndikatorIds(ctx, indikatorIds)
 	if err != nil {
+		s.Logger.Error("FindTargetIndikatorTujuanByIndikatorIds")
 		return nil, err
 	}
 	targetMap := make(
