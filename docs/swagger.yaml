@@ -202,22 +202,13 @@ definitions:
         example: 1
         type: integer
     type: object
-  web.UnprocessableEntityResponse:
-    properties:
-      error:
-        additionalProperties:
-          type: string
-        example:
-          kode_opd: format kode tidak valid
-        type: object
-    type: object
   web.ValidationErrorResponse:
     properties:
       error:
         additionalProperties:
           type: string
         example:
-          kodeOpd: required
+          kode_opd: required
           tahun: required
         type: object
     type: object
@@ -292,7 +283,7 @@ paths:
       parameters:
       - description: Payload sinkronisasi penetapan OPD
         in: body
-        name: request
+        name: payload
         required: true
         schema:
           $ref: '#/definitions/web.SyncPenetapanOpdRequest'
@@ -303,14 +294,10 @@ paths:
           description: Berhasil mengambil data tujuan OPD
           schema:
             $ref: '#/definitions/web.Response-web_SyncPenetapanOpdResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/web.ValidationErrorResponse'
         "422":
           description: Unprocessable Entity
           schema:
-            $ref: '#/definitions/web.UnprocessableEntityResponse'
+            $ref: '#/definitions/web.ValidationErrorResponse'
         "500":
           description: Internal Server Error
           schema:

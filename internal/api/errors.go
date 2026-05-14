@@ -78,7 +78,7 @@ func (app *Application) BadRequestResponse(w http.ResponseWriter, r *http.Reques
 // from post request
 func (app *Application) FailedValidationResponse(w http.ResponseWriter, r *http.Request, errors map[string]string) {
 	status := http.StatusUnprocessableEntity
-	message := web.UnprocessableEntityResponse{
+	message := web.ValidationErrorResponse{
 		Error: errors,
 	}
 	err := app.WriteJSON(w, status, message, nil)

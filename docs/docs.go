@@ -114,7 +114,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "description": "Payload sinkronisasi penetapan OPD",
-                        "name": "request",
+                        "name": "payload",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -129,16 +129,10 @@ const docTemplate = `{
                             "$ref": "#/definitions/web.Response-web_SyncPenetapanOpdResponse"
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/web.ValidationErrorResponse"
-                        }
-                    },
                     "422": {
                         "description": "Unprocessable Entity",
                         "schema": {
-                            "$ref": "#/definitions/web.UnprocessableEntityResponse"
+                            "$ref": "#/definitions/web.ValidationErrorResponse"
                         }
                     },
                     "500": {
@@ -500,20 +494,6 @@ const docTemplate = `{
                 }
             }
         },
-        "web.UnprocessableEntityResponse": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    },
-                    "example": {
-                        "kode_opd": "format kode tidak valid"
-                    }
-                }
-            }
-        },
         "web.ValidationErrorResponse": {
             "type": "object",
             "properties": {
@@ -523,7 +503,7 @@ const docTemplate = `{
                         "type": "string"
                     },
                     "example": {
-                        "kodeOpd": "required",
+                        "kode_opd": "required",
                         "tahun": "required"
                     }
                 }

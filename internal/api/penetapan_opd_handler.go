@@ -17,11 +17,10 @@ import (
 // @Accept      json
 // @Produce     json
 //
-// @Param       request body web.SyncPenetapanOpdRequest true "Payload sinkronisasi penetapan OPD"
+// @Param       payload body web.SyncPenetapanOpdRequest true "Payload sinkronisasi penetapan OPD"
 //
 // @Success     200 {object} web.Response[web.SyncPenetapanOpdResponse] "Berhasil mengambil data tujuan OPD"
-// @Failure     400 {object} web.ValidationErrorResponse                "Bad Request"
-// @Failure     422 {object} web.UnprocessableEntityResponse            "Unprocessable Entity"
+// @Failure     422 {object} web.ValidationErrorResponse                "Unprocessable Entity"
 // @Failure     500 {object} web.ErrorResponse                          "Internal Server Error"
 //
 // @Router      /opd/sync_penetapan [post]
