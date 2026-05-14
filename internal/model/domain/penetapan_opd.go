@@ -13,8 +13,3 @@ type PenetapanOpd struct {
 	GeneratedBy    *string
 	IsActive       bool
 }
-
-const (
-	JenisPenetapanTujuan  = "TUJUAN-OPD"
-	JenisPenetapanSasaran = "SASARAN-OPD"
-)

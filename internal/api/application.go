@@ -2,6 +2,8 @@ package api
 
 import (
 	"log/slog"
+
+	"github.com/bappeda-dev-team/penetapan-service/internal/service/opd"
 )
 
 const Version = "1.0.0"
@@ -34,5 +36,5 @@ type Application struct {
 	Logger *slog.Logger
 
 	// inject service
-	PenetapanOpdService *PenetapanOpdService
+	PenetapanOpdService *opd.PenetapanOpdService
 }

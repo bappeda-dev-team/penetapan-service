@@ -13,16 +13,15 @@ import (
 //
 // @Summary     Sync Penetapan OPD
 // @Description Sinkron data penetapan OPD berdasarkan kode OPD, tahun dan jenis penetapan dari perencanaan
-// @Tags        Sync,Opd
+// @Tags        Sync
 // @Accept      json
 // @Produce     json
 //
-// @Param       kode_opd query string true "Kode OPD"
-// @Param       tahun   query int    true "Tahun Penetapan"
-// @Param       jenis_penetapan   query string    true "Jenis Penetapan"
+// @Param       request body web.SyncPenetapanOpdRequest true "Payload sinkronisasi penetapan OPD"
 //
 // @Success     200 {object} web.Response[web.SyncPenetapanOpdResponse] "Berhasil mengambil data tujuan OPD"
 // @Failure     400 {object} web.ValidationErrorResponse                "Bad Request"
+// @Failure     422 {object} web.UnprocessableEntityResponse            "Unprocessable Entity"
 // @Failure     500 {object} web.ErrorResponse                          "Internal Server Error"
 //
 // @Router      /opd/sync_penetapan [post]

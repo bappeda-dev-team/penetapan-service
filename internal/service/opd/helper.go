@@ -1,4 +1,4 @@
-package api
+package opd
 
 import (
 	"github.com/bappeda-dev-team/penetapan-service/internal/model/domain"

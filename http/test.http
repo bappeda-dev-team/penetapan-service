@@ -23,7 +23,7 @@ Content-Type: application/json
 {
     "kode_opd": "5.01.5.05.0.00.01.0000",
     "tahun": 2026,
-    "jenis_penetapan": "tujuan"
+    "jenis_penetapan": "TUJUAN-OPD"
 }
 
 ## BAD REQUEST SYNC TUJUAN OPD PENETAPAN
@@ -34,20 +34,6 @@ Content-Type: application/json
     "kode_opd": "2.55.66",
     "tahun": 2006
 }
-
-## BAD REQUEST SYNC TUJUAN OPD PENETAPAN
-POST :baseUrl/opd/sync_penetapan
-Content-Type: application/json
-
-{
-    "kode_opd": "2.55.66",
-    "tahun": 2020,
-    "jenisSync": ""
-}
-
-## BAD REQUEST NO BODY SYNC TUJUAN OPD PENETAPAN
-POST :baseUrl/opd/sync/tujuan
-Content-Type: application/json
 
 
 ## TUJUAN OPD PENETAPAN

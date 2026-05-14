@@ -1,4 +1,4 @@
-package api
+package repository
 
 import (
 	"context"
@@ -12,6 +12,12 @@ import (
 
 type PenetapanOpdRepository struct {
 	DB *sql.DB
+}
+
+func NewPenetapanOpdRepository(db *sql.DB) *PenetapanOpdRepository {
+	return &PenetapanOpdRepository{
+		DB: db,
+	}
 }
 
 func (r *PenetapanOpdRepository) SaveTujuanPenetapanOpd(

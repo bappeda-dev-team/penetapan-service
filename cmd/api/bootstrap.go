@@ -7,6 +7,9 @@ import (
 
 	"github.com/bappeda-dev-team/penetapan-service/internal/api"
 	"github.com/bappeda-dev-team/penetapan-service/internal/client/perencanaan"
+	"github.com/bappeda-dev-team/penetapan-service/internal/repository"
+	"github.com/bappeda-dev-team/penetapan-service/internal/service/opd"
+	"github.com/bappeda-dev-team/penetapan-service/internal/service/opd/sync"
 
 	"net/http"
 )
@@ -20,24 +23,36 @@ func buildApplication(
 ) *api.Application {
 
 	// repository
-	penetapanOpdRepo := &api.PenetapanOpdRepository{
-		DB: db,
-	}
+	penetapanOpdRepo := repository.NewPenetapanOpdRepository(db)
 
 	// external service
 	// perencanaan
-	perencanaan := perencanaan.NewPerencanaanClient(
+	perencanaanClient := perencanaan.NewPerencanaanClient(
 		cfg.Services.Perencanaan.BaseURL,
 		cfg.Services.Perencanaan.ApiPath,
 		&http.Client{Timeout: 60 * time.Second},
 	)
 
-	// service
-	penetapanOpdService := &api.PenetapanOpdService{
-		Repo:        penetapanOpdRepo,
-		Perencanaan: perencanaan,
-		Logger:      logger,
+	// executor
+	//// tujuan
+	tujuanSyncExecutor := sync.NewTujuanSyncExecutor(
+		penetapanOpdRepo,
+		perencanaanClient,
+		logger,
+	)
+
+	// register executor
+	syncRegistry := &sync.Registry{
+		TujuanSyncExecutor: tujuanSyncExecutor,
 	}
+
+	// service
+	penetapanOpdService := opd.NewPenetapanOpdService(
+		penetapanOpdRepo,
+		perencanaanClient,
+		syncRegistry,
+		logger,
+	)
 
 	// application
 	app := &api.Application{

@@ -3,6 +3,7 @@ package web
 import (
 	"time"
 
+	"github.com/bappeda-dev-team/penetapan-service/internal/model/domain"
 	"github.com/bappeda-dev-team/penetapan-service/internal/validator"
 )
 
@@ -11,7 +12,7 @@ type SyncPenetapanOpdResponse struct {
 	Status           string                  `json:"status" example:"SUCCESS"`
 	KodeOpd          string                  `json:"kode_opd" example:"1.22.33"`
 	Tahun            int                     `json:"tahun" example:"2025"`
-	JenisPenetapan   string                  `json:"jenis_penetapan" example:"tujuan"`
+	JenisPenetapan   domain.JenisPenetapan   `json:"jenis_penetapan" example:"TUJUAN-OPD"`
 	ProcessedAt      time.Time               `json:"processed_at"`
 	ProcessedSummary SyncPenetapanOpdSummary `json:"processed_summary"`
 }
@@ -26,9 +27,9 @@ type SyncPenetapanOpdSummary struct {
 }
 
 type SyncPenetapanOpdRequest struct {
-	KodeOpd        string `json:"kode_opd" example:"1.22.33"`
-	Tahun          int    `json:"tahun" example:"2025"`
-	JenisPenetapan string `json:"jenis_penetapan" example:"tujuan"`
+	KodeOpd        string                `json:"kode_opd" example:"1.22.33"`
+	Tahun          int                   `json:"tahun" example:"2025"`
+	JenisPenetapan domain.JenisPenetapan `json:"jenis_penetapan" example:"TUJUAN-OPD" enums:"TUJUAN-OPD,SASARAN-OPD"`
 }
 
 func ValidateSyncPenetapanRequest(v *validator.Validator, syncRequest *SyncPenetapanOpdRequest) {
@@ -42,13 +43,8 @@ func ValidateSyncPenetapanRequest(v *validator.Validator, syncRequest *SyncPenet
 	v.Check(syncRequest.JenisPenetapan != "", "jenis_penetapan", "tidak boleh kosong")
 
 	v.Check(
-		validator.PermittedValue(
-			syncRequest.JenisPenetapan,
-			"tujuan",
-			"sasaran",
-			"renja",
-		),
+		syncRequest.JenisPenetapan.IsValid(),
 		"jenis_penetapan",
-		"jenis_penetapan tidak diketahui",
+		"must be one of: TUJUAN-OPD, SASARAN-OPD",
 	)
 }

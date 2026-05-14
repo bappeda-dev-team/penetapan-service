@@ -6,7 +6,7 @@ type SyncPenetapanMetadataOpd struct {
 	Id               int64
 	KodeOpd          string
 	Tahun            int
-	JenisPenetapan   string
+	JenisPenetapan   JenisPenetapan
 	Status           string
 	StartedAt        time.Time
 	FinishedAt       *time.Time

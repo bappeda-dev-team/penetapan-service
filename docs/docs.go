@@ -108,31 +108,18 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Sync",
-                    "Opd"
+                    "Sync"
                 ],
                 "summary": "Sync Penetapan OPD",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Kode OPD",
-                        "name": "kode_opd",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Tahun Penetapan",
-                        "name": "tahun",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Jenis Penetapan",
-                        "name": "jenis_penetapan",
-                        "in": "query",
-                        "required": true
+                        "description": "Payload sinkronisasi penetapan OPD",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/web.SyncPenetapanOpdRequest"
+                        }
                     }
                 ],
                 "responses": {
@@ -146,6 +133,12 @@ const docTemplate = `{
                         "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/web.ValidationErrorResponse"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/web.UnprocessableEntityResponse"
                         }
                     },
                     "500": {
@@ -367,12 +360,33 @@ const docTemplate = `{
                 }
             }
         },
+        "web.SyncPenetapanOpdRequest": {
+            "type": "object",
+            "properties": {
+                "jenis_penetapan": {
+                    "type": "string",
+                    "enum": [
+                        "TUJUAN-OPD",
+                        "SASARAN-OPD"
+                    ],
+                    "example": "TUJUAN-OPD"
+                },
+                "kode_opd": {
+                    "type": "string",
+                    "example": "1.22.33"
+                },
+                "tahun": {
+                    "type": "integer",
+                    "example": 2025
+                }
+            }
+        },
         "web.SyncPenetapanOpdResponse": {
             "type": "object",
             "properties": {
                 "jenis_penetapan": {
                     "type": "string",
-                    "example": "tujuan"
+                    "example": "TUJUAN-OPD"
                 },
                 "kode_opd": {
                     "type": "string",
@@ -483,6 +497,20 @@ const docTemplate = `{
                 "versi": {
                     "type": "integer",
                     "example": 1
+                }
+            }
+        },
+        "web.UnprocessableEntityResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "kode_opd": "format kode tidak valid"
+                    }
                 }
             }
         },
