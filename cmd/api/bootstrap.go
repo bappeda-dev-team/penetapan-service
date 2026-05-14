@@ -41,9 +41,17 @@ func buildApplication(
 		logger,
 	)
 
+	//// sasaran
+	sasaranSyncExecutor := sync.NewSasaranSyncExecutor(
+		penetapanOpdRepo,
+		perencanaanClient,
+		logger,
+	)
+
 	// register executor
 	syncRegistry := &sync.Registry{
-		TujuanSyncExecutor: tujuanSyncExecutor,
+		TujuanSyncExecutor:  tujuanSyncExecutor,
+		SasaranSyncExecutor: sasaranSyncExecutor,
 	}
 
 	// service

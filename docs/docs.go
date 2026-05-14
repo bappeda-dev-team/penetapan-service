@@ -231,20 +231,33 @@ const docTemplate = `{
         "web.IndikatorSasaranPenetapanResponse": {
             "type": "object",
             "properties": {
+                "definisi_operasional": {
+                    "type": "string",
+                    "example": "definisi abc"
+                },
                 "id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
+                },
+                "id_sasaran_opd": {
+                    "type": "integer",
+                    "example": 11
                 },
                 "indikator": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Indikator kepuasa publik"
                 },
                 "rumus_perhitungan": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "indeks kepuasan masyarakat"
                 },
                 "sumber_data": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "bps"
                 },
                 "tahun_aktif": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 2025
                 },
                 "target": {
                     "type": "array",
@@ -338,19 +351,28 @@ const docTemplate = `{
                     }
                 },
                 "kode_opd": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "1.02.0.00.0.00.01.0000"
                 },
                 "kode_sasaran_opd": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "SAS-001"
                 },
                 "periode": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "2025-2029"
                 },
                 "sasaran_opd": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Meningkatnya Nilai SAKIP"
                 },
                 "tahun_aktif": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 2025
+                },
+                "versi": {
+                    "type": "integer",
+                    "example": 1
                 }
             }
         },
@@ -439,7 +461,8 @@ const docTemplate = `{
                     "example": 1
                 },
                 "indikator_id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 44
                 },
                 "satuan": {
                     "type": "string",

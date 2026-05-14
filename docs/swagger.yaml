@@ -20,15 +20,26 @@ definitions:
     type: object
   web.IndikatorSasaranPenetapanResponse:
     properties:
+      definisi_operasional:
+        example: definisi abc
+        type: string
       id:
+        example: 1
+        type: integer
+      id_sasaran_opd:
+        example: 11
         type: integer
       indikator:
+        example: Indikator kepuasa publik
         type: string
       rumus_perhitungan:
+        example: indeks kepuasan masyarakat
         type: string
       sumber_data:
+        example: bps
         type: string
       tahun_aktif:
+        example: 2025
         type: integer
       target:
         items:
@@ -92,14 +103,22 @@ definitions:
           $ref: '#/definitions/web.IndikatorSasaranPenetapanResponse'
         type: array
       kode_opd:
+        example: 1.02.0.00.0.00.01.0000
         type: string
       kode_sasaran_opd:
+        example: SAS-001
         type: string
       periode:
+        example: 2025-2029
         type: string
       sasaran_opd:
+        example: Meningkatnya Nilai SAKIP
         type: string
       tahun_aktif:
+        example: 2025
+        type: integer
+      versi:
+        example: 1
         type: integer
     type: object
   web.SyncPenetapanOpdRequest:
@@ -163,6 +182,7 @@ definitions:
         example: 1
         type: integer
       indikator_id:
+        example: 44
         type: integer
       satuan:
         example: '%'

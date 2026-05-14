@@ -108,16 +108,14 @@ func (s *PenetapanOpdService) FindTujuan(
 	ctx context.Context,
 	req domain.PenetapanOpdRequest,
 ) ([]web.TujuanPenetapanOpdResponse, error) {
+	s.Logger.Info("FindTujuan")
+
 	jenisPenetapan := domain.JenisPenetapanTujuan
-	snapshotActive, err := s.Repo.GetActiveSnapshot(ctx, req.KodeOpd, jenisPenetapan, req.Tahun)
+	snapshotID, err := s.getActiveSnapshot(ctx, req.KodeOpd, jenisPenetapan, req.Tahun)
 	if err != nil {
-		s.Logger.Error("GetActiveSnapshot")
 		return nil, err
 	}
-	if snapshotActive == nil {
-		return []web.TujuanPenetapanOpdResponse{}, nil
-	}
-	req.SnapshotId = snapshotActive
+	req.SnapshotId = snapshotID
 
 	tujuanOpd, err := s.Repo.FindTujuanBySnapshot(ctx, req)
 	if err != nil {
@@ -153,9 +151,7 @@ func (s *PenetapanOpdService) FindTujuan(
 		)
 	}
 
-	indikatorMap := make(
-		map[int64][]web.IndikatorTujuanPenetapanResponse,
-	)
+	indikatorMap := make(map[int64][]web.IndikatorTujuanPenetapanResponse)
 	for _, indikator := range indikators {
 		indikatorResp := ToIndikatorTujuanOpdResponse(indikator)
 		indikatorResp.Target = targetMap[indikator.Id]
@@ -165,11 +161,7 @@ func (s *PenetapanOpdService) FindTujuan(
 		)
 	}
 
-	result := make(
-		[]web.TujuanPenetapanOpdResponse,
-		0,
-		len(tujuanOpd),
-	)
+	result := make([]web.TujuanPenetapanOpdResponse, 0, len(tujuanOpd))
 	for _, tujuan := range tujuanOpd {
 		tujResp := ToTujuanOpdResponse(tujuan)
 		tujResp.Indikator = indikatorMap[tujuan.Id]
@@ -183,18 +175,64 @@ func (s *PenetapanOpdService) FindSasaran(
 	ctx context.Context,
 	req domain.PenetapanOpdRequest,
 ) ([]web.SasaranPenetapanOpdResponse, error) {
-	sasaranOpd, err := s.Repo.FindSasaran(ctx, req)
+	s.Logger.Info("FindSasaran")
+
+	jenisPenetapan := domain.JenisPenetapanSasaran
+	snapshotID, err := s.getActiveSnapshot(ctx, req.KodeOpd, jenisPenetapan, req.Tahun)
 	if err != nil {
 		return nil, err
 	}
+	req.SnapshotId = snapshotID
+	sasaranOpds, err := s.Repo.FindSasaranBySnapshot(ctx, req)
+	if err != nil {
+		s.Logger.Error("FindSasaranBySnapshot")
+		return nil, err
+	}
+	sasaranOpdIds := make([]int64, 0, len(sasaranOpds))
+	for _, sas := range sasaranOpds {
+		sasaranOpdIds = append(sasaranOpdIds, sas.Id)
+	}
+	indikators, err := s.Repo.FindIndikatorSasaranBySasarands(ctx, sasaranOpdIds)
+	if err != nil {
+		s.Logger.Error("FindIndikatorSasaranBySasarands")
+		return nil, err
+	}
+	indikatorIds := make([]int64, 0, len(indikators))
+	for _, ind := range indikators {
+		indikatorIds = append(indikatorIds, ind.Id)
+	}
 
-	result := make(
-		[]web.SasaranPenetapanOpdResponse,
-		0,
-		len(sasaranOpd),
+	targets, err := s.Repo.FindTargetIndikatorSasaranByIndikatorIds(ctx, indikatorIds)
+	if err != nil {
+		s.Logger.Error("FindTargetIndikatorSasaranByIndikatorIds")
+		return nil, err
+	}
+	targetMap := make(
+		map[int64][]web.TargetIndikatorResponse,
 	)
-	for _, sasaran := range sasaranOpd {
-		result = append(result, ToSasaranOpdResponse(sasaran))
+	for _, target := range targets {
+		targetResp := ToTargetIndikatorSasaranOpdResponse(target)
+		targetMap[target.IndikatorSasaranId] = append(
+			targetMap[target.IndikatorSasaranId],
+			targetResp,
+		)
+	}
+
+	indikatorMap := make(map[int64][]web.IndikatorSasaranPenetapanResponse)
+	for _, indikator := range indikators {
+		indikatorResp := ToIndikatorSasaranOpdResponse(indikator)
+		indikatorResp.Target = targetMap[indikator.Id]
+		indikatorMap[indikator.IdSasaranOpd] = append(
+			indikatorMap[indikator.IdSasaranOpd],
+			indikatorResp,
+		)
+	}
+
+	result := make([]web.SasaranPenetapanOpdResponse, 0, len(sasaranOpds))
+	for _, sasaran := range sasaranOpds {
+		sasaranResp := ToSasaranOpdResponse(sasaran)
+		sasaranResp.Indikator = indikatorMap[sasaran.Id]
+		result = append(result, sasaranResp)
 	}
 
 	return result, nil
@@ -241,4 +279,25 @@ func (s *PenetapanOpdService) failSync(ctx context.Context, syncId int64, cause 
 		return updateErr
 	}
 	return cause
+}
+
+func (s *PenetapanOpdService) getActiveSnapshot(ctx context.Context, kodeOpd string, jenisPenetapan string, tahun int) (*int64, error) {
+	snapshotID, err := s.Repo.GetActiveSnapshot(ctx, kodeOpd, jenisPenetapan, tahun)
+	if err != nil {
+		s.Logger.Error("GetActiveSnapshot")
+		return nil, err
+	}
+	if snapshotID == nil {
+		s.Logger.ErrorContext(
+			ctx,
+			"get active snapshot failed",
+			"kode_opd", kodeOpd,
+			"jenis", jenisPenetapan,
+			"tahun", tahun,
+			"err", err,
+		)
+		return nil, nil
+	}
+
+	return snapshotID, nil
 }

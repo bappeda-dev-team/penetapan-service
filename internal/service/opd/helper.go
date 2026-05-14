@@ -49,5 +49,30 @@ func ToSasaranOpdResponse(sasaranOpd domain.SasaranPenetapanOpd) web.SasaranPene
 		SasaranOpd:     sasaranOpd.SasaranOpd,
 		Periode:        sasaranOpd.Periode,
 		TahunAktif:     sasaranOpd.TahunAktif,
+		Versi:          sasaranOpd.Versi,
+		Indikator:      []web.IndikatorSasaranPenetapanResponse{},
+	}
+}
+
+func ToIndikatorSasaranOpdResponse(indikator domain.IndikatorSasaranPenetapanOpd) web.IndikatorSasaranPenetapanResponse {
+	return web.IndikatorSasaranPenetapanResponse{
+		Id:                  indikator.Id,
+		IdSasaranOpd:        indikator.IdSasaranOpd,
+		Indikator:           indikator.Indikator,
+		RumusPerhitungan:    indikator.RumusPerhitungan,
+		SumberData:          indikator.SumberData,
+		DefinisiOperasional: indikator.DefinisiOperasional,
+		TahunAktif:          indikator.TahunAktif,
+		Target:              []web.TargetIndikatorResponse{},
+	}
+}
+
+func ToTargetIndikatorSasaranOpdResponse(target domain.TargetIndikatorSasaranPenetapanOpd) web.TargetIndikatorResponse {
+	return web.TargetIndikatorResponse{
+		Id:          target.Id,
+		IndikatorId: target.IndikatorSasaranId,
+		Tahun:       target.Tahun,
+		Target:      target.Target,
+		Satuan:      target.Satuan,
 	}
 }

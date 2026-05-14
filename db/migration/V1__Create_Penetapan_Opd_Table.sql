@@ -137,6 +137,8 @@ CREATE TABLE tb_indikator_sasaran_penetapan_opd (
 
     sumber_data TEXT,
 
+    definisi_operasional TEXT,
+
     tahun_aktif INTEGER NOT NULL,
 
     created_date TIMESTAMPTZ NOT NULL DEFAULT NOW(),

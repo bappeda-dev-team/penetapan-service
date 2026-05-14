@@ -7,8 +7,8 @@ import (
 )
 
 type Registry struct {
-	TujuanSyncExecutor PenetapanSyncExecutor
-	// SasaranSyncExecutor PenetapanSyncExecutor
+	TujuanSyncExecutor  PenetapanSyncExecutor
+	SasaranSyncExecutor PenetapanSyncExecutor
 }
 
 func (r *Registry) Get(
@@ -20,8 +20,8 @@ func (r *Registry) Get(
 	case domain.JenisPenetapanTujuan:
 		return r.TujuanSyncExecutor, nil
 
-		// case domain.JenisPenetapanSasaran:
-		// 	return r.SasaranSyncExecutor, nil
+	case domain.JenisPenetapanSasaran:
+		return r.SasaranSyncExecutor, nil
 	}
 
 	return nil, errors.New(

@@ -20,6 +20,51 @@ func NewPenetapanOpdRepository(db *sql.DB) *PenetapanOpdRepository {
 	}
 }
 
+func (r *PenetapanOpdRepository) SaveSasaranPenetapanOpd(
+	ctx context.Context,
+	tx *sql.Tx,
+	data domain.SasaranPenetapanOpd,
+) (int64, error) {
+
+	query := `
+		INSERT INTO tb_sasaran_penetapan_opd
+		(
+			kode_opd,
+			kode_sasaran_opd,
+			sasaran_opd,
+			periode,
+			tahun_aktif,
+			created_by,
+			penetapan_id
+		)
+		VALUES
+		(
+			$1, $2, $3, $4, $5, $6, $7
+		)
+		RETURNING id
+	`
+
+	var id int64
+
+	err := tx.QueryRowContext(
+		ctx,
+		query,
+		data.KodeOpd,
+		data.KodeSasaranOpd,
+		data.SasaranOpd,
+		data.Periode,
+		data.TahunAktif,
+		data.CreatedBy,
+		data.PenetapanId,
+	).Scan(&id)
+
+	if err != nil {
+		return 0, err
+	}
+
+	return id, nil
+}
+
 func (r *PenetapanOpdRepository) SaveTujuanPenetapanOpd(
 	ctx context.Context,
 	tx *sql.Tx,
@@ -53,6 +98,58 @@ func (r *PenetapanOpdRepository) SaveTujuanPenetapanOpd(
 		data.KodeTujuanOpd,
 		data.TujuanOpd,
 		data.Periode,
+		data.TahunAktif,
+		data.CreatedBy,
+		data.PenetapanId,
+	).Scan(&id)
+
+	if err != nil {
+		return 0, err
+	}
+
+	return id, nil
+}
+
+func (r *PenetapanOpdRepository) SaveIndikatorSasaranPenetapanOpd(
+	ctx context.Context,
+	tx *sql.Tx,
+	data domain.IndikatorSasaranPenetapanOpd,
+	sasaranId int64,
+) (int64, error) {
+
+	query := `
+		INSERT INTO tb_indikator_sasaran_penetapan_opd
+		(
+			id_sasaran_opd,
+			kode_opd,
+			kode_indikator,
+			indikator,
+			rumus_perhitungan,
+			sumber_data,
+			definisi_operasional,
+			tahun_aktif,
+			created_by,
+			penetapan_id
+		)
+		VALUES
+		(
+			$1, $2, $3, $4, $5, $6, $7, $8, $9, $10
+		)
+		RETURNING id
+	`
+
+	var id int64
+
+	err := tx.QueryRowContext(
+		ctx,
+		query,
+		sasaranId,
+		data.KodeOpd,
+		data.KodeIndikator,
+		data.Indikator,
+		data.RumusPerhitungan,
+		data.SumberData,
+		data.DefinisiOperasional,
 		data.TahunAktif,
 		data.CreatedBy,
 		data.PenetapanId,
@@ -115,6 +212,83 @@ func (r *PenetapanOpdRepository) SaveIndikatorTujuanPenetapanOpd(
 	}
 
 	return id, nil
+}
+
+func (r *PenetapanOpdRepository) SaveTargetIndikatorSasaranBatch(
+	ctx context.Context,
+	tx *sql.Tx,
+	indikatorId int64,
+	data []domain.TargetIndikatorSasaranPenetapanOpd,
+) (int, error) {
+
+	if len(data) == 0 {
+		return 0, nil
+	}
+
+	var (
+		valueStrings []string
+		valueArgs    []any
+	)
+
+	for i, item := range data {
+
+		base := i * 6
+
+		valueStrings = append(
+			valueStrings,
+			fmt.Sprintf(
+				"($%d, $%d, $%d, $%d, $%d, $%d)",
+				base+1,
+				base+2,
+				base+3,
+				base+4,
+				base+5,
+				base+6,
+			),
+		)
+
+		valueArgs = append(
+			valueArgs,
+			indikatorId,
+			item.Tahun,
+			item.Target,
+			item.Satuan,
+			item.CreatedBy,
+			item.PenetapanId,
+		)
+	}
+
+	query := fmt.Sprintf(`
+		INSERT INTO tb_target_indikator_sasaran_penetapan_opd
+		(
+			indikator_sasaran_id,
+			tahun,
+			target,
+			satuan,
+			created_by,
+			penetapan_id
+		)
+		VALUES %s
+	`,
+		strings.Join(valueStrings, ","),
+	)
+
+	result, err := tx.ExecContext(
+		ctx,
+		query,
+		valueArgs...,
+	)
+
+	if err != nil {
+		return 0, err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return 0, err
+	}
+
+	return int(rowsAffected), nil
 }
 
 func (r *PenetapanOpdRepository) SaveTargetIndikatorTujuanBatch(
@@ -523,6 +697,78 @@ func (r *PenetapanOpdRepository) FindTujuanBySnapshot(
 	return result, nil
 }
 
+func (r *PenetapanOpdRepository) FindSasaranBySnapshot(
+	ctx context.Context,
+	req domain.PenetapanOpdRequest,
+) ([]domain.SasaranPenetapanOpd, error) {
+
+	query := `
+		SELECT
+			sas.id,
+			sas.kode_opd,
+			sas.kode_sasaran_opd,
+			sas.sasaran_opd,
+			sas.periode,
+			sas.tahun_aktif,
+			sas.created_date,
+			sas.last_modified_date,
+			sas.created_by,
+                        pn.versi
+		FROM tb_sasaran_penetapan_opd sas
+		JOIN penetapan_opd pn ON pn.id = sas.penetapan_id
+		WHERE sas.kode_opd = $1
+		AND sas.tahun_aktif = $2
+                AND sas.penetapan_id = $3
+		ORDER BY sas.id ASC
+	`
+
+	rows, err := r.DB.QueryContext(
+		ctx,
+		query,
+		req.KodeOpd,
+		req.Tahun,
+		req.SnapshotId,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	var result []domain.SasaranPenetapanOpd
+
+	for rows.Next() {
+
+		var item domain.SasaranPenetapanOpd
+
+		err := rows.Scan(
+			&item.Id,
+			&item.KodeOpd,
+			&item.KodeSasaranOpd,
+			&item.SasaranOpd,
+			&item.Periode,
+			&item.TahunAktif,
+			&item.CreatedDate,
+			&item.LastModifiedDate,
+			&item.CreatedBy,
+			&item.Versi,
+		)
+
+		if err != nil {
+			return nil, err
+		}
+
+		result = append(result, item)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
 func (r *PenetapanOpdRepository) FindSasaran(
 	ctx context.Context,
 	req domain.PenetapanOpdRequest,
@@ -674,6 +920,86 @@ func (r *PenetapanOpdRepository) FindIndikatorTujuanByTujuanIds(
 	}
 	return result, nil
 }
+
+func (r *PenetapanOpdRepository) FindIndikatorSasaranBySasarands(
+	ctx context.Context,
+	sasaranids []int64,
+) ([]domain.IndikatorSasaranPenetapanOpd, error) {
+	if len(sasaranids) == 0 {
+
+		return []domain.IndikatorSasaranPenetapanOpd{}, nil
+	}
+	var (
+		placeholders []string
+		args         []any
+	)
+	for i, id := range sasaranids {
+		placeholders = append(placeholders, fmt.Sprintf("$%d", i+1))
+		args = append(args, id)
+	}
+	query := fmt.Sprintf(`
+		SELECT
+			id,
+			id_sasaran_opd,
+			kode_indikator,
+			kode_opd,
+			indikator,
+			rumus_perhitungan,
+			sumber_data,
+			definisi_operasional,
+			tahun_aktif,
+			created_date,
+			last_modified_date,
+			created_by,
+			penetapan_id
+		FROM tb_indikator_sasaran_penetapan_opd
+		WHERE id_sasaran_opd IN (%s)
+		ORDER BY id ASC
+	`,
+		strings.Join(placeholders, ","),
+	)
+	rows, err := r.DB.QueryContext(
+		ctx,
+		query,
+		args...,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	result := make(
+		[]domain.IndikatorSasaranPenetapanOpd,
+		0,
+		len(sasaranids),
+	)
+	for rows.Next() {
+		var item domain.IndikatorSasaranPenetapanOpd
+		err := rows.Scan(
+			&item.Id,
+			&item.IdSasaranOpd,
+			&item.KodeIndikator,
+			&item.KodeOpd,
+			&item.Indikator,
+			&item.RumusPerhitungan,
+			&item.SumberData,
+			&item.DefinisiOperasional,
+			&item.TahunAktif,
+			&item.CreatedDate,
+			&item.LastModifiedDate,
+			&item.CreatedBy,
+			&item.PenetapanId,
+		)
+		if err != nil {
+			return nil, err
+		}
+		result = append(result, item)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
 func (r *PenetapanOpdRepository) FindTargetIndikatorTujuanByIndikatorIds(
 	ctx context.Context,
 	indikatorIds []int64,
@@ -736,6 +1062,91 @@ func (r *PenetapanOpdRepository) FindTargetIndikatorTujuanByIndikatorIds(
 		err := rows.Scan(
 			&item.Id,
 			&item.IndikatorTujuanId,
+			&item.Tahun,
+			&item.Target,
+			&item.Satuan,
+			&item.CreatedDate,
+			&item.LastModifiedDate,
+			&item.CreatedBy,
+			&item.PenetapanId,
+		)
+
+		if err != nil {
+			return nil, err
+		}
+
+		result = append(result, item)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+func (r *PenetapanOpdRepository) FindTargetIndikatorSasaranByIndikatorIds(
+	ctx context.Context,
+	indikatorIds []int64,
+) ([]domain.TargetIndikatorSasaranPenetapanOpd, error) {
+
+	if len(indikatorIds) == 0 {
+		return []domain.TargetIndikatorSasaranPenetapanOpd{}, nil
+	}
+
+	var (
+		placeholders []string
+		args         []any
+	)
+
+	for i, id := range indikatorIds {
+		placeholders = append(placeholders, fmt.Sprintf("$%d", i+1))
+		args = append(args, id)
+	}
+
+	query := fmt.Sprintf(`
+		SELECT
+			id,
+			indikator_sasaran_id,
+			tahun,
+			target,
+			satuan,
+			created_date,
+			last_modified_date,
+			created_by,
+			penetapan_id
+		FROM tb_target_indikator_sasaran_penetapan_opd
+		WHERE indikator_sasaran_id IN (%s)
+		ORDER BY id ASC
+	`,
+		strings.Join(placeholders, ","),
+	)
+
+	rows, err := r.DB.QueryContext(
+		ctx,
+		query,
+		args...,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	result := make(
+		[]domain.TargetIndikatorSasaranPenetapanOpd,
+		0,
+		len(indikatorIds),
+	)
+
+	for rows.Next() {
+
+		var item domain.TargetIndikatorSasaranPenetapanOpd
+
+		err := rows.Scan(
+			&item.Id,
+			&item.IndikatorSasaranId,
 			&item.Tahun,
 			&item.Target,
 			&item.Satuan,

@@ -26,6 +26,16 @@ Content-Type: application/json
     "jenis_penetapan": "TUJUAN-OPD"
 }
 
+## SYNC PENETAPAN OPD SASARAN
+POST :baseUrl/opd/sync_penetapan
+Content-Type: application/json
+
+{
+    "kode_opd": "5.01.5.05.0.00.01.0000",
+    "tahun": 2026,
+    "jenis_penetapan": "SASARAN-OPD"
+}
+
 ## BAD REQUEST SYNC TUJUAN OPD PENETAPAN
 POST :baseUrl/opd/sync_penetapan
 Content-Type: application/json
@@ -50,7 +60,7 @@ GET :baseUrl/opd/tujuan?kodeOpd=2.55.66
 GET :baseUrl/opd/tujuan?kodeOpd=2.55.66&tahun=2026_error
 
 ## SASARAN OPD PENETAPAN
-GET :baseUrl/opd/sasaran?kodeOpd=2.55.66&tahun=2026
+GET :baseUrl/opd/sasaran?kodeOpd=5.01.5.05.0.00.01.0000&tahun=2026
 
 ### BAD REQUEST
 GET :baseUrl/opd/sasaran

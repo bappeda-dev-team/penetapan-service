@@ -102,7 +102,7 @@ func (app *Application) TujuanOpdHandler(
 	var tahun int
 
 	if kodeOpd == "" {
-		errors["kode_opd"] = "required"
+		errors["kodeOpd"] = "required"
 	}
 
 	if tahunStr == "" {
@@ -145,11 +145,8 @@ func (app *Application) TujuanOpdHandler(
 		r.Context(),
 		request,
 	)
-
 	if err != nil {
-
 		app.ServerErrorResponse(w, r, err)
-
 		return
 	}
 
@@ -157,17 +154,9 @@ func (app *Application) TujuanOpdHandler(
 		Data: result,
 	}
 
-	err = app.WriteJSON(
-		w,
-		http.StatusOK,
-		response,
-		nil,
-	)
-
+	err = app.WriteJSON(w, http.StatusOK, response, nil)
 	if err != nil {
-
 		app.ServerErrorResponse(w, r, err)
-
 		return
 	}
 }
@@ -192,29 +181,40 @@ func (app *Application) SasaranOpdHandler(
 	w http.ResponseWriter,
 	r *http.Request,
 ) {
-	// query
 	query := r.URL.Query()
+
 	errors := map[string]string{}
 
 	kodeOpd := query.Get("kodeOpd")
-	tahun, err := strconv.Atoi(query.Get("tahun"))
-	if err != nil {
-		errors["tahun"] = "tahun tidak valid"
-	}
-	request := domain.PenetapanOpdRequest{
-		KodeOpd: kodeOpd,
-		Tahun:   tahun,
+
+	tahunStr := query.Get("tahun")
+
+	var tahun int
+
+	if kodeOpd == "" {
+		errors["kodeOpd"] = "required"
 	}
 
-	if request.KodeOpd == "" {
-		errors["kode_opd"] = "required"
-	}
+	if tahunStr == "" {
 
-	if request.Tahun == 0 {
 		errors["tahun"] = "required"
+
+	} else {
+
+		parsedTahun, err := strconv.Atoi(tahunStr)
+
+		if err != nil {
+
+			errors["tahun"] = "tahun tidak valid"
+
+		} else {
+
+			tahun = parsedTahun
+		}
 	}
 
 	if len(errors) > 0 {
+
 		app.BadRequestResponse(
 			w,
 			r,
@@ -222,19 +222,28 @@ func (app *Application) SasaranOpdHandler(
 				Error: errors,
 			},
 		)
+
 		return
+	}
+
+	request := domain.PenetapanOpdRequest{
+		KodeOpd: kodeOpd,
+		Tahun:   tahun,
 	}
 
 	result, err := app.PenetapanOpdService.FindSasaran(r.Context(), request)
 	if err != nil {
 		app.ServerErrorResponse(w, r, err)
+		return
 	}
 
 	response := web.Response[[]web.SasaranPenetapanOpdResponse]{
 		Data: result,
 	}
+
 	err = app.WriteJSON(w, http.StatusOK, response, nil)
 	if err != nil {
 		app.ServerErrorResponse(w, r, err)
+		return
 	}
 }
