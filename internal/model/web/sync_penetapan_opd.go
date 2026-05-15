@@ -27,9 +27,8 @@ type SyncPenetapanOpdSummary struct {
 }
 
 type SyncPenetapanOpdRequest struct {
-	KodeOpd        string                `json:"kode_opd" example:"1.22.33"`
-	Tahun          int                   `json:"tahun" example:"2025"`
-	JenisPenetapan domain.JenisPenetapan `json:"jenis_penetapan" example:"TUJUAN-OPD" enums:"TUJUAN-OPD,SASARAN-OPD"`
+	KodeOpd string `json:"kode_opd" example:"1.22.33"`
+	Tahun   int    `json:"tahun" example:"2025"`
 }
 
 func ValidateSyncPenetapanRequest(v *validator.Validator, syncRequest *SyncPenetapanOpdRequest) {
@@ -39,12 +38,4 @@ func ValidateSyncPenetapanRequest(v *validator.Validator, syncRequest *SyncPenet
 	v.Check(syncRequest.Tahun != 0, "tahun", "tidak boleh kosong")
 	v.Check(syncRequest.Tahun >= 2020, "tahun", "tidak valid")
 	v.Check(syncRequest.Tahun <= 2080, "tahun", "tidak valid")
-
-	v.Check(syncRequest.JenisPenetapan != "", "jenis_penetapan", "tidak boleh kosong")
-
-	v.Check(
-		syncRequest.JenisPenetapan.IsValid(),
-		"jenis_penetapan",
-		"must be one of: TUJUAN-OPD, SASARAN-OPD",
-	)
 }

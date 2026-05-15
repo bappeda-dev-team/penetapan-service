@@ -25,14 +25,20 @@ func (app *Application) Routes() http.Handler {
 
 	router.HandlerFunc(http.MethodGet, "/healthcheck", app.HealthcheckHandler)
 
-	// sync penetapan dari perencanaan
-	router.HandlerFunc(http.MethodPost, "/opd/sync_penetapan", app.SyncPenetapanOpdHandler)
-
-	// penetapan opd
-	router.HandlerFunc(http.MethodGet, "/opd/tujuan", app.TujuanOpdHandler)
-	router.HandlerFunc(http.MethodGet, "/opd/sasaran", app.SasaranOpdHandler)
-	// router.HandlerFunc(http.MethodGet, "/opd/renja", app.RenjaOpdHandler)
+	// opd
+	// renaksi
 	// router.HandlerFunc(http.MethodGet, "/opd/renaksi", app.RenaksiOpdHandler)
+
+	// renja
+	// router.HandlerFunc(http.MethodGet, "/opd/renja", app.RenjaOpdHandler)
+
+	// sasaran opd
+	router.HandlerFunc(http.MethodGet, "/opd/sasaran", app.SasaranOpdHandler)
+	router.HandlerFunc(http.MethodPost, "/opd/sasaran/sync", app.SyncPenetapanSasaranOpdHandler)
+
+	// tujuan opd
+	router.HandlerFunc(http.MethodGet, "/opd/tujuan", app.TujuanOpdHandler)
+	router.HandlerFunc(http.MethodPost, "/opd/tujuan/sync", app.SyncPenetapanTujuanOpdHandler)
 
 	return app.recoverPanic(router)
 }

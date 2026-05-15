@@ -95,9 +95,9 @@
                 }
             }
         },
-        "/opd/sync_penetapan": {
+        "/opd/sasaran/sync": {
             "post": {
-                "description": "Sinkron data penetapan OPD berdasarkan kode OPD, tahun dan jenis penetapan dari perencanaan",
+                "description": "Sinkron data penetapan sasaran OPD berdasarkan kode OPD dan tahun dari perencanaan",
                 "consumes": [
                     "application/json"
                 ],
@@ -107,7 +107,7 @@
                 "tags": [
                     "Sync"
                 ],
-                "summary": "Sync Penetapan OPD",
+                "summary": "Sync Penetapan Sasaran OPD",
                 "parameters": [
                     {
                         "description": "Payload sinkronisasi penetapan OPD",
@@ -121,7 +121,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Berhasil mengambil data tujuan OPD",
+                        "description": "Success",
                         "schema": {
                             "$ref": "#/definitions/web.Response-web_SyncPenetapanOpdResponse"
                         }
@@ -182,6 +182,52 @@
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/web.ValidationErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/web.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/opd/tujuan/sync": {
+            "post": {
+                "description": "Sinkron data penetapan tujuan OPD berdasarkan kode OPD dan tahun dari perencanaan",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sync"
+                ],
+                "summary": "Sync Penetapan Tujuan OPD",
+                "parameters": [
+                    {
+                        "description": "Payload sinkronisasi penetapan OPD",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/web.SyncPenetapanOpdRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/web.Response-web_SyncPenetapanOpdResponse"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
                         "schema": {
                             "$ref": "#/definitions/web.ValidationErrorResponse"
                         }
@@ -376,14 +422,6 @@
         "web.SyncPenetapanOpdRequest": {
             "type": "object",
             "properties": {
-                "jenis_penetapan": {
-                    "type": "string",
-                    "enum": [
-                        "TUJUAN-OPD",
-                        "SASARAN-OPD"
-                    ],
-                    "example": "TUJUAN-OPD"
-                },
                 "kode_opd": {
                     "type": "string",
                     "example": "1.22.33"

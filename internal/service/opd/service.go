@@ -38,11 +38,10 @@ func NewPenetapanOpdService(
 func (s *PenetapanOpdService) SyncPenetapanOpd(
 	ctx context.Context,
 	req *web.SyncPenetapanOpdRequest,
+	jenisPenetapan domain.JenisPenetapan,
 ) (web.SyncPenetapanOpdResponse, error) {
 	now := time.Now()
 	currentUser := "super_admin" // ambil dari ctx nanti
-
-	jenisPenetapan := req.JenisPenetapan
 
 	executor, err := s.SyncExecutor.Get(jenisPenetapan)
 	if err != nil {

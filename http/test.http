@@ -17,23 +17,21 @@ GET :baseUrl/v3/api-docs
 
 # OPD
 ## SYNC PENETAPAN OPD
-POST :baseUrl/opd/sync_penetapan
+POST :baseUrl/opd/sync_penetapan/tujuan
 Content-Type: application/json
 
 {
     "kode_opd": "5.01.5.05.0.00.01.0000",
-    "tahun": 2026,
-    "jenis_penetapan": "TUJUAN-OPD"
+    "tahun": 2026
 }
 
 ## SYNC PENETAPAN OPD SASARAN
-POST :baseUrl/opd/sync_penetapan
+POST :baseUrl/opd/sync_penetapan/sasaran
 Content-Type: application/json
 
 {
     "kode_opd": "5.01.5.05.0.00.01.0000",
-    "tahun": 2026,
-    "jenis_penetapan": "SASARAN-OPD"
+    "tahun": 2026
 }
 
 ## BAD REQUEST SYNC TUJUAN OPD PENETAPAN

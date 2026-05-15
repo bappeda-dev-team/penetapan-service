@@ -123,12 +123,6 @@ definitions:
     type: object
   web.SyncPenetapanOpdRequest:
     properties:
-      jenis_penetapan:
-        enum:
-        - TUJUAN-OPD
-        - SASARAN-OPD
-        example: TUJUAN-OPD
-        type: string
       kode_opd:
         example: 1.22.33
         type: string
@@ -294,12 +288,12 @@ paths:
       summary: Get sasaran OPD penetapan
       tags:
       - OPD
-  /opd/sync_penetapan:
+  /opd/sasaran/sync:
     post:
       consumes:
       - application/json
-      description: Sinkron data penetapan OPD berdasarkan kode OPD, tahun dan jenis
-        penetapan dari perencanaan
+      description: Sinkron data penetapan sasaran OPD berdasarkan kode OPD dan tahun
+        dari perencanaan
       parameters:
       - description: Payload sinkronisasi penetapan OPD
         in: body
@@ -311,7 +305,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: Berhasil mengambil data tujuan OPD
+          description: Success
           schema:
             $ref: '#/definitions/web.Response-web_SyncPenetapanOpdResponse'
         "422":
@@ -322,7 +316,7 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/web.ErrorResponse'
-      summary: Sync Penetapan OPD
+      summary: Sync Penetapan Sasaran OPD
       tags:
       - Sync
   /opd/tujuan:
@@ -361,6 +355,37 @@ paths:
       summary: Get tujuan OPD penetapan
       tags:
       - OPD
+  /opd/tujuan/sync:
+    post:
+      consumes:
+      - application/json
+      description: Sinkron data penetapan tujuan OPD berdasarkan kode OPD dan tahun
+        dari perencanaan
+      parameters:
+      - description: Payload sinkronisasi penetapan OPD
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/web.SyncPenetapanOpdRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/web.Response-web_SyncPenetapanOpdResponse'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/web.ValidationErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/web.ErrorResponse'
+      summary: Sync Penetapan Tujuan OPD
+      tags:
+      - Sync
 schemes:
 - http
 - https

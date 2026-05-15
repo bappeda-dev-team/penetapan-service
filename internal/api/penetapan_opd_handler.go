@@ -9,22 +9,22 @@ import (
 	"github.com/bappeda-dev-team/penetapan-service/internal/validator"
 )
 
-// SyncPenetapanOpdHandler godoc
+// SyncPenetapanSasaranOpdHandler godoc
 //
-// @Summary     Sync Penetapan OPD
-// @Description Sinkron data penetapan OPD berdasarkan kode OPD, tahun dan jenis penetapan dari perencanaan
+// @Summary     Sync Penetapan Sasaran OPD
+// @Description Sinkron data penetapan sasaran OPD berdasarkan kode OPD dan tahun dari perencanaan
 // @Tags        Sync
 // @Accept      json
 // @Produce     json
 //
 // @Param       payload body web.SyncPenetapanOpdRequest true "Payload sinkronisasi penetapan OPD"
 //
-// @Success     200 {object} web.Response[web.SyncPenetapanOpdResponse] "Berhasil mengambil data tujuan OPD"
+// @Success     200 {object} web.Response[web.SyncPenetapanOpdResponse] "Success"
 // @Failure     422 {object} web.ValidationErrorResponse                "Unprocessable Entity"
 // @Failure     500 {object} web.ErrorResponse                          "Internal Server Error"
 //
-// @Router      /opd/sync_penetapan [post]
-func (app *Application) SyncPenetapanOpdHandler(
+// @Router      /opd/sasaran/sync [post]
+func (app *Application) SyncPenetapanSasaranOpdHandler(
 	w http.ResponseWriter,
 	r *http.Request,
 ) {
@@ -45,9 +45,8 @@ func (app *Application) SyncPenetapanOpdHandler(
 	}
 
 	request := &web.SyncPenetapanOpdRequest{
-		KodeOpd:        input.KodeOpd,
-		Tahun:          input.Tahun,
-		JenisPenetapan: input.JenisPenetapan,
+		KodeOpd: input.KodeOpd,
+		Tahun:   input.Tahun,
 	}
 	v := validator.New()
 	if web.ValidateSyncPenetapanRequest(v, request); !v.Valid() {
@@ -55,7 +54,75 @@ func (app *Application) SyncPenetapanOpdHandler(
 		return
 	}
 
-	result, err := app.PenetapanOpdService.SyncPenetapanOpd(r.Context(), request)
+	result, err := app.PenetapanOpdService.SyncPenetapanOpd(
+		r.Context(),
+		request,
+		domain.JenisPenetapanSasaran,
+	)
+	if err != nil {
+		app.ServerErrorResponse(w, r, err)
+		return
+	}
+
+	response := web.Response[web.SyncPenetapanOpdResponse]{
+		Data: result,
+	}
+	err = app.WriteJSON(w, http.StatusOK, response, nil)
+	if err != nil {
+		app.ServerErrorResponse(w, r, err)
+	}
+}
+
+// SyncPenetapanTujuanOpdHandler godoc
+//
+// @Summary     Sync Penetapan Tujuan OPD
+// @Description Sinkron data penetapan tujuan OPD berdasarkan kode OPD dan tahun dari perencanaan
+// @Tags        Sync
+// @Accept      json
+// @Produce     json
+//
+// @Param       payload body web.SyncPenetapanOpdRequest true "Payload sinkronisasi penetapan OPD"
+//
+// @Success     200 {object} web.Response[web.SyncPenetapanOpdResponse] "Success"
+// @Failure     422 {object} web.ValidationErrorResponse                "Unprocessable Entity"
+// @Failure     500 {object} web.ErrorResponse                          "Internal Server Error"
+//
+// @Router      /opd/tujuan/sync [post]
+func (app *Application) SyncPenetapanTujuanOpdHandler(
+	w http.ResponseWriter,
+	r *http.Request,
+) {
+	input := web.SyncPenetapanOpdRequest{}
+	errors := map[string]string{}
+
+	err := app.ReadJSON(w, r, &input)
+	if err != nil {
+		errors["invalid_request"] = err.Error()
+		app.BadRequestResponse(
+			w,
+			r,
+			web.ValidationErrorResponse{
+				Error: errors,
+			},
+		)
+		return
+	}
+
+	request := &web.SyncPenetapanOpdRequest{
+		KodeOpd: input.KodeOpd,
+		Tahun:   input.Tahun,
+	}
+	v := validator.New()
+	if web.ValidateSyncPenetapanRequest(v, request); !v.Valid() {
+		app.FailedValidationResponse(w, r, v.Errors)
+		return
+	}
+
+	result, err := app.PenetapanOpdService.SyncPenetapanOpd(
+		r.Context(),
+		request,
+		domain.JenisPenetapanTujuan,
+	)
 	if err != nil {
 		app.ServerErrorResponse(w, r, err)
 		return
