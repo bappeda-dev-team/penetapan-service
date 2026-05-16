@@ -21,7 +21,7 @@ func ToTujuanOpdResponse(tujuanOpd domain.TujuanPenetapanOpd) web.TujuanPenetapa
 func ToIndikatorTujuanOpdResponse(indikator domain.IndikatorTujuanPenetapanOpd) web.IndikatorTujuanPenetapanResponse {
 	return web.IndikatorTujuanPenetapanResponse{
 		Id:                  indikator.Id,
-		IdTujuanOpd:         indikator.IdTujuanOpd,
+		KodeIndikator:       indikator.KodeIndikator,
 		Indikator:           indikator.Indikator,
 		RumusPerhitungan:    indikator.RumusPerhitungan,
 		SumberData:          indikator.SumberData,
@@ -33,11 +33,11 @@ func ToIndikatorTujuanOpdResponse(indikator domain.IndikatorTujuanPenetapanOpd) 
 
 func ToTargetIndikatorTujuanOpdResponse(target domain.TargetIndikatorTujuanPenetapanOpd) web.TargetIndikatorResponse {
 	return web.TargetIndikatorResponse{
-		Id:          target.Id,
-		IndikatorId: target.IndikatorTujuanId,
-		Tahun:       target.Tahun,
-		Target:      target.Target,
-		Satuan:      target.Satuan,
+		Id:         target.Id,
+		KodeTarget: target.KodeTarget,
+		Tahun:      target.Tahun,
+		Target:     target.Target,
+		Satuan:     target.Satuan,
 	}
 }
 
@@ -57,7 +57,7 @@ func ToSasaranOpdResponse(sasaranOpd domain.SasaranPenetapanOpd) web.SasaranPene
 func ToIndikatorSasaranOpdResponse(indikator domain.IndikatorSasaranPenetapanOpd) web.IndikatorSasaranPenetapanResponse {
 	return web.IndikatorSasaranPenetapanResponse{
 		Id:                  indikator.Id,
-		IdSasaranOpd:        indikator.IdSasaranOpd,
+		KodeIndikator:       indikator.KodeIndikator,
 		Indikator:           indikator.Indikator,
 		RumusPerhitungan:    indikator.RumusPerhitungan,
 		SumberData:          indikator.SumberData,
@@ -69,10 +69,10 @@ func ToIndikatorSasaranOpdResponse(indikator domain.IndikatorSasaranPenetapanOpd
 
 func ToTargetIndikatorSasaranOpdResponse(target domain.TargetIndikatorSasaranPenetapanOpd) web.TargetIndikatorResponse {
 	return web.TargetIndikatorResponse{
-		Id:          target.Id,
-		IndikatorId: target.IndikatorSasaranId,
-		Tahun:       target.Tahun,
-		Target:      target.Target,
-		Satuan:      target.Satuan,
+		Id:         target.Id,
+		KodeTarget: target.KodeTarget,
+		Tahun:      target.Tahun,
+		Target:     target.Target,
+		Satuan:     target.Satuan,
 	}
 }

@@ -88,7 +88,7 @@ func (ex *SasaranSyncExecutor) Sync(
 	}
 
 	// convert response perencanaan to snapshot
-	snapshotSasaran, err := ex.toSasaranSnapshot(sasaranPerencanaans, currentUser, penetapanId, req.Tahun)
+	snapshotSasaran, err := ex.toSasaranSnapshots(sasaranPerencanaans, currentUser, penetapanId, req.Tahun)
 	if err != nil {
 		return web.SyncPenetapanOpdSummary{}, err
 	}
@@ -136,20 +136,14 @@ func (ex *SasaranSyncExecutor) Sync(
 	}, nil
 }
 
-func (ex *SasaranSyncExecutor) toSasaranSnapshot(sasaranPerencanaans []perencanaan.PerencanaanSasaranOpdResponse, currentUser string, penetapanId int64, tahunAktif int) ([]domain.SasaranPenetapanOpd, error) {
+func (ex *SasaranSyncExecutor) toSasaranSnapshots(sasaranPerencanaans []perencanaan.PerencanaanSasaranOpdResponse, currentUser string, penetapanId int64, tahunAktif int) ([]domain.SasaranPenetapanOpd, error) {
 
 	createdBy := &currentUser
 	var penetapanSasaranOpds = []domain.SasaranPenetapanOpd{}
 	for _, per := range sasaranPerencanaans {
 		for _, sasaran := range per.SasaranOpd {
 
-			kodeSasaran := fmt.Sprintf("SAS-OPD-%s", sasaran.Id)
-			periodeTujuan := fmt.Sprintf("%s-%s",
-				sasaran.TahunAwal,
-				sasaran.TahunAkhir)
-
 			indikators := make(
-
 				[]domain.IndikatorSasaranPenetapanOpd,
 				0,
 				len(sasaran.Indikator),
@@ -170,21 +164,45 @@ func (ex *SasaranSyncExecutor) toSasaranSnapshot(sasaranPerencanaans []perencana
 				)
 
 			}
+			sasSnapshot := ex.toSasaranSnapshot(
+				sasaran,
+				per.KodeOpd,
+				tahunAktif,
+				penetapanId,
+				createdBy,
+				indikators,
+			)
 			penetapanSasaranOpds = append(penetapanSasaranOpds,
-				domain.SasaranPenetapanOpd{
-					KodeOpd:        per.KodeOpd,
-					KodeSasaranOpd: &kodeSasaran,
-					SasaranOpd:     sasaran.NamaSasaranOpd,
-					Periode:        periodeTujuan,
-					TahunAktif:     tahunAktif,
-					CreatedBy:      createdBy,
-					PenetapanId:    penetapanId,
-					Indikator:      indikators,
-				})
+				sasSnapshot,
+			)
 		}
 	}
 
 	return penetapanSasaranOpds, nil
+}
+
+func (ex *SasaranSyncExecutor) toSasaranSnapshot(
+	sasaran perencanaan.SasaranOpdDetailResponse,
+	kodeOpd string,
+	tahunAktif int,
+	penetapanId int64,
+	createdBy *string,
+	indikators []domain.IndikatorSasaranPenetapanOpd,
+) domain.SasaranPenetapanOpd {
+	kodeSasaran := fmt.Sprintf("SAS-OPD-%s", sasaran.Id)
+	periodeTujuan := fmt.Sprintf("%s-%s",
+		sasaran.TahunAwal,
+		sasaran.TahunAkhir)
+	return domain.SasaranPenetapanOpd{
+		KodeOpd:        kodeOpd,
+		KodeSasaranOpd: kodeSasaran,
+		SasaranOpd:     sasaran.NamaSasaranOpd,
+		Periode:        periodeTujuan,
+		TahunAktif:     tahunAktif,
+		CreatedBy:      createdBy,
+		PenetapanId:    penetapanId,
+		Indikator:      indikators,
+	}
 }
 
 func (ex *SasaranSyncExecutor) toIndikatorSasaranSnapshot(ind perencanaan.IndikatorSasaranResponse, kodeOpd string, createdBy *string, tahunAktif int, penetapanId int64) (domain.IndikatorSasaranPenetapanOpd, error) {
@@ -192,8 +210,9 @@ func (ex *SasaranSyncExecutor) toIndikatorSasaranSnapshot(ind perencanaan.Indika
 	if err != nil {
 		return domain.IndikatorSasaranPenetapanOpd{}, err
 	}
+	kodeIndikator := fmt.Sprintf("IND-%s", ind.Id)
 	return domain.IndikatorSasaranPenetapanOpd{
-		KodeIndikator:       ind.KodeIndikator,
+		KodeIndikator:       kodeIndikator,
 		KodeOpd:             kodeOpd,
 		Indikator:           ind.NamaIndikator,
 		RumusPerhitungan:    &ind.RumusPerhitungan,
@@ -201,7 +220,6 @@ func (ex *SasaranSyncExecutor) toIndikatorSasaranSnapshot(ind perencanaan.Indika
 		DefinisiOperasional: &ind.DefinisiOperasional,
 		TahunAktif:          tahunAktif,
 		CreatedBy:           createdBy,
-		PenetapanId:         penetapanId,
 		Target:              targets,
 	}, nil
 }
@@ -232,11 +250,12 @@ func (ex *SasaranSyncExecutor) toTargetSnapshots(targets []perencanaan.TargetRes
 }
 
 func (ex *SasaranSyncExecutor) toTargetIndikatorSasaranSnapshot(tgt perencanaan.TargetResponse, tahunTarget int, target float64, createdBy *string, penetapanId int64) domain.TargetIndikatorSasaranPenetapanOpd {
+	kodeTarget := fmt.Sprintf("TGT-%s", tgt.Id)
 	return domain.TargetIndikatorSasaranPenetapanOpd{
-		Tahun:       tahunTarget,
-		Target:      target,
-		Satuan:      tgt.SatuanIndikator,
-		CreatedBy:   createdBy,
-		PenetapanId: penetapanId,
+		KodeTarget: kodeTarget,
+		Tahun:      tahunTarget,
+		Target:     target,
+		Satuan:     tgt.SatuanIndikator,
+		CreatedBy:  createdBy,
 	}
 }

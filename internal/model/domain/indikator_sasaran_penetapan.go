@@ -15,6 +15,5 @@ type IndikatorSasaranPenetapanOpd struct {
 	CreatedDate         time.Time
 	LastModifiedDate    time.Time
 	CreatedBy           *string
-	PenetapanId         int64
 	Target              []TargetIndikatorSasaranPenetapanOpd
 }

@@ -87,7 +87,7 @@ func (ex *TujuanSyncExecutor) Sync(
 	}
 
 	// convert response perencanaan to snapshot
-	snapshotTujuan, err := ex.toTujuanSnapshot(tujuanPerencanaan, currentUser, penetapanId, req.Tahun)
+	snapshotTujuan, err := ex.toTujuanSnapshots(tujuanPerencanaan, currentUser, penetapanId, req.Tahun)
 	if err != nil {
 		return web.SyncPenetapanOpdSummary{}, err
 	}
@@ -135,20 +135,14 @@ func (ex *TujuanSyncExecutor) Sync(
 	}, nil
 }
 
-func (ex *TujuanSyncExecutor) toTujuanSnapshot(tujuanPerencanaan []perencanaan.PerencanaanTujuanOpdResponse, currentUser string, penetapanId int64, tahunAktif int) ([]domain.TujuanPenetapanOpd, error) {
+func (ex *TujuanSyncExecutor) toTujuanSnapshots(tujuanPerencanaan []perencanaan.PerencanaanTujuanOpdResponse, currentUser string, penetapanId int64, tahunAktif int) ([]domain.TujuanPenetapanOpd, error) {
 
 	createdBy := &currentUser
 	var penetapanTujuanOpds = []domain.TujuanPenetapanOpd{}
 	for _, per := range tujuanPerencanaan {
 		for _, tujuan := range per.TujuanOpd {
 
-			kodeTujuan := fmt.Sprintf("TUJ-OPD-%d", tujuan.Id)
-			periodeTujuan := fmt.Sprintf("%s-%s",
-				tujuan.TahunAwal,
-				tujuan.TahunAkhir)
-
 			indikators := make(
-
 				[]domain.IndikatorTujuanPenetapanOpd,
 				0,
 				len(tujuan.Indikator),
@@ -169,21 +163,46 @@ func (ex *TujuanSyncExecutor) toTujuanSnapshot(tujuanPerencanaan []perencanaan.P
 				)
 
 			}
+
+			tujSnapshot := ex.toTujuanSnapshot(
+				tujuan,
+				per.KodeOpd,
+				tahunAktif,
+				penetapanId,
+				createdBy,
+				indikators,
+			)
 			penetapanTujuanOpds = append(penetapanTujuanOpds,
-				domain.TujuanPenetapanOpd{
-					KodeOpd:       per.KodeOpd,
-					KodeTujuanOpd: &kodeTujuan,
-					TujuanOpd:     tujuan.Tujuan,
-					Periode:       periodeTujuan,
-					TahunAktif:    tahunAktif,
-					CreatedBy:     createdBy,
-					PenetapanId:   penetapanId,
-					Indikator:     indikators,
-				})
+				tujSnapshot,
+			)
 		}
 	}
 
 	return penetapanTujuanOpds, nil
+}
+
+func (ex *TujuanSyncExecutor) toTujuanSnapshot(
+	tujuan perencanaan.TujuanOpdResponse,
+	kodeOpd string,
+	tahunAktif int,
+	penetapanId int64,
+	createdBy *string,
+	indikators []domain.IndikatorTujuanPenetapanOpd,
+) domain.TujuanPenetapanOpd {
+	kodeTujuan := fmt.Sprintf("TUJ-OPD-%d", tujuan.Id)
+	periodeTujuan := fmt.Sprintf("%s-%s",
+		tujuan.TahunAwal,
+		tujuan.TahunAkhir)
+	return domain.TujuanPenetapanOpd{
+		KodeOpd:       kodeOpd,
+		KodeTujuanOpd: kodeTujuan,
+		TujuanOpd:     tujuan.Tujuan,
+		Periode:       periodeTujuan,
+		TahunAktif:    tahunAktif,
+		CreatedBy:     createdBy,
+		PenetapanId:   penetapanId,
+		Indikator:     indikators,
+	}
 }
 
 func (ex *TujuanSyncExecutor) toIndikatorTujuanSnapshot(ind perencanaan.IndikatorResponse, kodeOpd string, createdBy *string, tahunAktif int, penetapanId int64) (domain.IndikatorTujuanPenetapanOpd, error) {
@@ -191,8 +210,9 @@ func (ex *TujuanSyncExecutor) toIndikatorTujuanSnapshot(ind perencanaan.Indikato
 	if err != nil {
 		return domain.IndikatorTujuanPenetapanOpd{}, err
 	}
+	kodeIndikator := fmt.Sprintf("IND-%s", ind.Id)
 	return domain.IndikatorTujuanPenetapanOpd{
-		KodeIndikator:       ind.KodeIndikator,
+		KodeIndikator:       kodeIndikator,
 		KodeOpd:             kodeOpd,
 		Indikator:           ind.NamaIndikator,
 		RumusPerhitungan:    &ind.RumusPerhitungan,
@@ -200,7 +220,6 @@ func (ex *TujuanSyncExecutor) toIndikatorTujuanSnapshot(ind perencanaan.Indikato
 		DefinisiOperasional: &ind.DefinisiOperasional,
 		TahunAktif:          tahunAktif,
 		CreatedBy:           createdBy,
-		PenetapanId:         penetapanId,
 		Target:              targets,
 	}, nil
 }
@@ -231,12 +250,13 @@ func (ex *TujuanSyncExecutor) toTargetSnapshots(targets []perencanaan.TargetResp
 }
 
 func (ex *TujuanSyncExecutor) toTargetIndikatorTujuanSnapshot(tgt perencanaan.TargetResponse, tahunTarget int, target float64, createdBy *string, penetapanId int64) domain.TargetIndikatorTujuanPenetapanOpd {
+	kodeTarget := fmt.Sprintf("TGT-%s", tgt.Id)
 	return domain.TargetIndikatorTujuanPenetapanOpd{
-		Tahun:       tahunTarget,
-		Target:      target,
-		Satuan:      tgt.SatuanIndikator,
-		CreatedBy:   createdBy,
-		PenetapanId: penetapanId,
+		KodeTarget: kodeTarget,
+		Tahun:      tahunTarget,
+		Target:     target,
+		Satuan:     tgt.SatuanIndikator,
+		CreatedBy:  createdBy,
 	}
 
 }

@@ -5,7 +5,7 @@ import "time"
 type TujuanPenetapanOpd struct {
 	Id               int64
 	KodeOpd          string
-	KodeTujuanOpd    *string
+	KodeTujuanOpd    string
 	TujuanOpd        string
 	Periode          string
 	TahunAktif       int

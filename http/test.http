@@ -17,7 +17,7 @@ GET :baseUrl/v3/api-docs
 
 # OPD
 ## SYNC PENETAPAN OPD
-POST :baseUrl/opd/sync_penetapan/tujuan
+POST :baseUrl/opd/tujuan/sync
 Content-Type: application/json
 
 {
@@ -26,7 +26,7 @@ Content-Type: application/json
 }
 
 ## SYNC PENETAPAN OPD SASARAN
-POST :baseUrl/opd/sync_penetapan/sasaran
+POST :baseUrl/opd/sasaran/sync
 Content-Type: application/json
 
 {

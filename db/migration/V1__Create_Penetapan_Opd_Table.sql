@@ -1,9 +1,9 @@
-CREATE TABLE tb_tujuan_penetapan_opd (
+CREATE TABLE tujuan_opd (
     id BIGSERIAL PRIMARY KEY NOT NULL,
 
     kode_opd VARCHAR(50) NOT NULL,
 
-    kode_tujuan_opd VARCHAR(255),
+    kode_tujuan_opd VARCHAR(255) NOT NULL,
 
     tujuan_opd TEXT NOT NULL,
 
@@ -19,17 +19,17 @@ CREATE TABLE tb_tujuan_penetapan_opd (
 
 );
 
-CREATE INDEX idx_tujuan_penetapan_opd_kode_tahun
-ON tb_tujuan_penetapan_opd(kode_opd, tahun_aktif);
+CREATE INDEX idx_tujuan_opd_kode_opd_tahun_aktif
+ON tujuan_opd(kode_opd, tahun_aktif);
 
 
 
-CREATE TABLE tb_indikator_tujuan_penetapan_opd (
+CREATE TABLE indikator_tujuan_opd (
     id BIGSERIAL PRIMARY KEY NOT NULL,
 
-    id_tujuan_opd BIGINT NOT NULL,
+    tujuan_opd_id BIGINT NOT NULL,
 
-    kode_indikator VARCHAR(255),
+    kode_indikator VARCHAR(255) NOT NULL,
 
     kode_opd VARCHAR(50) NOT NULL,
 
@@ -49,25 +49,26 @@ CREATE TABLE tb_indikator_tujuan_penetapan_opd (
 
     created_by VARCHAR(100),
 
-    CONSTRAINT fk_tujuan_penetapan
-        FOREIGN KEY(id_tujuan_opd)
-        REFERENCES tb_tujuan_penetapan_opd(id)
+    CONSTRAINT fk_indikator_tujuan
+        FOREIGN KEY(tujuan_opd_id)
+        REFERENCES tujuan_opd(id)
         ON DELETE CASCADE
 
 );
 
-CREATE INDEX idx_indikator_tujuan_penetapan_parent
-ON tb_indikator_tujuan_penetapan_opd(id_tujuan_opd);
+CREATE INDEX idx_indikator_tujuan_opd_parent
+ON indikator_tujuan_opd(tujuan_opd_id);
 
-CREATE INDEX idx_indikator_tujuan_penetapan_kode_tahun
-ON tb_indikator_tujuan_penetapan_opd(kode_opd, tahun_aktif);
+CREATE INDEX idx_indikator_tujuan_opd_kode_opd_tahun_aktif
+ON indikator_tujuan_opd(kode_opd, tahun_aktif);
 
 
-
-CREATE TABLE tb_target_indikator_tujuan_penetapan_opd (
+CREATE TABLE target_indikator_tujuan_opd (
     id BIGSERIAL PRIMARY KEY,
 
     indikator_tujuan_id BIGINT NOT NULL,
+
+    kode_target VARCHAR(255) NOT NULL,
 
     tahun INTEGER NOT NULL,
 
@@ -81,9 +82,9 @@ CREATE TABLE tb_target_indikator_tujuan_penetapan_opd (
 
     created_by VARCHAR(100),
 
-    CONSTRAINT fk_target_indikator_tujuan
+    CONSTRAINT fk_target_indikator_tujuan_opd
         FOREIGN KEY(indikator_tujuan_id)
-        REFERENCES tb_indikator_tujuan_penetapan_opd(id)
+        REFERENCES indikator_tujuan_opd(id)
         ON DELETE CASCADE,
 
     CONSTRAINT uq_target_tujuan_tahun
@@ -92,16 +93,16 @@ CREATE TABLE tb_target_indikator_tujuan_penetapan_opd (
 );
 
 CREATE INDEX idx_target_indikator_tujuan_parent
-ON tb_target_indikator_tujuan_penetapan_opd(indikator_tujuan_id);
+ON target_indikator_tujuan_opd(indikator_tujuan_id);
 
 
 
-CREATE TABLE tb_sasaran_penetapan_opd (
+CREATE TABLE sasaran_opd (
     id BIGSERIAL PRIMARY KEY NOT NULL,
 
     kode_opd VARCHAR(50) NOT NULL,
 
-    kode_sasaran_opd VARCHAR(255),
+    kode_sasaran_opd VARCHAR(255) NOT NULL,
 
     sasaran_opd TEXT NOT NULL,
 
@@ -117,17 +118,17 @@ CREATE TABLE tb_sasaran_penetapan_opd (
 
 );
 
-CREATE INDEX idx_sasaran_penetapan_opd_kode_tahun
-ON tb_sasaran_penetapan_opd(kode_opd, tahun_aktif);
+CREATE INDEX idx_sasaran_opd_kode_opd_tahun_aktif
+ON sasaran_opd(kode_opd, tahun_aktif);
 
 
 
-CREATE TABLE tb_indikator_sasaran_penetapan_opd (
+CREATE TABLE indikator_sasaran_opd (
     id BIGSERIAL PRIMARY KEY NOT NULL,
 
-    id_sasaran_opd BIGINT NOT NULL,
+    sasaran_opd_id BIGINT NOT NULL,
 
-    kode_indikator VARCHAR(255),
+    kode_indikator VARCHAR(255) NOT NULL,
 
     kode_opd VARCHAR(50) NOT NULL,
 
@@ -147,25 +148,26 @@ CREATE TABLE tb_indikator_sasaran_penetapan_opd (
 
     created_by VARCHAR(100),
 
-    CONSTRAINT fk_sasaran_penetapan
-        FOREIGN KEY(id_sasaran_opd)
-        REFERENCES tb_sasaran_penetapan_opd(id)
+    CONSTRAINT fk_indikator_sasaran
+        FOREIGN KEY(sasaran_opd_id)
+        REFERENCES sasaran_opd(id)
         ON DELETE CASCADE
 
 );
 
-CREATE INDEX idx_indikator_sasaran_penetapan_parent
-ON tb_indikator_sasaran_penetapan_opd(id_sasaran_opd);
+CREATE INDEX idx_indikator_sasaran_opd_parent
+ON indikator_sasaran_opd(sasaran_opd_id);
 
-CREATE INDEX idx_indikator_sasaran_penetapan_kode_tahun
-ON tb_indikator_sasaran_penetapan_opd(kode_opd, tahun_aktif);
+CREATE INDEX idx_indikator_sasaran_opd_kode_opd_tahun_aktif
+ON indikator_sasaran_opd(kode_opd, tahun_aktif);
 
 
-
-CREATE TABLE tb_target_indikator_sasaran_penetapan_opd (
+CREATE TABLE target_indikator_sasaran_opd (
     id BIGSERIAL PRIMARY KEY,
 
     indikator_sasaran_id BIGINT NOT NULL,
+
+    kode_target VARCHAR(255) NOT NULL,
 
     tahun INTEGER NOT NULL,
 
@@ -179,14 +181,14 @@ CREATE TABLE tb_target_indikator_sasaran_penetapan_opd (
 
     created_by VARCHAR(100),
 
-    CONSTRAINT fk_target_indikator_sasaran
+    CONSTRAINT fk_target_indikator_sasaran_opd
         FOREIGN KEY(indikator_sasaran_id)
-        REFERENCES tb_indikator_sasaran_penetapan_opd(id)
+        REFERENCES indikator_sasaran_opd(id)
         ON DELETE CASCADE,
 
     CONSTRAINT uq_target_sasaran_tahun
         UNIQUE(indikator_sasaran_id, tahun)
 );
 
-CREATE INDEX idx_target_indikator_sasaran_parent
-ON tb_target_indikator_sasaran_penetapan_opd(indikator_sasaran_id);
+CREATE INDEX idx_target_indikator_sasaran_opd_parent
+ON target_indikator_sasaran_opd(indikator_sasaran_id);
