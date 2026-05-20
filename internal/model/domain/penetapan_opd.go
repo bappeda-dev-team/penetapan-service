@@ -13,3 +13,8 @@ type PenetapanOpd struct {
 	GeneratedBy    *string
 	IsActive       bool
 }
+
+type ActiveSnapshot struct {
+	Id    int64
+	Versi int
+}

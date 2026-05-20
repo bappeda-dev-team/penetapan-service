@@ -7,6 +7,8 @@ CREATE TABLE pagu_renja_program (
 
     program_id BIGINT NOT NULL,
 
+    kode_pagu VARCHAR(255) NOT NULL,
+
     tahun INTEGER NOT NULL,
 
     pagu BIGINT NOT NULL,
@@ -26,21 +28,19 @@ CREATE TABLE pagu_renja_program (
     CONSTRAINT uq_pagu_program
         UNIQUE(
             program_id,
-            tahun,
-            jenis_pagu
+            kode_pagu
         )
 );
 
-CREATE INDEX idx_pagu_program_parent
+CREATE INDEX idx_pagu_program_source
 ON pagu_renja_program(
-    program_id
+    kode_pagu
 );
 
 CREATE INDEX idx_pagu_program_tahun
 ON pagu_renja_program(
     tahun
 );
-
 
 
 -- =========================================================
@@ -51,6 +51,8 @@ CREATE TABLE pagu_renja_kegiatan (
     id BIGSERIAL PRIMARY KEY,
 
     kegiatan_id BIGINT NOT NULL,
+
+    kode_pagu VARCHAR(255) NOT NULL,
 
     tahun INTEGER NOT NULL,
 
@@ -71,21 +73,19 @@ CREATE TABLE pagu_renja_kegiatan (
     CONSTRAINT uq_pagu_kegiatan
         UNIQUE(
             kegiatan_id,
-            tahun,
-            jenis_pagu
+            kode_pagu
         )
 );
 
-CREATE INDEX idx_pagu_kegiatan_parent
+CREATE INDEX idx_pagu_kegiatan_source
 ON pagu_renja_kegiatan(
-    kegiatan_id
+    kode_pagu
 );
 
 CREATE INDEX idx_pagu_kegiatan_tahun
 ON pagu_renja_kegiatan(
     tahun
 );
-
 
 
 -- =========================================================
@@ -96,6 +96,8 @@ CREATE TABLE pagu_renja_subkegiatan (
     id BIGSERIAL PRIMARY KEY,
 
     subkegiatan_id BIGINT NOT NULL,
+
+    kode_pagu VARCHAR(255) NOT NULL,
 
     tahun INTEGER NOT NULL,
 
@@ -116,14 +118,13 @@ CREATE TABLE pagu_renja_subkegiatan (
     CONSTRAINT uq_pagu_subkegiatan
         UNIQUE(
             subkegiatan_id,
-            tahun,
-            jenis_pagu
+            kode_pagu
         )
 );
 
-CREATE INDEX idx_pagu_subkegiatan_parent
+CREATE INDEX idx_pagu_subkegiatan_source
 ON pagu_renja_subkegiatan(
-    subkegiatan_id
+    kode_pagu
 );
 
 CREATE INDEX idx_pagu_subkegiatan_tahun

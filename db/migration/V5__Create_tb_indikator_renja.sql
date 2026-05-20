@@ -26,18 +26,17 @@ CREATE TABLE indikator_renja_program (
     CONSTRAINT uq_indikator_program
         UNIQUE(
             program_id,
-            kode_indikator,
-            tahun
+            kode_indikator
         )
 );
-
-CREATE INDEX idx_indikator_program_parent
-ON indikator_renja_program(program_id);
 
 CREATE INDEX idx_indikator_program_tahun
 ON indikator_renja_program(tahun);
 
-
+CREATE INDEX idx_indikator_program_source
+ON indikator_renja_program(
+    kode_indikator
+);
 
 CREATE TABLE target_indikator_renja_program (
     id BIGSERIAL PRIMARY KEY,
@@ -65,16 +64,19 @@ CREATE TABLE target_indikator_renja_program (
     CONSTRAINT uq_target_program
         UNIQUE(
             indikator_program_id,
-            tahun
+            kode_target
         )
 );
 
-CREATE INDEX idx_target_program_parent
+CREATE INDEX idx_target_program_source
 ON target_indikator_renja_program(
-    indikator_program_id
+    kode_target
 );
 
-
+CREATE INDEX idx_target_program_tahun
+ON target_indikator_renja_program(
+    tahun
+);
 
 -- =========================================================
 -- SNAPSHOT INDIKATOR KEGIATAN
@@ -104,27 +106,24 @@ CREATE TABLE indikator_renja_kegiatan (
     CONSTRAINT uq_indikator_kegiatan
         UNIQUE(
             kegiatan_id,
-            kode_indikator,
-            tahun
+            kode_indikator
         )
 );
 
-CREATE INDEX idx_indikator_kegiatan_parent
-ON indikator_renja_kegiatan(
-    kegiatan_id
-);
-
 CREATE INDEX idx_indikator_kegiatan_tahun
+ON indikator_renja_kegiatan(tahun);
+
+CREATE INDEX idx_indikator_kegiatan_source
 ON indikator_renja_kegiatan(
-    tahun
+    kode_indikator
 );
-
-
 
 CREATE TABLE target_indikator_renja_kegiatan (
     id BIGSERIAL PRIMARY KEY,
 
     indikator_kegiatan_id BIGINT NOT NULL,
+
+    kode_target VARCHAR(255) NOT NULL,
 
     tahun INTEGER NOT NULL,
 
@@ -145,16 +144,19 @@ CREATE TABLE target_indikator_renja_kegiatan (
     CONSTRAINT uq_target_kegiatan
         UNIQUE(
             indikator_kegiatan_id,
-            tahun
+            kode_target
         )
 );
 
-CREATE INDEX idx_target_kegiatan_parent
+CREATE INDEX idx_target_kegiatan_source
 ON target_indikator_renja_kegiatan(
-    indikator_kegiatan_id
+    kode_target
 );
 
-
+CREATE INDEX idx_target_kegiatan_tahun
+ON target_indikator_renja_kegiatan(
+    tahun
+);
 
 -- =========================================================
 -- SNAPSHOT INDIKATOR SUBKEGIATAN
@@ -184,27 +186,25 @@ CREATE TABLE indikator_renja_subkegiatan (
     CONSTRAINT uq_indikator_subkegiatan
         UNIQUE(
             subkegiatan_id,
-            kode_indikator,
-            tahun
+            kode_indikator
         )
 );
 
-CREATE INDEX idx_indikator_subkegiatan_parent
-ON indikator_renja_subkegiatan(
-    subkegiatan_id
-);
-
 CREATE INDEX idx_indikator_subkegiatan_tahun
-ON indikator_renja_subkegiatan(
-    tahun
-);
+ON indikator_renja_subkegiatan(tahun);
 
+CREATE INDEX idx_indikator_subkegiatan_source
+ON indikator_renja_subkegiatan(
+    kode_indikator
+);
 
 
 CREATE TABLE target_indikator_renja_subkegiatan (
     id BIGSERIAL PRIMARY KEY,
 
     indikator_subkegiatan_id BIGINT NOT NULL,
+
+    kode_target VARCHAR(255) NOT NULL,
 
     tahun INTEGER NOT NULL,
 
@@ -225,11 +225,16 @@ CREATE TABLE target_indikator_renja_subkegiatan (
     CONSTRAINT uq_target_subkegiatan
         UNIQUE(
             indikator_subkegiatan_id,
-            tahun
+            kode_target
         )
 );
 
-CREATE INDEX idx_target_subkegiatan_parent
+CREATE INDEX idx_target_subkegiatan_source
 ON target_indikator_renja_subkegiatan(
-    indikator_subkegiatan_id
+    kode_target
+);
+
+CREATE INDEX idx_target_subkegiatan_tahun
+ON target_indikator_renja_subkegiatan(
+    tahun
 );

@@ -206,7 +206,7 @@ func (ex *SasaranSyncExecutor) toSasaranSnapshot(
 }
 
 func (ex *SasaranSyncExecutor) toIndikatorSasaranSnapshot(ind perencanaan.IndikatorSasaranResponse, kodeOpd string, createdBy *string, tahunAktif int, penetapanId int64) (domain.IndikatorSasaranPenetapanOpd, error) {
-	targets, err := ex.toTargetSnapshots(ind.Target, ind.NamaIndikator, createdBy, penetapanId)
+	targets, err := ex.toTargetSnapshots(ind.Target, ind.NamaIndikator, createdBy)
 	if err != nil {
 		return domain.IndikatorSasaranPenetapanOpd{}, err
 	}
@@ -224,7 +224,7 @@ func (ex *SasaranSyncExecutor) toIndikatorSasaranSnapshot(ind perencanaan.Indika
 	}, nil
 }
 
-func (ex *SasaranSyncExecutor) toTargetSnapshots(targets []perencanaan.TargetResponse, namaIndikator string, createdBy *string, penetapanId int64) ([]domain.TargetIndikatorSasaranPenetapanOpd, error) {
+func (ex *SasaranSyncExecutor) toTargetSnapshots(targets []perencanaan.TargetResponse, namaIndikator string, createdBy *string) ([]domain.TargetIndikatorSasaranPenetapanOpd, error) {
 	result := make([]domain.TargetIndikatorSasaranPenetapanOpd, 0, len(targets))
 	for _, tgt := range targets {
 		tahunTarget, err := strconv.Atoi(tgt.Tahun)
@@ -243,13 +243,13 @@ func (ex *SasaranSyncExecutor) toTargetSnapshots(targets []perencanaan.TargetRes
 				tgt.TargetIndikator,
 			)
 		}
-		tgtSnapshot := ex.toTargetIndikatorSasaranSnapshot(tgt, tahunTarget, target, createdBy, penetapanId)
+		tgtSnapshot := ex.toTargetIndikatorSasaranSnapshot(tgt, tahunTarget, target, createdBy)
 		result = append(result, tgtSnapshot)
 	}
 	return result, nil
 }
 
-func (ex *SasaranSyncExecutor) toTargetIndikatorSasaranSnapshot(tgt perencanaan.TargetResponse, tahunTarget int, target float64, createdBy *string, penetapanId int64) domain.TargetIndikatorSasaranPenetapanOpd {
+func (ex *SasaranSyncExecutor) toTargetIndikatorSasaranSnapshot(tgt perencanaan.TargetResponse, tahunTarget int, target float64, createdBy *string) domain.TargetIndikatorSasaranPenetapanOpd {
 	kodeTarget := fmt.Sprintf("TGT-%s", tgt.Id)
 	return domain.TargetIndikatorSasaranPenetapanOpd{
 		KodeTarget: kodeTarget,

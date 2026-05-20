@@ -35,12 +35,21 @@ Content-Type: application/json
 }
 
 ## BAD REQUEST SYNC TUJUAN OPD PENETAPAN
-POST :baseUrl/opd/sync_penetapan
+POST :baseUrl/opd/tujuan/sync
 Content-Type: application/json
 
 {
     "kode_opd": "2.55.66",
     "tahun": 2006
+}
+
+## SYNC PENETAPAN OPD RENJA
+POST :baseUrl/opd/renja/sync
+Content-Type: application/json
+
+{
+    "kode_opd": "5.01.5.05.0.00.01.0000",
+    "tahun": 2026
 }
 
 

@@ -243,13 +243,13 @@ func (ex *TujuanSyncExecutor) toTargetSnapshots(targets []perencanaan.TargetResp
 				tgt.TargetIndikator,
 			)
 		}
-		tgtSnapshot := ex.toTargetIndikatorTujuanSnapshot(tgt, tahunTarget, target, createdBy, penetapanId)
+		tgtSnapshot := ex.toTargetIndikatorTujuanSnapshot(tgt, tahunTarget, target, createdBy)
 		result = append(result, tgtSnapshot)
 	}
 	return result, nil
 }
 
-func (ex *TujuanSyncExecutor) toTargetIndikatorTujuanSnapshot(tgt perencanaan.TargetResponse, tahunTarget int, target float64, createdBy *string, penetapanId int64) domain.TargetIndikatorTujuanPenetapanOpd {
+func (ex *TujuanSyncExecutor) toTargetIndikatorTujuanSnapshot(tgt perencanaan.TargetResponse, tahunTarget int, target float64, createdBy *string) domain.TargetIndikatorTujuanPenetapanOpd {
 	kodeTarget := fmt.Sprintf("TGT-%s", tgt.Id)
 	return domain.TargetIndikatorTujuanPenetapanOpd{
 		KodeTarget: kodeTarget,

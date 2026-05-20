@@ -31,6 +31,8 @@ func (app *Application) Routes() http.Handler {
 
 	// renja
 	// router.HandlerFunc(http.MethodGet, "/opd/renja", app.RenjaOpdHandler)
+	router.HandlerFunc(http.MethodGet, "/opd/renja", app.RenjaOpdHandler)
+	router.HandlerFunc(http.MethodPost, "/opd/renja/sync", app.SyncPenetapanRenjaOpdHandler)
 
 	// sasaran opd
 	router.HandlerFunc(http.MethodGet, "/opd/sasaran", app.SasaranOpdHandler)

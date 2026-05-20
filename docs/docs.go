@@ -44,6 +44,103 @@ const docTemplate = `{
                 }
             }
         },
+        "/opd/renja": {
+            "get": {
+                "description": "Mengambil data renja OPD berdasarkan kode OPD dan tahun penetapan",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "OPD"
+                ],
+                "summary": "Get sasaran OPD penetapan",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Kode OPD",
+                        "name": "kodeOpd",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Tahun Penetapan",
+                        "name": "tahun",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Berhasil mengambil data renja OPD",
+                        "schema": {
+                            "$ref": "#/definitions/web.Response-web_RenjaPenetapanOpdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/web.ValidationErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/web.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/opd/renja/sync": {
+            "post": {
+                "description": "Sinkron data penetapan renja OPD berdasarkan kode OPD dan tahun dari perencanaan",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sync"
+                ],
+                "summary": "Sync Penetapan Renja OPD",
+                "parameters": [
+                    {
+                        "description": "Payload sinkronisasi penetapan OPD",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/web.SyncPenetapanOpdRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/web.Response-web_SyncPenetapanOpdResponse"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/web.ValidationErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/web.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/opd/sasaran": {
             "get": {
                 "description": "Mengambil data sasaran OPD berdasarkan kode OPD dan tahun penetapan",
@@ -77,10 +174,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Berhasil mengambil data sasaran OPD",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/web.Response-web_SasaranPenetapanOpdResponse"
-                            }
+                            "$ref": "#/definitions/web.Response-web_SasaranPenetapanOpdResponse"
                         }
                     },
                     "400": {
@@ -177,10 +271,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Berhasil mengambil data tujuan OPD",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/web.Response-web_TujuanPenetapanOpdResponse"
-                            }
+                            "$ref": "#/definitions/web.Response-web_TujuanPenetapanOpdResponse"
                         }
                     },
                     "400": {
@@ -285,13 +376,13 @@ const docTemplate = `{
                     "type": "integer",
                     "example": 1
                 },
-                "id_sasaran_opd": {
-                    "type": "integer",
-                    "example": 11
-                },
                 "indikator": {
                     "type": "string",
                     "example": "Indikator kepuasa publik"
+                },
+                "kode_indikator": {
+                    "type": "string",
+                    "example": "IND-TUJ-01"
                 },
                 "rumus_perhitungan": {
                     "type": "string",
@@ -305,7 +396,7 @@ const docTemplate = `{
                     "type": "integer",
                     "example": 2025
                 },
-                "target": {
+                "targets": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/web.TargetIndikatorResponse"
@@ -324,13 +415,13 @@ const docTemplate = `{
                     "type": "integer",
                     "example": 1
                 },
-                "id_tujuan_opd": {
-                    "type": "integer",
-                    "example": 12
-                },
                 "indikator": {
                     "type": "string",
                     "example": "Indikator kepuasa publik"
+                },
+                "kode_indikator": {
+                    "type": "string",
+                    "example": "IND-TUJ-01"
                 },
                 "rumus_perhitungan": {
                     "type": "string",
@@ -344,11 +435,162 @@ const docTemplate = `{
                     "type": "integer",
                     "example": 2025
                 },
-                "target": {
+                "targets": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/web.TargetIndikatorResponse"
                     }
+                }
+            }
+        },
+        "web.RenjaBidangUrusanResponse": {
+            "type": "object",
+            "properties": {
+                "bidang_urusan": {
+                    "type": "string",
+                    "example": "URUSAN PEMERINTAHAN BIDANG PENDIDIKAN"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_locked": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "kode_bidang_urusan": {
+                    "type": "string",
+                    "example": "1.01"
+                }
+            }
+        },
+        "web.RenjaKegiatanResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "is_locked": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "kegiatan": {
+                    "type": "string",
+                    "example": "KEGIATAN X"
+                },
+                "kode_kegiatan": {
+                    "type": "string",
+                    "example": "1.01.01.01.01.01"
+                }
+            }
+        },
+        "web.RenjaPenetapanOpdResponse": {
+            "type": "object",
+            "properties": {
+                "bidang_urusans": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/web.RenjaBidangUrusanResponse"
+                    }
+                },
+                "is_locked": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "kegiatans": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/web.RenjaKegiatanResponse"
+                    }
+                },
+                "kode_opd": {
+                    "type": "string",
+                    "example": "1.02.0.00.0.00.01.0000"
+                },
+                "programs": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/web.RenjaProgramResponse"
+                    }
+                },
+                "subkegiatans": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/web.RenjaSubkegiatanResponse"
+                    }
+                },
+                "tahun_aktif": {
+                    "type": "integer",
+                    "example": 2025
+                },
+                "urusans": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/web.RenjaUrusanResponse"
+                    }
+                },
+                "versi": {
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
+        "web.RenjaProgramResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "is_locked": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "kode_program": {
+                    "type": "string",
+                    "example": "1.01.01.01"
+                },
+                "program": {
+                    "type": "string",
+                    "example": "PROGRAM X"
+                }
+            }
+        },
+        "web.RenjaSubkegiatanResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "is_locked": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "kode_subkegiatan": {
+                    "type": "string",
+                    "example": "1.01.01.01.01.01.0001"
+                },
+                "subkegiatan": {
+                    "type": "string",
+                    "example": "SUBKEGIATAN X"
+                }
+            }
+        },
+        "web.RenjaUrusanResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "is_locked": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "kode_urusan": {
+                    "type": "string",
+                    "example": "1"
+                },
+                "urusan": {
+                    "type": "string",
+                    "example": "URUSAN PENUNJANG"
                 }
             }
         },
@@ -357,6 +599,14 @@ const docTemplate = `{
             "properties": {
                 "data": {
                     "$ref": "#/definitions/web.HealthcheckResponse"
+                }
+            }
+        },
+        "web.Response-web_RenjaPenetapanOpdResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/web.RenjaPenetapanOpdResponse"
                 }
             }
         },
@@ -384,21 +634,17 @@ const docTemplate = `{
                 }
             }
         },
-        "web.SasaranPenetapanOpdResponse": {
+        "web.SasaranOpdResponse": {
             "type": "object",
             "properties": {
                 "id": {
                     "type": "integer"
                 },
-                "indikator": {
+                "indikators": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/web.IndikatorSasaranPenetapanResponse"
                     }
-                },
-                "kode_opd": {
-                    "type": "string",
-                    "example": "1.02.0.00.0.00.01.0000"
                 },
                 "kode_sasaran_opd": {
                     "type": "string",
@@ -411,6 +657,25 @@ const docTemplate = `{
                 "sasaran_opd": {
                     "type": "string",
                     "example": "Meningkatnya Nilai SAKIP"
+                }
+            }
+        },
+        "web.SasaranPenetapanOpdResponse": {
+            "type": "object",
+            "properties": {
+                "is_locked": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "kode_opd": {
+                    "type": "string",
+                    "example": "1.02.0.00.0.00.01.0000"
+                },
+                "sasaran_opds": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/web.SasaranOpdResponse"
+                    }
                 },
                 "tahun_aktif": {
                     "type": "integer",
@@ -498,9 +763,9 @@ const docTemplate = `{
                     "type": "integer",
                     "example": 1
                 },
-                "indikator_id": {
-                    "type": "integer",
-                    "example": 44
+                "kode_target": {
+                    "type": "string",
+                    "example": "TGT-IND-01"
                 },
                 "satuan": {
                     "type": "string",
@@ -516,22 +781,18 @@ const docTemplate = `{
                 }
             }
         },
-        "web.TujuanPenetapanOpdResponse": {
+        "web.TujuanOpdResponse": {
             "type": "object",
             "properties": {
                 "id": {
                     "type": "integer",
                     "example": 1
                 },
-                "indikator": {
+                "indikators": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/web.IndikatorTujuanPenetapanResponse"
                     }
-                },
-                "kode_opd": {
-                    "type": "string",
-                    "example": "1.02.0.00.0.00.01.0000"
                 },
                 "kode_tujuan_opd": {
                     "type": "string",
@@ -541,13 +802,32 @@ const docTemplate = `{
                     "type": "string",
                     "example": "2025-2029"
                 },
+                "tujuan_opd": {
+                    "type": "string",
+                    "example": "Meningkatkan kualitas pelayanan publik"
+                }
+            }
+        },
+        "web.TujuanPenetapanOpdResponse": {
+            "type": "object",
+            "properties": {
+                "is_locked": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "kode_opd": {
+                    "type": "string",
+                    "example": "1.02.0.00.0.00.01.0000"
+                },
                 "tahun_aktif": {
                     "type": "integer",
                     "example": 2025
                 },
-                "tujuan_opd": {
-                    "type": "string",
-                    "example": "Meningkatkan kualitas pelayanan publik"
+                "tujuan_opds": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/web.TujuanOpdResponse"
+                    }
                 },
                 "versi": {
                     "type": "integer",

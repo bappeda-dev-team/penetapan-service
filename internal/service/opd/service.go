@@ -106,20 +106,20 @@ func (s *PenetapanOpdService) SyncPenetapanOpd(
 func (s *PenetapanOpdService) FindTujuan(
 	ctx context.Context,
 	req domain.PenetapanOpdRequest,
-) ([]web.TujuanPenetapanOpdResponse, error) {
+) (web.TujuanPenetapanOpdResponse, error) {
 	s.Logger.Info("FindTujuan")
 
 	jenisPenetapan := domain.JenisPenetapanTujuan
-	snapshotID, err := s.getActiveSnapshot(ctx, req.KodeOpd, jenisPenetapan, req.Tahun)
+	snapshot, err := s.getActiveSnapshot(ctx, req.KodeOpd, jenisPenetapan, req.Tahun)
 	if err != nil {
-		return nil, err
+		return web.TujuanPenetapanOpdResponse{}, err
 	}
-	req.SnapshotId = snapshotID
+	req.SnapshotId = &snapshot.Id
 
 	tujuanOpd, err := s.Repo.FindTujuanBySnapshot(ctx, req)
 	if err != nil {
 		s.Logger.Error("FindTujuanBySnapshot")
-		return nil, err
+		return web.TujuanPenetapanOpdResponse{}, err
 	}
 	tujuanOpdIds := make([]int64, 0, len(tujuanOpd))
 	for _, tj := range tujuanOpd {
@@ -128,7 +128,7 @@ func (s *PenetapanOpdService) FindTujuan(
 	indikators, err := s.Repo.FindIndikatorTujuanByTujuanIds(ctx, tujuanOpdIds)
 	if err != nil {
 		s.Logger.Error("FindIndikatorTujuanByTujuanIds")
-		return nil, err
+		return web.TujuanPenetapanOpdResponse{}, err
 	}
 	indikatorIds := make([]int64, 0, len(indikators))
 	for _, ind := range indikators {
@@ -137,7 +137,7 @@ func (s *PenetapanOpdService) FindTujuan(
 	targets, err := s.Repo.FindTargetIndikatorTujuanByIndikatorIds(ctx, indikatorIds)
 	if err != nil {
 		s.Logger.Error("FindTargetIndikatorTujuanByIndikatorIds")
-		return nil, err
+		return web.TujuanPenetapanOpdResponse{}, err
 	}
 	targetMap := make(
 		map[int64][]web.TargetIndikatorResponse,
@@ -160,32 +160,38 @@ func (s *PenetapanOpdService) FindTujuan(
 		)
 	}
 
-	result := make([]web.TujuanPenetapanOpdResponse, 0, len(tujuanOpd))
+	tujuanResponse := make([]web.TujuanOpdResponse, 0, len(tujuanOpd))
 	for _, tujuan := range tujuanOpd {
 		tujResp := ToTujuanOpdResponse(tujuan)
 		tujResp.Indikator = indikatorMap[tujuan.Id]
-		result = append(result, tujResp)
+		tujuanResponse = append(tujuanResponse, tujResp)
 	}
 
-	return result, nil
+	return web.TujuanPenetapanOpdResponse{
+		KodeOpd:    req.KodeOpd,
+		TahunAktif: req.Tahun,
+		Versi:      snapshot.Versi,
+		IsLocked:   true,
+		Tujuans:    tujuanResponse,
+	}, nil
 }
 
 func (s *PenetapanOpdService) FindSasaran(
 	ctx context.Context,
 	req domain.PenetapanOpdRequest,
-) ([]web.SasaranPenetapanOpdResponse, error) {
+) (web.SasaranPenetapanOpdResponse, error) {
 	s.Logger.Info("FindSasaran")
 
 	jenisPenetapan := domain.JenisPenetapanSasaran
-	snapshotID, err := s.getActiveSnapshot(ctx, req.KodeOpd, jenisPenetapan, req.Tahun)
+	snapshot, err := s.getActiveSnapshot(ctx, req.KodeOpd, jenisPenetapan, req.Tahun)
 	if err != nil {
-		return nil, err
+		return web.SasaranPenetapanOpdResponse{}, err
 	}
-	req.SnapshotId = snapshotID
+	req.SnapshotId = &snapshot.Id
 	sasaranOpds, err := s.Repo.FindSasaranBySnapshot(ctx, req)
 	if err != nil {
 		s.Logger.Error("FindSasaranBySnapshot")
-		return nil, err
+		return web.SasaranPenetapanOpdResponse{}, err
 	}
 	sasaranOpdIds := make([]int64, 0, len(sasaranOpds))
 	for _, sas := range sasaranOpds {
@@ -194,7 +200,7 @@ func (s *PenetapanOpdService) FindSasaran(
 	indikators, err := s.Repo.FindIndikatorSasaranBySasarands(ctx, sasaranOpdIds)
 	if err != nil {
 		s.Logger.Error("FindIndikatorSasaranBySasarands")
-		return nil, err
+		return web.SasaranPenetapanOpdResponse{}, err
 	}
 	indikatorIds := make([]int64, 0, len(indikators))
 	for _, ind := range indikators {
@@ -204,7 +210,7 @@ func (s *PenetapanOpdService) FindSasaran(
 	targets, err := s.Repo.FindTargetIndikatorSasaranByIndikatorIds(ctx, indikatorIds)
 	if err != nil {
 		s.Logger.Error("FindTargetIndikatorSasaranByIndikatorIds")
-		return nil, err
+		return web.SasaranPenetapanOpdResponse{}, err
 	}
 	targetMap := make(
 		map[int64][]web.TargetIndikatorResponse,
@@ -227,14 +233,144 @@ func (s *PenetapanOpdService) FindSasaran(
 		)
 	}
 
-	result := make([]web.SasaranPenetapanOpdResponse, 0, len(sasaranOpds))
+	sasaranResponse := make([]web.SasaranOpdResponse, 0, len(sasaranOpds))
 	for _, sasaran := range sasaranOpds {
 		sasaranResp := ToSasaranOpdResponse(sasaran)
 		sasaranResp.Indikator = indikatorMap[sasaran.Id]
-		result = append(result, sasaranResp)
+		sasaranResponse = append(sasaranResponse, sasaranResp)
 	}
 
-	return result, nil
+	return web.SasaranPenetapanOpdResponse{
+		KodeOpd:    req.KodeOpd,
+		TahunAktif: req.Tahun,
+		Versi:      snapshot.Versi,
+		IsLocked:   true,
+		Sasarans:   sasaranResponse,
+	}, nil
+}
+
+func (s *PenetapanOpdService) FindRenja(
+	ctx context.Context,
+	req domain.PenetapanOpdRequest,
+) (web.RenjaPenetapanOpdResponse, error) {
+	s.Logger.Info("FindRenja")
+
+	jenisPenetapan := domain.JenisPenetapanRenja
+	snapshot, err := s.getActiveSnapshot(ctx, req.KodeOpd, jenisPenetapan, req.Tahun)
+	if err != nil {
+		return web.RenjaPenetapanOpdResponse{}, err
+	}
+
+	req.SnapshotId = &snapshot.Id
+
+	urusans, err := s.Repo.FindRenjaUrusanBySnapshot(ctx, req)
+	if err != nil {
+		s.Logger.Error("FindRenjaUrusanBySnapshot")
+		return web.RenjaPenetapanOpdResponse{}, err
+	}
+
+	bidangUrusans, err := s.Repo.FindRenjaBidangUrusanBySnapshot(ctx, req)
+	if err != nil {
+		s.Logger.Error("FindRenjaBidangUrusanBySnapshot")
+		return web.RenjaPenetapanOpdResponse{}, err
+	}
+
+	programs, err := s.Repo.FindRenjaProgramBySnapshot(ctx, req)
+	if err != nil {
+		s.Logger.Error("FindRenjaProgramBySnapshot")
+		return web.RenjaPenetapanOpdResponse{}, err
+	}
+
+	kegiatans, err := s.Repo.FindRenjaKegiatanBySnapshot(ctx, req)
+	if err != nil {
+		s.Logger.Error("FindRenjaKegiatanBySnapshot")
+		return web.RenjaPenetapanOpdResponse{}, err
+	}
+
+	subkegiatans, err := s.Repo.FindRenjaSubkegiatanBySnapshot(ctx, req)
+	if err != nil {
+		s.Logger.Error("FindRenjaSubkegiatanBySnapshot")
+		return web.RenjaPenetapanOpdResponse{}, err
+	}
+
+	// responses
+
+	var urusanResponses []web.RenjaUrusanResponse
+	for _, urusan := range urusans {
+		urusanResponses = append(
+			urusanResponses,
+			web.RenjaUrusanResponse{
+				Id:         urusan.Id,
+				KodeUrusan: urusan.KodeUrusan,
+				Urusan:     urusan.Urusan,
+				IsLocked:   true,
+			},
+		)
+	}
+
+	var bidangUrusanResponses []web.RenjaBidangUrusanResponse
+	for _, bidang := range bidangUrusans {
+		bidangUrusanResponses = append(
+			bidangUrusanResponses,
+			web.RenjaBidangUrusanResponse{
+				Id:               bidang.Id,
+				KodeBidangUrusan: bidang.KodeBidangUrusan,
+				BidangUrusan:     bidang.BidangUrusan,
+				IsLocked:         true,
+			},
+		)
+	}
+
+	var programResponses []web.RenjaProgramResponse
+	for _, program := range programs {
+		programResponses = append(
+			programResponses,
+			web.RenjaProgramResponse{
+				Id:          program.Id,
+				KodeProgram: program.KodeProgram,
+				Program:     program.Program,
+				IsLocked:    true,
+			},
+		)
+	}
+
+	var kegiatanResponses []web.RenjaKegiatanResponse
+	for _, kegiatan := range kegiatans {
+		kegiatanResponses = append(
+			kegiatanResponses,
+			web.RenjaKegiatanResponse{
+				Id:           kegiatan.Id,
+				KodeKegiatan: kegiatan.KodeKegiatan,
+				Kegiatan:     kegiatan.Kegiatan,
+				IsLocked:     true,
+			},
+		)
+	}
+
+	var subkegiatanResponses []web.RenjaSubkegiatanResponse
+	for _, sub := range subkegiatans {
+		subkegiatanResponses = append(
+			subkegiatanResponses,
+			web.RenjaSubkegiatanResponse{
+				Id:              sub.Id,
+				KodeSubkegiatan: sub.KodeSubkegiatan,
+				Subkegiatan:     sub.Subkegiatan,
+				IsLocked:        true,
+			},
+		)
+	}
+
+	return web.RenjaPenetapanOpdResponse{
+		KodeOpd:       req.KodeOpd,
+		TahunAktif:    req.Tahun,
+		Versi:         12,
+		IsLocked:      true,
+		Urusans:       urusanResponses,
+		BidangUrusans: bidangUrusanResponses,
+		Programs:      programResponses,
+		Kegiatans:     kegiatanResponses,
+		Subkegiatans:  subkegiatanResponses,
+	}, nil
 }
 
 func (s *PenetapanOpdService) markSyncAsFailed(ctx context.Context, syncId int64, msg string) error {
@@ -280,13 +416,19 @@ func (s *PenetapanOpdService) failSync(ctx context.Context, syncId int64, cause 
 	return cause
 }
 
-func (s *PenetapanOpdService) getActiveSnapshot(ctx context.Context, kodeOpd string, jenisPenetapan string, tahun int) (*int64, error) {
-	snapshotID, err := s.Repo.GetActiveSnapshot(ctx, kodeOpd, jenisPenetapan, tahun)
+func (s *PenetapanOpdService) getActiveSnapshot(
+	ctx context.Context,
+	kodeOpd string,
+	jenisPenetapan string,
+	tahun int,
+) (*domain.ActiveSnapshot, error) {
+
+	snapshot, err := s.Repo.GetActiveSnapshot(ctx, kodeOpd, jenisPenetapan, tahun)
 	if err != nil {
 		s.Logger.Error("GetActiveSnapshot")
 		return nil, err
 	}
-	if snapshotID == nil {
+	if snapshot == nil {
 		s.Logger.ErrorContext(
 			ctx,
 			"get active snapshot failed",
@@ -298,5 +440,5 @@ func (s *PenetapanOpdService) getActiveSnapshot(ctx context.Context, kodeOpd str
 		return nil, nil
 	}
 
-	return snapshotID, nil
+	return snapshot, nil
 }

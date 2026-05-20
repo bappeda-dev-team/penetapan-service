@@ -8,5 +8,5 @@ type IndikatorSasaranPenetapanResponse struct {
 	SumberData          *string                   `json:"sumber_data" example:"bps"`
 	DefinisiOperasional *string                   `json:"definisi_operasional" example:"definisi abc"`
 	TahunAktif          int                       `json:"tahun_aktif" example:"2025"`
-	Target              []TargetIndikatorResponse `json:"target"`
+	Target              []TargetIndikatorResponse `json:"targets"`
 }

@@ -48,10 +48,18 @@ func buildApplication(
 		logger,
 	)
 
+	//// renja
+	renjaSyncExecutor := sync.NewRenjaSyncExecutor(
+		penetapanOpdRepo,
+		perencanaanClient,
+		logger,
+	)
+
 	// register executor
 	syncRegistry := &sync.Registry{
 		TujuanSyncExecutor:  tujuanSyncExecutor,
 		SasaranSyncExecutor: sasaranSyncExecutor,
+		RenjaSyncExecutor:   renjaSyncExecutor,
 	}
 
 	// service

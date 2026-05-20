@@ -2,8 +2,9 @@ package api
 
 import (
 	"fmt"
-	"github.com/bappeda-dev-team/penetapan-service/internal/model/web"
 	"net/http"
+
+	"github.com/bappeda-dev-team/penetapan-service/internal/model/web"
 )
 
 // The logError() method is a helper for logging an error message

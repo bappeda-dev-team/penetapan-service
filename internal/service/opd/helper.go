@@ -5,15 +5,12 @@ import (
 	"github.com/bappeda-dev-team/penetapan-service/internal/model/web"
 )
 
-func ToTujuanOpdResponse(tujuanOpd domain.TujuanPenetapanOpd) web.TujuanPenetapanOpdResponse {
-	return web.TujuanPenetapanOpdResponse{
+func ToTujuanOpdResponse(tujuanOpd domain.TujuanPenetapanOpd) web.TujuanOpdResponse {
+	return web.TujuanOpdResponse{
 		Id:            tujuanOpd.Id,
-		KodeOpd:       tujuanOpd.KodeOpd,
 		KodeTujuanOpd: tujuanOpd.KodeTujuanOpd,
 		TujuanOpd:     tujuanOpd.TujuanOpd,
 		Periode:       tujuanOpd.Periode,
-		TahunAktif:    tujuanOpd.TahunAktif,
-		Versi:         tujuanOpd.Versi,
 		Indikator:     []web.IndikatorTujuanPenetapanResponse{},
 	}
 }
@@ -41,15 +38,12 @@ func ToTargetIndikatorTujuanOpdResponse(target domain.TargetIndikatorTujuanPenet
 	}
 }
 
-func ToSasaranOpdResponse(sasaranOpd domain.SasaranPenetapanOpd) web.SasaranPenetapanOpdResponse {
-	return web.SasaranPenetapanOpdResponse{
+func ToSasaranOpdResponse(sasaranOpd domain.SasaranPenetapanOpd) web.SasaranOpdResponse {
+	return web.SasaranOpdResponse{
 		Id:             sasaranOpd.Id,
-		KodeOpd:        sasaranOpd.KodeOpd,
 		KodeSasaranOpd: sasaranOpd.KodeSasaranOpd,
 		SasaranOpd:     sasaranOpd.SasaranOpd,
 		Periode:        sasaranOpd.Periode,
-		TahunAktif:     sasaranOpd.TahunAktif,
-		Versi:          sasaranOpd.Versi,
 		Indikator:      []web.IndikatorSasaranPenetapanResponse{},
 	}
 }
