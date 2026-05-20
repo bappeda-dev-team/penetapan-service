@@ -27,22 +27,32 @@ type RenjaBidangUrusanResponse struct {
 }
 
 type RenjaProgramResponse struct {
-	Id          int64  `json:"id"`
-	KodeProgram string `json:"kode_program" example:"1.01.01.01"`
-	Program     string `json:"program" example:"PROGRAM X"`
-	IsLocked    bool   `json:"is_locked" example:"true"`
+	Id          int64                    `json:"id"`
+	KodeProgram string                   `json:"kode_program" example:"1.01.01.01"`
+	Program     string                   `json:"program" example:"PROGRAM X"`
+	IsLocked    bool                     `json:"is_locked" example:"true"`
+	Indikators  []IndikatorRenjaResponse `json:"indikators"`
 }
 
 type RenjaKegiatanResponse struct {
-	Id           int64  `json:"id"`
-	KodeKegiatan string `json:"kode_kegiatan" example:"1.01.01.01.01.01"`
-	Kegiatan     string `json:"kegiatan" example:"KEGIATAN X"`
-	IsLocked     bool   `json:"is_locked" example:"true"`
+	Id           int64                    `json:"id"`
+	KodeKegiatan string                   `json:"kode_kegiatan" example:"1.01.01.01.01.01"`
+	Kegiatan     string                   `json:"kegiatan" example:"KEGIATAN X"`
+	IsLocked     bool                     `json:"is_locked" example:"true"`
+	Indikators   []IndikatorRenjaResponse `json:"indikators"`
 }
 
 type RenjaSubkegiatanResponse struct {
-	Id              int64  `json:"id"`
-	KodeSubkegiatan string `json:"kode_subkegiatan" example:"1.01.01.01.01.01.0001"`
-	Subkegiatan     string `json:"subkegiatan" example:"SUBKEGIATAN X"`
-	IsLocked        bool   `json:"is_locked" example:"true"`
+	Id              int64                    `json:"id"`
+	KodeSubkegiatan string                   `json:"kode_subkegiatan" example:"1.01.01.01.01.01.0001"`
+	Subkegiatan     string                   `json:"subkegiatan" example:"SUBKEGIATAN X"`
+	IsLocked        bool                     `json:"is_locked" example:"true"`
+	Indikators      []IndikatorRenjaResponse `json:"indikators"`
+}
+
+type IndikatorRenjaResponse struct {
+	Id            int64                     `json:"id"`
+	KodeIndikator string                    `json:"kode_indikator" example:"IND-123"`
+	Indikator     string                    `json:"indikator" example:"TEST-INDIKATOR"`
+	Targets       []TargetIndikatorResponse `json:"targets"`
 }

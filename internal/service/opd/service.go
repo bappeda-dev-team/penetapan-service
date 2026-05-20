@@ -280,16 +280,31 @@ func (s *PenetapanOpdService) FindRenja(
 		s.Logger.Error("FindRenjaProgramBySnapshot")
 		return web.RenjaPenetapanOpdResponse{}, err
 	}
+	err = s.findIndikatorRenjaProgram(ctx, &programs)
+	if err != nil {
+		s.Logger.Error("findIndikatorRenjaProgram")
+		return web.RenjaPenetapanOpdResponse{}, err
+	}
 
 	kegiatans, err := s.Repo.FindRenjaKegiatanBySnapshot(ctx, req)
 	if err != nil {
 		s.Logger.Error("FindRenjaKegiatanBySnapshot")
 		return web.RenjaPenetapanOpdResponse{}, err
 	}
+	err = s.findIndikatorRenjaKegiatan(ctx, &kegiatans)
+	if err != nil {
+		s.Logger.Error("findIndikatorRenjaKegiatan")
+		return web.RenjaPenetapanOpdResponse{}, err
+	}
 
 	subkegiatans, err := s.Repo.FindRenjaSubkegiatanBySnapshot(ctx, req)
 	if err != nil {
 		s.Logger.Error("FindRenjaSubkegiatanBySnapshot")
+		return web.RenjaPenetapanOpdResponse{}, err
+	}
+	err = s.findIndikatorRenjaSubkegiatan(ctx, &subkegiatans)
+	if err != nil {
+		s.Logger.Error("findIndikatorRenjaSubkegiatan")
 		return web.RenjaPenetapanOpdResponse{}, err
 	}
 
@@ -323,6 +338,27 @@ func (s *PenetapanOpdService) FindRenja(
 
 	var programResponses []web.RenjaProgramResponse
 	for _, program := range programs {
+		var indResp []web.IndikatorRenjaResponse
+		for _, ind := range program.Indikators {
+			var targetResp []web.TargetIndikatorResponse
+			for _, tar := range ind.Targets {
+				targetResp = append(targetResp,
+					web.TargetIndikatorResponse{
+						Id:         tar.Id,
+						KodeTarget: tar.KodeTarget,
+						Tahun:      tar.Tahun,
+						Target:     tar.Target,
+						Satuan:     tar.Satuan,
+					})
+			}
+			indResp = append(indResp,
+				web.IndikatorRenjaResponse{
+					Id:            ind.Id,
+					KodeIndikator: ind.KodeIndikator,
+					Indikator:     ind.Indikator,
+					Targets:       targetResp,
+				})
+		}
 		programResponses = append(
 			programResponses,
 			web.RenjaProgramResponse{
@@ -330,12 +366,34 @@ func (s *PenetapanOpdService) FindRenja(
 				KodeProgram: program.KodeProgram,
 				Program:     program.Program,
 				IsLocked:    true,
+				Indikators:  indResp,
 			},
 		)
 	}
 
 	var kegiatanResponses []web.RenjaKegiatanResponse
 	for _, kegiatan := range kegiatans {
+		var indResp []web.IndikatorRenjaResponse
+		for _, ind := range kegiatan.Indikators {
+			var targetResp []web.TargetIndikatorResponse
+			for _, tar := range ind.Targets {
+				targetResp = append(targetResp,
+					web.TargetIndikatorResponse{
+						Id:         tar.Id,
+						KodeTarget: tar.KodeTarget,
+						Tahun:      tar.Tahun,
+						Target:     tar.Target,
+						Satuan:     tar.Satuan,
+					})
+			}
+			indResp = append(indResp,
+				web.IndikatorRenjaResponse{
+					Id:            ind.Id,
+					KodeIndikator: ind.KodeIndikator,
+					Indikator:     ind.Indikator,
+					Targets:       targetResp,
+				})
+		}
 		kegiatanResponses = append(
 			kegiatanResponses,
 			web.RenjaKegiatanResponse{
@@ -343,12 +401,34 @@ func (s *PenetapanOpdService) FindRenja(
 				KodeKegiatan: kegiatan.KodeKegiatan,
 				Kegiatan:     kegiatan.Kegiatan,
 				IsLocked:     true,
+				Indikators:   indResp,
 			},
 		)
 	}
 
 	var subkegiatanResponses []web.RenjaSubkegiatanResponse
 	for _, sub := range subkegiatans {
+		var indResp []web.IndikatorRenjaResponse
+		for _, ind := range sub.Indikators {
+			var targetResp []web.TargetIndikatorResponse
+			for _, tar := range ind.Targets {
+				targetResp = append(targetResp,
+					web.TargetIndikatorResponse{
+						Id:         tar.Id,
+						KodeTarget: tar.KodeTarget,
+						Tahun:      tar.Tahun,
+						Target:     tar.Target,
+						Satuan:     tar.Satuan,
+					})
+			}
+			indResp = append(indResp,
+				web.IndikatorRenjaResponse{
+					Id:            ind.Id,
+					KodeIndikator: ind.KodeIndikator,
+					Indikator:     ind.Indikator,
+					Targets:       targetResp,
+				})
+		}
 		subkegiatanResponses = append(
 			subkegiatanResponses,
 			web.RenjaSubkegiatanResponse{
@@ -356,6 +436,7 @@ func (s *PenetapanOpdService) FindRenja(
 				KodeSubkegiatan: sub.KodeSubkegiatan,
 				Subkegiatan:     sub.Subkegiatan,
 				IsLocked:        true,
+				Indikators:      indResp,
 			},
 		)
 	}

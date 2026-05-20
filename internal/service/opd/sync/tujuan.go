@@ -153,7 +153,7 @@ func (ex *TujuanSyncExecutor) toTujuanSnapshots(tujuanPerencanaan []perencanaan.
 					ind, per.KodeOpd,
 					createdBy,
 					tahunAktif,
-					penetapanId)
+				)
 				if err != nil {
 					return nil, err
 				}
@@ -205,8 +205,8 @@ func (ex *TujuanSyncExecutor) toTujuanSnapshot(
 	}
 }
 
-func (ex *TujuanSyncExecutor) toIndikatorTujuanSnapshot(ind perencanaan.IndikatorResponse, kodeOpd string, createdBy *string, tahunAktif int, penetapanId int64) (domain.IndikatorTujuanPenetapanOpd, error) {
-	targets, err := ex.toTargetSnapshots(ind.Target, ind.NamaIndikator, createdBy, penetapanId)
+func (ex *TujuanSyncExecutor) toIndikatorTujuanSnapshot(ind perencanaan.IndikatorResponse, kodeOpd string, createdBy *string, tahunAktif int) (domain.IndikatorTujuanPenetapanOpd, error) {
+	targets, err := ex.toTargetSnapshots(ind.Target, ind.NamaIndikator, createdBy)
 	if err != nil {
 		return domain.IndikatorTujuanPenetapanOpd{}, err
 	}
@@ -224,7 +224,7 @@ func (ex *TujuanSyncExecutor) toIndikatorTujuanSnapshot(ind perencanaan.Indikato
 	}, nil
 }
 
-func (ex *TujuanSyncExecutor) toTargetSnapshots(targets []perencanaan.TargetResponse, namaIndikator string, createdBy *string, penetapanId int64) ([]domain.TargetIndikatorTujuanPenetapanOpd, error) {
+func (ex *TujuanSyncExecutor) toTargetSnapshots(targets []perencanaan.TargetResponse, namaIndikator string, createdBy *string) ([]domain.TargetIndikatorTujuanPenetapanOpd, error) {
 	result := make([]domain.TargetIndikatorTujuanPenetapanOpd, 0, len(targets))
 	for _, tgt := range targets {
 		tahunTarget, err := strconv.Atoi(tgt.Tahun)

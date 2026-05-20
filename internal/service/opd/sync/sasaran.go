@@ -154,7 +154,7 @@ func (ex *SasaranSyncExecutor) toSasaranSnapshots(sasaranPerencanaans []perencan
 					ind, per.KodeOpd,
 					createdBy,
 					tahunAktif,
-					penetapanId)
+				)
 				if err != nil {
 					return nil, err
 				}
@@ -205,7 +205,7 @@ func (ex *SasaranSyncExecutor) toSasaranSnapshot(
 	}
 }
 
-func (ex *SasaranSyncExecutor) toIndikatorSasaranSnapshot(ind perencanaan.IndikatorSasaranResponse, kodeOpd string, createdBy *string, tahunAktif int, penetapanId int64) (domain.IndikatorSasaranPenetapanOpd, error) {
+func (ex *SasaranSyncExecutor) toIndikatorSasaranSnapshot(ind perencanaan.IndikatorSasaranResponse, kodeOpd string, createdBy *string, tahunAktif int) (domain.IndikatorSasaranPenetapanOpd, error) {
 	targets, err := ex.toTargetSnapshots(ind.Target, ind.NamaIndikator, createdBy)
 	if err != nil {
 		return domain.IndikatorSasaranPenetapanOpd{}, err

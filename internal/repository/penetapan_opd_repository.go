@@ -1850,3 +1850,471 @@ func (r *PenetapanOpdRepository) FindRenjaSubkegiatanBySnapshot(
 
 	return result, rows.Err()
 }
+
+func (r *PenetapanOpdRepository) FindIndikatorRenjaProgram(
+	ctx context.Context,
+	programIds []int64,
+) ([]domain.IndikatorRenjaProgram, error) {
+
+	if len(programIds) == 0 {
+		return []domain.IndikatorRenjaProgram{}, nil
+	}
+
+	var (
+		placeholders []string
+		args         []any
+	)
+
+	for i, id := range programIds {
+		placeholders = append(placeholders, fmt.Sprintf("$%d", i+1))
+		args = append(args, id)
+	}
+
+	query := fmt.Sprintf(`
+	SELECT
+		id,
+		program_id,
+		kode_indikator,
+		indikator,
+		tahun,
+		created_date,
+		last_modified_date,
+		created_by
+	FROM indikator_renja_program
+	WHERE program_id IN (%s)
+	ORDER BY id
+	`, strings.Join(placeholders, ","))
+
+	rows, err := r.DB.QueryContext(
+		ctx,
+		query,
+		args...,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	var result []domain.IndikatorRenjaProgram
+
+	for rows.Next() {
+
+		var item domain.IndikatorRenjaProgram
+
+		err := rows.Scan(
+			&item.Id,
+			&item.ProgramId,
+			&item.KodeIndikator,
+			&item.Indikator,
+			&item.Tahun,
+			&item.CreatedDate,
+			&item.LastModifiedDate,
+			&item.CreatedBy,
+		)
+
+		if err != nil {
+			return nil, err
+		}
+
+		result = append(
+			result,
+			item,
+		)
+	}
+
+	return result, rows.Err()
+}
+
+func (r *PenetapanOpdRepository) FindTargetIndikatorRenjaProgramBatch(
+	ctx context.Context,
+	indikatorIds []int64,
+) ([]domain.TargetIndikatorRenjaProgram, error) {
+
+	if len(indikatorIds) == 0 {
+		return []domain.TargetIndikatorRenjaProgram{}, nil
+	}
+
+	var (
+		placeholders []string
+		args         []any
+	)
+
+	for i, id := range indikatorIds {
+		placeholders = append(placeholders, fmt.Sprintf("$%d", i+1))
+		args = append(args, id)
+	}
+
+	query := fmt.Sprintf(`
+	SELECT
+		id,
+		indikator_program_id,
+		kode_target,
+		target,
+		satuan,
+		tahun,
+		created_date,
+		last_modified_date,
+		created_by
+	FROM target_indikator_renja_program
+	WHERE indikator_program_id IN (%s)
+	ORDER BY id
+	`, strings.Join(placeholders, ","))
+
+	rows, err := r.DB.QueryContext(
+		ctx,
+		query,
+		args...,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	result := make(
+		[]domain.TargetIndikatorRenjaProgram,
+		0,
+		len(indikatorIds),
+	)
+
+	for rows.Next() {
+
+		var item domain.TargetIndikatorRenjaProgram
+
+		err := rows.Scan(
+			&item.Id,
+			&item.IndikatorProgramId,
+			&item.KodeTarget,
+			&item.Target,
+			&item.Satuan,
+			&item.Tahun,
+			&item.CreatedDate,
+			&item.LastModifiedDate,
+			&item.CreatedBy,
+		)
+
+		if err != nil {
+			return nil, err
+		}
+
+		result = append(
+			result,
+			item,
+		)
+	}
+
+	return result, rows.Err()
+}
+
+func (r *PenetapanOpdRepository) FindIndikatorRenjaKegiatan(
+	ctx context.Context,
+	kegiatanIds []int64,
+) ([]domain.IndikatorRenjaKegiatan, error) {
+
+	if len(kegiatanIds) == 0 {
+		return []domain.IndikatorRenjaKegiatan{}, nil
+	}
+
+	var (
+		placeholders []string
+		args         []any
+	)
+
+	for i, id := range kegiatanIds {
+		placeholders = append(placeholders, fmt.Sprintf("$%d", i+1))
+		args = append(args, id)
+	}
+
+	query := fmt.Sprintf(`
+	SELECT
+		id,
+		kegiatan_id,
+		kode_indikator,
+		indikator,
+		tahun,
+		created_date,
+		last_modified_date,
+		created_by
+	FROM indikator_renja_kegiatan
+	WHERE kegiatan_id IN (%s)
+	ORDER BY id
+	`, strings.Join(placeholders, ","))
+
+	rows, err := r.DB.QueryContext(
+		ctx,
+		query,
+		args...,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	var result []domain.IndikatorRenjaKegiatan
+
+	for rows.Next() {
+
+		var item domain.IndikatorRenjaKegiatan
+
+		err := rows.Scan(
+			&item.Id,
+			&item.KegiatanId,
+			&item.KodeIndikator,
+			&item.Indikator,
+			&item.Tahun,
+			&item.CreatedDate,
+			&item.LastModifiedDate,
+			&item.CreatedBy,
+		)
+
+		if err != nil {
+			return nil, err
+		}
+
+		result = append(
+			result,
+			item,
+		)
+	}
+
+	return result, rows.Err()
+}
+
+func (r *PenetapanOpdRepository) FindTargetIndikatorRenjaKegiatanBatch(
+	ctx context.Context,
+	indikatorIds []int64,
+) ([]domain.TargetIndikatorRenjaKegiatan, error) {
+
+	if len(indikatorIds) == 0 {
+		return []domain.TargetIndikatorRenjaKegiatan{}, nil
+	}
+
+	var (
+		placeholders []string
+		args         []any
+	)
+
+	for i, id := range indikatorIds {
+		placeholders = append(placeholders, fmt.Sprintf("$%d", i+1))
+		args = append(args, id)
+	}
+
+	query := fmt.Sprintf(`
+	SELECT
+		id,
+		indikator_kegiatan_id,
+		kode_target,
+		target,
+		satuan,
+		tahun,
+		created_date,
+		last_modified_date,
+		created_by
+	FROM target_indikator_renja_kegiatan
+	WHERE indikator_kegiatan_id IN (%s)
+	ORDER BY id
+	`, strings.Join(placeholders, ","))
+
+	rows, err := r.DB.QueryContext(
+		ctx,
+		query,
+		args...,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	result := make(
+		[]domain.TargetIndikatorRenjaKegiatan,
+		0,
+		len(indikatorIds),
+	)
+
+	for rows.Next() {
+
+		var item domain.TargetIndikatorRenjaKegiatan
+
+		err := rows.Scan(
+			&item.Id,
+			&item.IndikatorKegiatanId,
+			&item.KodeTarget,
+			&item.Target,
+			&item.Satuan,
+			&item.Tahun,
+			&item.CreatedDate,
+			&item.LastModifiedDate,
+			&item.CreatedBy,
+		)
+
+		if err != nil {
+			return nil, err
+		}
+
+		result = append(
+			result,
+			item,
+		)
+	}
+
+	return result, rows.Err()
+}
+
+func (r *PenetapanOpdRepository) FindIndikatorRenjaSubkegiatan(
+	ctx context.Context,
+	subkegiatanIds []int64,
+) ([]domain.IndikatorRenjaSubkegiatan, error) {
+
+	if len(subkegiatanIds) == 0 {
+
+		return []domain.IndikatorRenjaSubkegiatan{}, nil
+	}
+	var (
+		placeholders []string
+		args         []any
+	)
+	for i, id := range subkegiatanIds {
+		placeholders = append(placeholders, fmt.Sprintf("$%d", i+1))
+		args = append(args, id)
+	}
+
+	query := fmt.Sprintf(`
+	SELECT
+		id,
+		kegiatan_id,
+		kode_indikator,
+		indikator,
+		tahun,
+		created_date,
+		last_modified_date,
+		created_by
+	FROM indikator_renja_kegiatan
+	WHERE kegiatan_id IN (%s)
+	ORDER BY id
+	`, strings.Join(placeholders, ","))
+
+	rows, err := r.DB.QueryContext(
+		ctx,
+		query,
+		args...,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	var result []domain.IndikatorRenjaSubkegiatan
+
+	for rows.Next() {
+
+		var item domain.IndikatorRenjaSubkegiatan
+
+		err := rows.Scan(
+			&item.Id,
+			&item.SubkegiatanId,
+			&item.KodeIndikator,
+			&item.Indikator,
+			&item.Tahun,
+			&item.CreatedDate,
+			&item.LastModifiedDate,
+			&item.CreatedBy,
+		)
+
+		if err != nil {
+			return nil, err
+		}
+
+		result = append(
+			result,
+			item,
+		)
+	}
+
+	return result, rows.Err()
+}
+
+func (r *PenetapanOpdRepository) FindTargetIndikatorRenjaSubkegiatanBatch(
+	ctx context.Context,
+	indikatorIds []int64,
+) ([]domain.TargetIndikatorRenjaSubkegiatan, error) {
+
+	if len(indikatorIds) == 0 {
+		return []domain.TargetIndikatorRenjaSubkegiatan{}, nil
+	}
+
+	var (
+		placeholders []string
+		args         []any
+	)
+	for i, id := range indikatorIds {
+		placeholders = append(placeholders, fmt.Sprintf("$%d", i+1))
+		args = append(args, id)
+	}
+
+	query := fmt.Sprintf(`
+	SELECT
+		id,
+		indikator_subkegiatan_id,
+		kode_target,
+		target,
+		satuan,
+		tahun,
+		created_date,
+		last_modified_date,
+		created_by
+	FROM target_indikator_renja_subkegiatan
+	WHERE indikator_subkegiatan_id IN (%s)
+	ORDER BY id
+	`, strings.Join(placeholders, ","))
+
+	rows, err := r.DB.QueryContext(
+		ctx,
+		query,
+		args...,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	var result []domain.TargetIndikatorRenjaSubkegiatan
+
+	for rows.Next() {
+
+		var item domain.TargetIndikatorRenjaSubkegiatan
+
+		err := rows.Scan(
+			&item.Id,
+			&item.IndikatorSubkegiatanId,
+			&item.KodeTarget,
+			&item.Target,
+			&item.Satuan,
+			&item.Tahun,
+			&item.CreatedDate,
+			&item.LastModifiedDate,
+			&item.CreatedBy,
+		)
+
+		if err != nil {
+			return nil, err
+		}
+
+		result = append(
+			result,
+			item,
+		)
+	}
+
+	return result, rows.Err()
+}
