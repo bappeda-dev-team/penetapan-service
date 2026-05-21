@@ -13,41 +13,46 @@ type RenjaPenetapanOpdResponse struct {
 }
 
 type RenjaUrusanResponse struct {
-	Id         int64  `json:"id"`
-	KodeUrusan string `json:"kode_urusan" example:"1"`
-	Urusan     string `json:"urusan" example:"URUSAN PENUNJANG"`
-	IsLocked   bool   `json:"is_locked" example:"true"`
+	Id           int64                       `json:"id"`
+	KodeUrusan   string                      `json:"kode_urusan" example:"1"`
+	Urusan       string                      `json:"urusan" example:"URUSAN PENUNJANG"`
+	IsLocked     bool                        `json:"is_locked" example:"true"`
+	PaguAnggaran []PaguAnggaranRenjaResponse `json:"pagu_anggaran"`
 }
 
 type RenjaBidangUrusanResponse struct {
-	Id               int64  `json:"id"`
-	KodeBidangUrusan string `json:"kode_bidang_urusan" example:"1.01"`
-	BidangUrusan     string `json:"bidang_urusan" example:"URUSAN PEMERINTAHAN BIDANG PENDIDIKAN"`
-	IsLocked         bool   `json:"is_locked" example:"true"`
+	Id               int64                       `json:"id"`
+	KodeBidangUrusan string                      `json:"kode_bidang_urusan" example:"1.01"`
+	BidangUrusan     string                      `json:"bidang_urusan" example:"URUSAN PEMERINTAHAN BIDANG PENDIDIKAN"`
+	IsLocked         bool                        `json:"is_locked" example:"true"`
+	PaguAnggaran     []PaguAnggaranRenjaResponse `json:"pagu_anggaran"`
 }
 
 type RenjaProgramResponse struct {
-	Id          int64                    `json:"id"`
-	KodeProgram string                   `json:"kode_program" example:"1.01.01.01"`
-	Program     string                   `json:"program" example:"PROGRAM X"`
-	IsLocked    bool                     `json:"is_locked" example:"true"`
-	Indikators  []IndikatorRenjaResponse `json:"indikators"`
+	Id           int64                       `json:"id"`
+	KodeProgram  string                      `json:"kode_program" example:"1.01.01.01"`
+	Program      string                      `json:"program" example:"PROGRAM X"`
+	IsLocked     bool                        `json:"is_locked" example:"true"`
+	Indikators   []IndikatorRenjaResponse    `json:"indikators"`
+	PaguAnggaran []PaguAnggaranRenjaResponse `json:"pagu_anggaran"`
 }
 
 type RenjaKegiatanResponse struct {
-	Id           int64                    `json:"id"`
-	KodeKegiatan string                   `json:"kode_kegiatan" example:"1.01.01.01.01.01"`
-	Kegiatan     string                   `json:"kegiatan" example:"KEGIATAN X"`
-	IsLocked     bool                     `json:"is_locked" example:"true"`
-	Indikators   []IndikatorRenjaResponse `json:"indikators"`
+	Id           int64                       `json:"id"`
+	KodeKegiatan string                      `json:"kode_kegiatan" example:"1.01.01.01.01.01"`
+	Kegiatan     string                      `json:"kegiatan" example:"KEGIATAN X"`
+	IsLocked     bool                        `json:"is_locked" example:"true"`
+	Indikators   []IndikatorRenjaResponse    `json:"indikators"`
+	PaguAnggaran []PaguAnggaranRenjaResponse `json:"pagu_anggaran"`
 }
 
 type RenjaSubkegiatanResponse struct {
-	Id              int64                    `json:"id"`
-	KodeSubkegiatan string                   `json:"kode_subkegiatan" example:"1.01.01.01.01.01.0001"`
-	Subkegiatan     string                   `json:"subkegiatan" example:"SUBKEGIATAN X"`
-	IsLocked        bool                     `json:"is_locked" example:"true"`
-	Indikators      []IndikatorRenjaResponse `json:"indikators"`
+	Id              int64                       `json:"id"`
+	KodeSubkegiatan string                      `json:"kode_subkegiatan" example:"1.01.01.01.01.01.0001"`
+	Subkegiatan     string                      `json:"subkegiatan" example:"SUBKEGIATAN X"`
+	IsLocked        bool                        `json:"is_locked" example:"true"`
+	Indikators      []IndikatorRenjaResponse    `json:"indikators"`
+	PaguAnggaran    []PaguAnggaranRenjaResponse `json:"pagu_anggaran"`
 }
 
 type IndikatorRenjaResponse struct {
@@ -55,4 +60,11 @@ type IndikatorRenjaResponse struct {
 	KodeIndikator string                    `json:"kode_indikator" example:"IND-123"`
 	Indikator     string                    `json:"indikator" example:"TEST-INDIKATOR"`
 	Targets       []TargetIndikatorResponse `json:"targets"`
+}
+
+type PaguAnggaranRenjaResponse struct {
+	Id        int64  `json:"id"`
+	KodePagu  string `json:"kode_pagu" example:"PAGU-UR-123"`
+	Pagu      int64  `json:"pagu" example:"100000"`
+	JenisPagu string `json:"jenis_pagu" example:"PENETAPAN"`
 }

@@ -22,6 +22,7 @@ type RenjaUrusan struct {
 	CreatedBy        *string
 	Versi            int
 	BidangUrusans    []RenjaBidangUrusan
+	PaguAnggaran     []AnggaranRenja
 }
 
 // BIDANG URUSAN
@@ -39,6 +40,7 @@ type RenjaBidangUrusan struct {
 	CreatedBy        *string
 	Versi            int
 	Programs         []RenjaProgram
+	PaguAnggaran     []AnggaranRenja
 }
 
 // PROGRAM
@@ -57,6 +59,7 @@ type RenjaProgram struct {
 	Versi            int
 	Kegiatans        []RenjaKegiatan
 	Indikators       []IndikatorRenjaProgram
+	PaguAnggaran     []AnggaranRenja
 }
 
 type IndikatorRenjaProgram struct {
@@ -71,6 +74,7 @@ type IndikatorRenjaProgram struct {
 	CreatedBy        *string
 	PenetapanId      int64
 	Targets          []TargetIndikatorRenjaProgram
+	PaguAnggaran     []AnggaranRenja
 }
 
 type TargetIndikatorRenjaProgram struct {
@@ -83,6 +87,7 @@ type TargetIndikatorRenjaProgram struct {
 	CreatedDate        time.Time
 	LastModifiedDate   time.Time
 	CreatedBy          *string
+	PaguAnggaran       []AnggaranRenja
 }
 
 // KEGIATAN
@@ -101,6 +106,7 @@ type RenjaKegiatan struct {
 	Versi            int
 	SubKegiatans     []RenjaSubkegiatan
 	Indikators       []IndikatorRenjaKegiatan
+	PaguAnggaran     []AnggaranRenja
 }
 
 type IndikatorRenjaKegiatan struct {
@@ -144,6 +150,7 @@ type RenjaSubkegiatan struct {
 	CreatedBy        *string
 	Versi            int
 	Indikators       []IndikatorRenjaSubkegiatan
+	PaguAnggaran     []AnggaranRenja
 }
 
 type IndikatorRenjaSubkegiatan struct {
@@ -169,4 +176,20 @@ type TargetIndikatorRenjaSubkegiatan struct {
 	CreatedDate            time.Time
 	LastModifiedDate       time.Time
 	CreatedBy              *string
+}
+
+type AnggaranRenja struct {
+	Id               int64
+	KodePagu         string
+	PaguAnggaran     int64
+	UrusanId         *int64
+	BidangUrusanId   *int64
+	ProgramId        *int64
+	KegiatanId       *int64
+	SubkegiatanId    *int64
+	Tahun            int
+	JenisPagu        string
+	CreatedDate      time.Time
+	LastModifiedDate time.Time
+	CreatedBy        *string
 }

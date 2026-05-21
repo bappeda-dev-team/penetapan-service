@@ -1033,7 +1033,7 @@ func (r *PenetapanOpdRepository) SaveRenjaUrusan(
 	ctx context.Context,
 	tx *sql.Tx,
 	urusan domain.RenjaUrusan,
-) error {
+) (int64, error) {
 
 	query := `
 	INSERT INTO renja_urusan(
@@ -1045,9 +1045,11 @@ func (r *PenetapanOpdRepository) SaveRenjaUrusan(
 		created_by
 	)
 	VALUES($1,$2,$3,$4,$5,$6)
+	RETURNING id
 	`
 
-	_, err := tx.ExecContext(
+	var id int64
+	err := tx.QueryRowContext(
 		ctx,
 		query,
 		urusan.PenetapanId,
@@ -1056,16 +1058,20 @@ func (r *PenetapanOpdRepository) SaveRenjaUrusan(
 		urusan.Urusan,
 		urusan.TahunAktif,
 		urusan.CreatedBy,
-	)
+	).Scan(&id)
 
-	return err
+	if err != nil {
+		return 0, err
+	}
+
+	return id, nil
 }
 
 func (r *PenetapanOpdRepository) SaveRenjaBidangUrusan(
 	ctx context.Context,
 	tx *sql.Tx,
 	bidang domain.RenjaBidangUrusan,
-) error {
+) (int64, error) {
 
 	query := `
 	INSERT INTO renja_bidang_urusan(
@@ -1078,9 +1084,11 @@ func (r *PenetapanOpdRepository) SaveRenjaBidangUrusan(
 		created_by
 	)
 	VALUES($1,$2,$3,$4,$5,$6,$7)
+	RETURNING id
 	`
 
-	_, err := tx.ExecContext(
+	var id int64
+	err := tx.QueryRowContext(
 		ctx,
 		query,
 		bidang.PenetapanId,
@@ -1090,9 +1098,12 @@ func (r *PenetapanOpdRepository) SaveRenjaBidangUrusan(
 		bidang.BidangUrusan,
 		bidang.TahunAktif,
 		bidang.CreatedBy,
-	)
+	).Scan(&id)
+	if err != nil {
+		return 0, err
+	}
 
-	return err
+	return id, err
 }
 
 func (r *PenetapanOpdRepository) SaveRenjaProgram(
@@ -2317,4 +2328,790 @@ func (r *PenetapanOpdRepository) FindTargetIndikatorRenjaSubkegiatanBatch(
 	}
 
 	return result, rows.Err()
+}
+
+func (r *PenetapanOpdRepository) SavePaguRenjaUrusan(
+	ctx context.Context,
+	tx *sql.Tx,
+	urusanId int64,
+	data []domain.AnggaranRenja,
+) (int, error) {
+
+	if len(data) == 0 {
+		return 0, nil
+	}
+
+	var (
+		valueStrings []string
+		valueArgs    []any
+	)
+
+	for i, item := range data {
+
+		base := i * 6
+
+		valueStrings = append(
+			valueStrings,
+			fmt.Sprintf(
+				"($%d, $%d, $%d, $%d, $%d, $%d)",
+				base+1,
+				base+2,
+				base+3,
+				base+4,
+				base+5,
+				base+6,
+			),
+		)
+
+		valueArgs = append(
+			valueArgs,
+			urusanId,
+			item.KodePagu,
+			item.Tahun,
+			item.PaguAnggaran,
+			item.JenisPagu,
+			item.CreatedBy,
+		)
+	}
+
+	query := fmt.Sprintf(`
+	INSERT INTO pagu_renja_urusan
+	(
+		urusan_id,
+		kode_pagu,
+		tahun,
+		pagu,
+		jenis_pagu,
+		created_by
+	)
+	VALUES %s
+	`, strings.Join(valueStrings, ","),
+	)
+
+	result, err := tx.ExecContext(
+		ctx,
+		query,
+		valueArgs...,
+	)
+
+	if err != nil {
+		return 0, err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return 0, err
+	}
+
+	return int(rowsAffected), nil
+}
+
+func (r *PenetapanOpdRepository) SavePaguRenjaBidangUrusan(
+	ctx context.Context,
+	tx *sql.Tx,
+	bidangUrusanId int64,
+	data []domain.AnggaranRenja,
+) (int, error) {
+
+	if len(data) == 0 {
+		return 0, nil
+	}
+
+	var (
+		valueStrings []string
+		valueArgs    []any
+	)
+
+	for i, item := range data {
+
+		base := i * 6
+
+		valueStrings = append(
+			valueStrings,
+			fmt.Sprintf(
+				"($%d, $%d, $%d, $%d, $%d, $%d)",
+				base+1,
+				base+2,
+				base+3,
+				base+4,
+				base+5,
+				base+6,
+			),
+		)
+
+		valueArgs = append(
+			valueArgs,
+			bidangUrusanId,
+			item.KodePagu,
+			item.Tahun,
+			item.PaguAnggaran,
+			item.JenisPagu,
+			item.CreatedBy,
+		)
+	}
+
+	query := fmt.Sprintf(`
+	INSERT INTO pagu_renja_bidang_urusan
+	(
+		bidang_urusan_id,
+		kode_pagu,
+		tahun,
+		pagu,
+		jenis_pagu,
+		created_by
+	)
+	VALUES %s
+	`, strings.Join(valueStrings, ","),
+	)
+
+	result, err := tx.ExecContext(
+		ctx,
+		query,
+		valueArgs...,
+	)
+
+	if err != nil {
+		return 0, err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return 0, err
+	}
+
+	return int(rowsAffected), nil
+}
+
+func (r *PenetapanOpdRepository) SavePaguRenjaProgram(
+	ctx context.Context,
+	tx *sql.Tx,
+	programId int64,
+	data []domain.AnggaranRenja,
+) (int, error) {
+
+	if len(data) == 0 {
+		return 0, nil
+	}
+
+	var (
+		valueStrings []string
+		valueArgs    []any
+	)
+
+	for i, item := range data {
+
+		base := i * 6
+
+		valueStrings = append(
+			valueStrings,
+			fmt.Sprintf(
+				"($%d, $%d, $%d, $%d, $%d, $%d)",
+				base+1,
+				base+2,
+				base+3,
+				base+4,
+				base+5,
+				base+6,
+			),
+		)
+
+		valueArgs = append(
+			valueArgs,
+			programId,
+			item.KodePagu,
+			item.Tahun,
+			item.PaguAnggaran,
+			item.JenisPagu,
+			item.CreatedBy,
+		)
+	}
+
+	query := fmt.Sprintf(`
+	INSERT INTO pagu_renja_program
+	(
+		program_id,
+		kode_pagu,
+		tahun,
+		pagu,
+		jenis_pagu,
+		created_by
+	)
+	VALUES %s
+	`, strings.Join(valueStrings, ","),
+	)
+
+	result, err := tx.ExecContext(
+		ctx,
+		query,
+		valueArgs...,
+	)
+
+	if err != nil {
+		return 0, err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return 0, err
+	}
+
+	return int(rowsAffected), nil
+}
+
+func (r *PenetapanOpdRepository) SavePaguRenjaKegiatan(
+	ctx context.Context,
+	tx *sql.Tx,
+	kegiatanId int64,
+	data []domain.AnggaranRenja,
+) (int, error) {
+
+	if len(data) == 0 {
+		return 0, nil
+	}
+
+	var (
+		valueStrings []string
+		valueArgs    []any
+	)
+
+	for i, item := range data {
+
+		base := i * 6
+
+		valueStrings = append(
+			valueStrings,
+			fmt.Sprintf(
+				"($%d, $%d, $%d, $%d, $%d, $%d)",
+				base+1,
+				base+2,
+				base+3,
+				base+4,
+				base+5,
+				base+6,
+			),
+		)
+
+		valueArgs = append(
+			valueArgs,
+			kegiatanId,
+			item.KodePagu,
+			item.Tahun,
+			item.PaguAnggaran,
+			item.JenisPagu,
+			item.CreatedBy,
+		)
+	}
+
+	query := fmt.Sprintf(`
+	INSERT INTO pagu_renja_kegiatan
+	(
+		kegiatan_id,
+		kode_pagu,
+		tahun,
+		pagu,
+		jenis_pagu,
+		created_by
+	)
+	VALUES %s
+	`, strings.Join(valueStrings, ","),
+	)
+
+	result, err := tx.ExecContext(
+		ctx,
+		query,
+		valueArgs...,
+	)
+
+	if err != nil {
+		return 0, err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return 0, err
+	}
+
+	return int(rowsAffected), nil
+}
+
+func (r *PenetapanOpdRepository) SavePaguRenjaSubkegiatan(
+	ctx context.Context,
+	tx *sql.Tx,
+	subkegiatanId int64,
+	data []domain.AnggaranRenja,
+) (int, error) {
+
+	if len(data) == 0 {
+		return 0, nil
+	}
+
+	var (
+		valueStrings []string
+		valueArgs    []any
+	)
+
+	for i, item := range data {
+
+		base := i * 6
+
+		valueStrings = append(
+			valueStrings,
+			fmt.Sprintf(
+				"($%d, $%d, $%d, $%d, $%d, $%d)",
+				base+1,
+				base+2,
+				base+3,
+				base+4,
+				base+5,
+				base+6,
+			),
+		)
+
+		valueArgs = append(
+			valueArgs,
+			subkegiatanId,
+			item.KodePagu,
+			item.Tahun,
+			item.PaguAnggaran,
+			item.JenisPagu,
+			item.CreatedBy,
+		)
+	}
+
+	query := fmt.Sprintf(`
+	INSERT INTO pagu_renja_subkegiatan
+	(
+		subkegiatan_id,
+		kode_pagu,
+		tahun,
+		pagu,
+		jenis_pagu,
+		created_by
+	)
+	VALUES %s
+	`, strings.Join(valueStrings, ","),
+	)
+
+	result, err := tx.ExecContext(
+		ctx,
+		query,
+		valueArgs...,
+	)
+
+	if err != nil {
+		return 0, err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return 0, err
+	}
+
+	return int(rowsAffected), nil
+}
+
+func (r *PenetapanOpdRepository) FindPaguRenjaUrusan(
+	ctx context.Context,
+	urusanIds []int64,
+) ([]domain.AnggaranRenja, error) {
+
+	if len(urusanIds) == 0 {
+		return []domain.AnggaranRenja{}, nil
+	}
+
+	var (
+		placeholders []string
+		args         []any
+	)
+
+	for i, id := range urusanIds {
+		placeholders = append(placeholders, fmt.Sprintf("$%d", i+1))
+		args = append(args, id)
+	}
+
+	query := fmt.Sprintf(`
+		SELECT
+			id,
+			urusan_id,
+			kode_pagu,
+			tahun,
+			pagu,
+			jenis_pagu,
+			created_date,
+			last_modified_date,
+			created_by
+		FROM pagu_renja_urusan
+		WHERE urusan_id IN (%s)
+		ORDER BY urusan_id,tahun
+	`,
+		strings.Join(
+			placeholders,
+			",",
+		),
+	)
+	rows, err := r.DB.QueryContext(
+		ctx,
+		query,
+		args...,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var pagus []domain.AnggaranRenja
+	for rows.Next() {
+		var pagu domain.AnggaranRenja
+		err := rows.Scan(
+			&pagu.Id,
+			&pagu.UrusanId,
+			&pagu.KodePagu,
+			&pagu.Tahun,
+			&pagu.PaguAnggaran,
+			&pagu.JenisPagu,
+			&pagu.CreatedDate,
+			&pagu.LastModifiedDate,
+			&pagu.CreatedBy,
+		)
+		if err != nil {
+			return nil, err
+		}
+		pagus = append(
+			pagus,
+			pagu,
+		)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return pagus, nil
+}
+
+func (r *PenetapanOpdRepository) FindPaguRenjaBidangUrusan(
+	ctx context.Context,
+	bidangIds []int64,
+) ([]domain.AnggaranRenja, error) {
+
+	if len(bidangIds) == 0 {
+		return []domain.AnggaranRenja{}, nil
+	}
+
+	var (
+		placeholders []string
+		args         []any
+	)
+
+	for i, id := range bidangIds {
+		placeholders = append(
+			placeholders,
+			fmt.Sprintf("$%d", i+1),
+		)
+		args = append(args, id)
+	}
+
+	query := fmt.Sprintf(`
+		SELECT
+			id,
+			bidang_urusan_id,
+			kode_pagu,
+			tahun,
+			pagu,
+			jenis_pagu,
+			created_date,
+			last_modified_date,
+			created_by
+		FROM pagu_renja_bidang_urusan
+		WHERE bidang_urusan_id IN (%s)
+		ORDER BY bidang_urusan_id,tahun
+	`,
+		strings.Join(placeholders, ","),
+	)
+
+	rows, err := r.DB.QueryContext(
+		ctx,
+		query,
+		args...,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var pagus []domain.AnggaranRenja
+
+	for rows.Next() {
+
+		var pagu domain.AnggaranRenja
+
+		err := rows.Scan(
+			&pagu.Id,
+			&pagu.BidangUrusanId,
+			&pagu.KodePagu,
+			&pagu.Tahun,
+			&pagu.PaguAnggaran,
+			&pagu.JenisPagu,
+			&pagu.CreatedDate,
+			&pagu.LastModifiedDate,
+			&pagu.CreatedBy,
+		)
+
+		if err != nil {
+			return nil, err
+		}
+
+		pagus = append(
+			pagus,
+			pagu,
+		)
+	}
+
+	return pagus, rows.Err()
+}
+
+func (r *PenetapanOpdRepository) FindPaguRenjaProgram(
+	ctx context.Context,
+	programIds []int64,
+) ([]domain.AnggaranRenja, error) {
+
+	if len(programIds) == 0 {
+		return []domain.AnggaranRenja{}, nil
+	}
+
+	var (
+		placeholders []string
+		args         []any
+	)
+
+	for i, id := range programIds {
+		placeholders = append(
+			placeholders,
+			fmt.Sprintf("$%d", i+1),
+		)
+		args = append(args, id)
+	}
+
+	query := fmt.Sprintf(`
+		SELECT
+			id,
+			program_id,
+			kode_pagu,
+			tahun,
+			pagu,
+			jenis_pagu,
+			created_date,
+			last_modified_date,
+			created_by
+		FROM pagu_renja_program
+		WHERE program_id IN (%s)
+		ORDER BY program_id,tahun
+	`,
+		strings.Join(placeholders, ","),
+	)
+
+	rows, err := r.DB.QueryContext(
+		ctx,
+		query,
+		args...,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	var pagus []domain.AnggaranRenja
+
+	for rows.Next() {
+
+		var pagu domain.AnggaranRenja
+
+		err := rows.Scan(
+			&pagu.Id,
+			&pagu.ProgramId,
+			&pagu.KodePagu,
+			&pagu.Tahun,
+			&pagu.PaguAnggaran,
+			&pagu.JenisPagu,
+			&pagu.CreatedDate,
+			&pagu.LastModifiedDate,
+			&pagu.CreatedBy,
+		)
+
+		if err != nil {
+			return nil, err
+		}
+
+		pagus = append(
+			pagus,
+			pagu,
+		)
+	}
+
+	return pagus, rows.Err()
+}
+
+func (r *PenetapanOpdRepository) FindPaguRenjaKegiatan(
+	ctx context.Context,
+	kegiatanIds []int64,
+) ([]domain.AnggaranRenja, error) {
+
+	if len(kegiatanIds) == 0 {
+		return []domain.AnggaranRenja{}, nil
+	}
+
+	var (
+		placeholders []string
+		args         []any
+	)
+
+	for i, id := range kegiatanIds {
+		placeholders = append(
+			placeholders,
+			fmt.Sprintf("$%d", i+1),
+		)
+		args = append(args, id)
+	}
+
+	query := fmt.Sprintf(`
+		SELECT
+			id,
+			kegiatan_id,
+			kode_pagu,
+			tahun,
+			pagu,
+			jenis_pagu,
+			created_date,
+			last_modified_date,
+			created_by
+		FROM pagu_renja_kegiatan
+		WHERE kegiatan_id IN (%s)
+		ORDER BY kegiatan_id,tahun
+	`,
+		strings.Join(placeholders, ","),
+	)
+
+	rows, err := r.DB.QueryContext(
+		ctx,
+		query,
+		args...,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	var pagus []domain.AnggaranRenja
+
+	for rows.Next() {
+
+		var pagu domain.AnggaranRenja
+
+		err := rows.Scan(
+			&pagu.Id,
+			&pagu.KegiatanId,
+			&pagu.KodePagu,
+			&pagu.Tahun,
+			&pagu.PaguAnggaran,
+			&pagu.JenisPagu,
+			&pagu.CreatedDate,
+			&pagu.LastModifiedDate,
+			&pagu.CreatedBy,
+		)
+
+		if err != nil {
+			return nil, err
+		}
+
+		pagus = append(
+			pagus,
+			pagu,
+		)
+	}
+
+	return pagus, rows.Err()
+}
+
+func (r *PenetapanOpdRepository) FindPaguRenjaSubkegiatan(
+	ctx context.Context,
+	subIds []int64,
+) ([]domain.AnggaranRenja, error) {
+
+	if len(subIds) == 0 {
+		return []domain.AnggaranRenja{}, nil
+	}
+
+	var (
+		placeholders []string
+		args         []any
+	)
+
+	for i, id := range subIds {
+		placeholders = append(
+			placeholders,
+			fmt.Sprintf("$%d", i+1),
+		)
+		args = append(args, id)
+	}
+
+	query := fmt.Sprintf(`
+		SELECT
+			id,
+			subkegiatan_id,
+			kode_pagu,
+			tahun,
+			pagu,
+			jenis_pagu,
+			created_date,
+			last_modified_date,
+			created_by
+		FROM pagu_renja_subkegiatan
+		WHERE subkegiatan_id IN (%s)
+		ORDER BY subkegiatan_id,tahun
+	`,
+		strings.Join(placeholders, ","),
+	)
+
+	rows, err := r.DB.QueryContext(
+		ctx,
+		query,
+		args...,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	var pagus []domain.AnggaranRenja
+
+	for rows.Next() {
+
+		var pagu domain.AnggaranRenja
+
+		err := rows.Scan(
+			&pagu.Id,
+			&pagu.SubkegiatanId,
+			&pagu.KodePagu,
+			&pagu.Tahun,
+			&pagu.PaguAnggaran,
+			&pagu.JenisPagu,
+			&pagu.CreatedDate,
+			&pagu.LastModifiedDate,
+			&pagu.CreatedBy,
+		)
+
+		if err != nil {
+			return nil, err
+		}
+
+		pagus = append(
+			pagus,
+			pagu,
+		)
+	}
+
+	return pagus, rows.Err()
 }

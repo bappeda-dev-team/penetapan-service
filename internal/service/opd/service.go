@@ -268,10 +268,20 @@ func (s *PenetapanOpdService) FindRenja(
 		s.Logger.Error("FindRenjaUrusanBySnapshot")
 		return web.RenjaPenetapanOpdResponse{}, err
 	}
+	err = s.findPaguRenjaUrusan(ctx, &urusans)
+	if err != nil {
+		s.Logger.Error("findPaguRenjaUrusan")
+		return web.RenjaPenetapanOpdResponse{}, err
+	}
 
 	bidangUrusans, err := s.Repo.FindRenjaBidangUrusanBySnapshot(ctx, req)
 	if err != nil {
 		s.Logger.Error("FindRenjaBidangUrusanBySnapshot")
+		return web.RenjaPenetapanOpdResponse{}, err
+	}
+	err = s.findPaguRenjaBidangUrusan(ctx, &bidangUrusans)
+	if err != nil {
+		s.Logger.Error("findPaguRenjaBidangUrusan")
 		return web.RenjaPenetapanOpdResponse{}, err
 	}
 
@@ -285,6 +295,11 @@ func (s *PenetapanOpdService) FindRenja(
 		s.Logger.Error("findIndikatorRenjaProgram")
 		return web.RenjaPenetapanOpdResponse{}, err
 	}
+	err = s.findPaguRenjaProgram(ctx, &programs)
+	if err != nil {
+		s.Logger.Error("findPaguRenjaProgram")
+		return web.RenjaPenetapanOpdResponse{}, err
+	}
 
 	kegiatans, err := s.Repo.FindRenjaKegiatanBySnapshot(ctx, req)
 	if err != nil {
@@ -294,6 +309,11 @@ func (s *PenetapanOpdService) FindRenja(
 	err = s.findIndikatorRenjaKegiatan(ctx, &kegiatans)
 	if err != nil {
 		s.Logger.Error("findIndikatorRenjaKegiatan")
+		return web.RenjaPenetapanOpdResponse{}, err
+	}
+	err = s.findPaguRenjaKegiatan(ctx, &kegiatans)
+	if err != nil {
+		s.Logger.Error("findPaguRenjaKegiatan")
 		return web.RenjaPenetapanOpdResponse{}, err
 	}
 
@@ -307,24 +327,54 @@ func (s *PenetapanOpdService) FindRenja(
 		s.Logger.Error("findIndikatorRenjaSubkegiatan")
 		return web.RenjaPenetapanOpdResponse{}, err
 	}
+	err = s.findPaguRenjaSubkegiatan(ctx, &subkegiatans)
+	if err != nil {
+		s.Logger.Error("findPaguRenjaSubkegiatan")
+		return web.RenjaPenetapanOpdResponse{}, err
+	}
 
 	// responses
 
 	var urusanResponses []web.RenjaUrusanResponse
 	for _, urusan := range urusans {
+		// pagu urusan
+		var anggarans []web.PaguAnggaranRenjaResponse
+		for _, pagu := range urusan.PaguAnggaran {
+			anggarans = append(anggarans,
+				web.PaguAnggaranRenjaResponse{
+					Id:        pagu.Id,
+					KodePagu:  pagu.KodePagu,
+					Pagu:      pagu.PaguAnggaran,
+					JenisPagu: pagu.JenisPagu,
+				},
+			)
+		}
 		urusanResponses = append(
 			urusanResponses,
 			web.RenjaUrusanResponse{
-				Id:         urusan.Id,
-				KodeUrusan: urusan.KodeUrusan,
-				Urusan:     urusan.Urusan,
-				IsLocked:   true,
+				Id:           urusan.Id,
+				KodeUrusan:   urusan.KodeUrusan,
+				Urusan:       urusan.Urusan,
+				IsLocked:     true,
+				PaguAnggaran: anggarans,
 			},
 		)
 	}
 
 	var bidangUrusanResponses []web.RenjaBidangUrusanResponse
 	for _, bidang := range bidangUrusans {
+		// pagu urusan
+		var anggarans []web.PaguAnggaranRenjaResponse
+		for _, pagu := range bidang.PaguAnggaran {
+			anggarans = append(anggarans,
+				web.PaguAnggaranRenjaResponse{
+					Id:        pagu.Id,
+					KodePagu:  pagu.KodePagu,
+					Pagu:      pagu.PaguAnggaran,
+					JenisPagu: pagu.JenisPagu,
+				},
+			)
+		}
 		bidangUrusanResponses = append(
 			bidangUrusanResponses,
 			web.RenjaBidangUrusanResponse{
@@ -332,6 +382,7 @@ func (s *PenetapanOpdService) FindRenja(
 				KodeBidangUrusan: bidang.KodeBidangUrusan,
 				BidangUrusan:     bidang.BidangUrusan,
 				IsLocked:         true,
+				PaguAnggaran:     anggarans,
 			},
 		)
 	}
@@ -359,14 +410,28 @@ func (s *PenetapanOpdService) FindRenja(
 					Targets:       targetResp,
 				})
 		}
+
+		// pagu urusan
+		var anggarans []web.PaguAnggaranRenjaResponse
+		for _, pagu := range program.PaguAnggaran {
+			anggarans = append(anggarans,
+				web.PaguAnggaranRenjaResponse{
+					Id:        pagu.Id,
+					KodePagu:  pagu.KodePagu,
+					Pagu:      pagu.PaguAnggaran,
+					JenisPagu: pagu.JenisPagu,
+				},
+			)
+		}
 		programResponses = append(
 			programResponses,
 			web.RenjaProgramResponse{
-				Id:          program.Id,
-				KodeProgram: program.KodeProgram,
-				Program:     program.Program,
-				IsLocked:    true,
-				Indikators:  indResp,
+				Id:           program.Id,
+				KodeProgram:  program.KodeProgram,
+				Program:      program.Program,
+				IsLocked:     true,
+				Indikators:   indResp,
+				PaguAnggaran: anggarans,
 			},
 		)
 	}
@@ -394,6 +459,19 @@ func (s *PenetapanOpdService) FindRenja(
 					Targets:       targetResp,
 				})
 		}
+
+		// pagu urusan
+		var anggarans []web.PaguAnggaranRenjaResponse
+		for _, pagu := range kegiatan.PaguAnggaran {
+			anggarans = append(anggarans,
+				web.PaguAnggaranRenjaResponse{
+					Id:        pagu.Id,
+					KodePagu:  pagu.KodePagu,
+					Pagu:      pagu.PaguAnggaran,
+					JenisPagu: pagu.JenisPagu,
+				},
+			)
+		}
 		kegiatanResponses = append(
 			kegiatanResponses,
 			web.RenjaKegiatanResponse{
@@ -402,6 +480,7 @@ func (s *PenetapanOpdService) FindRenja(
 				Kegiatan:     kegiatan.Kegiatan,
 				IsLocked:     true,
 				Indikators:   indResp,
+				PaguAnggaran: anggarans,
 			},
 		)
 	}
@@ -429,6 +508,19 @@ func (s *PenetapanOpdService) FindRenja(
 					Targets:       targetResp,
 				})
 		}
+
+		// pagu urusan
+		var anggarans []web.PaguAnggaranRenjaResponse
+		for _, pagu := range sub.PaguAnggaran {
+			anggarans = append(anggarans,
+				web.PaguAnggaranRenjaResponse{
+					Id:        pagu.Id,
+					KodePagu:  pagu.KodePagu,
+					Pagu:      pagu.PaguAnggaran,
+					JenisPagu: pagu.JenisPagu,
+				},
+			)
+		}
 		subkegiatanResponses = append(
 			subkegiatanResponses,
 			web.RenjaSubkegiatanResponse{
@@ -437,6 +529,7 @@ func (s *PenetapanOpdService) FindRenja(
 				Subkegiatan:     sub.Subkegiatan,
 				IsLocked:        true,
 				Indikators:      indResp,
+				PaguAnggaran:    anggarans,
 			},
 		)
 	}

@@ -379,3 +379,308 @@ func (s *PenetapanOpdService) findIndikatorRenjaSubkegiatan(
 
 	return nil
 }
+
+func (s *PenetapanOpdService) findPaguRenjaUrusan(
+	ctx context.Context,
+	urusans *[]domain.RenjaUrusan,
+) error {
+
+	if len(*urusans) == 0 {
+		return nil
+	}
+
+	// ambil seluruh subkegiatan id
+	urIds := make(
+		[]int64,
+		0,
+		len(*urusans),
+	)
+
+	for _, ur := range *urusans {
+		urIds = append(
+			urIds,
+			ur.Id,
+		)
+	}
+
+	paguAnggs, err := s.Repo.FindPaguRenjaUrusan(
+		ctx,
+		urIds,
+	)
+	if err != nil {
+		return err
+	}
+	if len(paguAnggs) == 0 {
+		return nil
+	}
+	paguMap := make(
+		map[int64][]domain.AnggaranRenja,
+	)
+	for _, pagu := range paguAnggs {
+		urusanId := *pagu.UrusanId
+		paguMap[urusanId] =
+			append(
+				paguMap[urusanId],
+				pagu,
+			)
+	}
+	// tempel ke urusan
+	for i := range *urusans {
+		ur := &(*urusans)[i]
+		ur.PaguAnggaran = paguMap[ur.Id]
+	}
+
+	return nil
+}
+
+func (s *PenetapanOpdService) findPaguRenjaBidangUrusan(
+	ctx context.Context,
+	bidangUrusans *[]domain.RenjaBidangUrusan,
+) error {
+
+	if len(*bidangUrusans) == 0 {
+		return nil
+	}
+
+	ids := make(
+		[]int64,
+		0,
+		len(*bidangUrusans),
+	)
+
+	for _, b := range *bidangUrusans {
+		ids = append(
+			ids,
+			b.Id,
+		)
+	}
+
+	pagus, err := s.Repo.FindPaguRenjaBidangUrusan(
+		ctx,
+		ids,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	if len(pagus) == 0 {
+		return nil
+	}
+
+	paguMap := make(
+		map[int64][]domain.AnggaranRenja,
+	)
+
+	for _, pagu := range pagus {
+
+		if pagu.BidangUrusanId == nil {
+			continue
+		}
+
+		paguMap[*pagu.BidangUrusanId] =
+			append(
+				paguMap[*pagu.BidangUrusanId],
+				pagu,
+			)
+	}
+
+	for i := range *bidangUrusans {
+
+		b := &(*bidangUrusans)[i]
+
+		b.PaguAnggaran =
+			paguMap[b.Id]
+	}
+
+	return nil
+}
+
+func (s *PenetapanOpdService) findPaguRenjaProgram(
+	ctx context.Context,
+	programs *[]domain.RenjaProgram,
+) error {
+
+	if len(*programs) == 0 {
+		return nil
+	}
+
+	ids := make(
+		[]int64,
+		0,
+		len(*programs),
+	)
+
+	for _, p := range *programs {
+		ids = append(
+			ids,
+			p.Id,
+		)
+	}
+
+	pagus, err := s.Repo.FindPaguRenjaProgram(
+		ctx,
+		ids,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	if len(pagus) == 0 {
+		return nil
+	}
+
+	paguMap := make(
+		map[int64][]domain.AnggaranRenja,
+	)
+
+	for _, pagu := range pagus {
+
+		if pagu.ProgramId == nil {
+			continue
+		}
+
+		paguMap[*pagu.ProgramId] =
+			append(
+				paguMap[*pagu.ProgramId],
+				pagu,
+			)
+	}
+
+	for i := range *programs {
+
+		p := &(*programs)[i]
+
+		p.PaguAnggaran =
+			paguMap[p.Id]
+	}
+
+	return nil
+}
+
+func (s *PenetapanOpdService) findPaguRenjaKegiatan(
+	ctx context.Context,
+	kegiatans *[]domain.RenjaKegiatan,
+) error {
+
+	if len(*kegiatans) == 0 {
+		return nil
+	}
+
+	ids := make(
+		[]int64,
+		0,
+		len(*kegiatans),
+	)
+
+	for _, k := range *kegiatans {
+		ids = append(
+			ids,
+			k.Id,
+		)
+	}
+
+	pagus, err := s.Repo.FindPaguRenjaKegiatan(
+		ctx,
+		ids,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	if len(pagus) == 0 {
+		return nil
+	}
+
+	paguMap := make(
+		map[int64][]domain.AnggaranRenja,
+	)
+
+	for _, pagu := range pagus {
+
+		if pagu.KegiatanId == nil {
+			continue
+		}
+
+		paguMap[*pagu.KegiatanId] =
+			append(
+				paguMap[*pagu.KegiatanId],
+				pagu,
+			)
+	}
+
+	for i := range *kegiatans {
+
+		k := &(*kegiatans)[i]
+
+		k.PaguAnggaran =
+			paguMap[k.Id]
+	}
+
+	return nil
+}
+
+func (s *PenetapanOpdService) findPaguRenjaSubkegiatan(
+	ctx context.Context,
+	subkegiatans *[]domain.RenjaSubkegiatan,
+) error {
+
+	if len(*subkegiatans) == 0 {
+		return nil
+	}
+
+	ids := make(
+		[]int64,
+		0,
+		len(*subkegiatans),
+	)
+
+	for _, sub := range *subkegiatans {
+		ids = append(
+			ids,
+			sub.Id,
+		)
+	}
+
+	pagus, err := s.Repo.FindPaguRenjaSubkegiatan(
+		ctx,
+		ids,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	if len(pagus) == 0 {
+		return nil
+	}
+
+	paguMap := make(
+		map[int64][]domain.AnggaranRenja,
+	)
+
+	for _, pagu := range pagus {
+
+		if pagu.SubkegiatanId == nil {
+			continue
+		}
+
+		paguMap[*pagu.SubkegiatanId] =
+			append(
+				paguMap[*pagu.SubkegiatanId],
+				pagu,
+			)
+	}
+
+	for i := range *subkegiatans {
+
+		sub := &(*subkegiatans)[i]
+
+		sub.PaguAnggaran =
+			paguMap[sub.Id]
+	}
+
+	return nil
+}

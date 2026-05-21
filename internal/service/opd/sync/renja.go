@@ -101,14 +101,19 @@ func (ex *RenjaSyncExecutor) Sync(
 	// simpan snapshot
 	var jumlahRenja int
 	var jumlahUrusan int
+	var jumlahPaguUrusan int
 	var jumlahBidangUrusan int
+	var jumlahPaguBidangUrusan int
 	var jumlahProgram int
+	var jumlahPaguProgram int
 	var jumlahKegiatan int
+	var jumlahPaguKegiatan int
 	var jumlahSubkegiatan int
+	var jumlahPaguSubkegiatan int
 	var jumlahIndikator int
 	var jumlahTarget int
 	for _, urusan := range snapshotRenjas {
-		err := ex.Repo.SaveRenjaUrusan(ctx, tx, urusan)
+		urId, err := ex.Repo.SaveRenjaUrusan(ctx, tx, urusan)
 		if err != nil {
 			return web.SyncPenetapanOpdSummary{}, err
 		}
@@ -116,7 +121,7 @@ func (ex *RenjaSyncExecutor) Sync(
 		jumlahUrusan += 1
 
 		for _, bidUr := range urusan.BidangUrusans {
-			err := ex.Repo.SaveRenjaBidangUrusan(ctx, tx, bidUr)
+			bidUrId, err := ex.Repo.SaveRenjaBidangUrusan(ctx, tx, bidUr)
 			if err != nil {
 				return web.SyncPenetapanOpdSummary{}, err
 			}
@@ -198,12 +203,47 @@ func (ex *RenjaSyncExecutor) Sync(
 							jumlahTarget += tgtInserted
 						}
 
+						// pagu subkegiatan
+						jmlPagu, err := ex.Repo.SavePaguRenjaSubkegiatan(ctx, tx, subId, sub.PaguAnggaran)
+						if err != nil {
+							return web.SyncPenetapanOpdSummary{}, err
+						}
+						jumlahPaguSubkegiatan += jmlPagu
+
 					}
+
+					// pagu kegiatan
+					jmlPagu, err := ex.Repo.SavePaguRenjaKegiatan(ctx, tx, kegId, keg.PaguAnggaran)
+					if err != nil {
+						return web.SyncPenetapanOpdSummary{}, err
+					}
+					jumlahPaguKegiatan += jmlPagu
 
 				}
 
+				// pagu program
+				jmlPagu, err := ex.Repo.SavePaguRenjaProgram(ctx, tx, prgId, prg.PaguAnggaran)
+				if err != nil {
+					return web.SyncPenetapanOpdSummary{}, err
+				}
+				jumlahPaguProgram += jmlPagu
+
 			}
+
+			// pagu bidang urusan
+			jmlPagu, err := ex.Repo.SavePaguRenjaBidangUrusan(ctx, tx, bidUrId, bidUr.PaguAnggaran)
+			if err != nil {
+				return web.SyncPenetapanOpdSummary{}, err
+			}
+			jumlahPaguBidangUrusan += jmlPagu
 		}
+
+		// pagu urusan
+		jmlPagu, err := ex.Repo.SavePaguRenjaUrusan(ctx, tx, urId, urusan.PaguAnggaran)
+		if err != nil {
+			return web.SyncPenetapanOpdSummary{}, err
+		}
+		jumlahPaguUrusan += jmlPagu
 	}
 
 	// commit transaction penetapan tujuan
@@ -295,14 +335,26 @@ func (ex *RenjaSyncExecutor) toUrusanSnapshot(
 	kodeOpd string,
 	tahun int,
 ) (domain.RenjaUrusan, error) {
+	var paguAnggarans []domain.AnggaranRenja
+	for _, angg := range renjaUrusan.Anggaran {
+		kodePagu := fmt.Sprintf("PAGU-UR-%s-%s-%s", renjaUrusan.Kode, angg.Tahun, renjaUrusan.Jenis)
+		paguAnggarans = append(paguAnggarans,
+			domain.AnggaranRenja{
+				KodePagu:     kodePagu,
+				PaguAnggaran: angg.PaguAnggaran,
+				Tahun:        tahun,
+				JenisPagu:    angg.JenisPagu,
+			})
+	}
 
 	return domain.RenjaUrusan{
-		PenetapanId: penetapanId,
-		KodeOpd:     kodeOpd,
-		KodeUrusan:  renjaUrusan.Kode,
-		Urusan:      renjaUrusan.Nama,
-		TahunAktif:  tahun,
-		CreatedBy:   createdBy,
+		PenetapanId:  penetapanId,
+		KodeOpd:      kodeOpd,
+		KodeUrusan:   renjaUrusan.Kode,
+		Urusan:       renjaUrusan.Nama,
+		TahunAktif:   tahun,
+		CreatedBy:    createdBy,
+		PaguAnggaran: paguAnggarans,
 	}, nil
 }
 
@@ -314,6 +366,17 @@ func (ex *RenjaSyncExecutor) toBidangUrusanSnapshot(
 	kodeOpd string,
 	tahun int,
 ) (domain.RenjaBidangUrusan, error) {
+	var paguAnggarans []domain.AnggaranRenja
+	for _, angg := range renjaBidangUrusan.Anggaran {
+		kodePagu := fmt.Sprintf("PAGU-BIDUR-%s-%s-%s", renjaBidangUrusan.Kode, angg.Tahun, renjaBidangUrusan.Jenis)
+		paguAnggarans = append(paguAnggarans,
+			domain.AnggaranRenja{
+				KodePagu:     kodePagu,
+				PaguAnggaran: angg.PaguAnggaran,
+				Tahun:        tahun,
+				JenisPagu:    angg.JenisPagu,
+			})
+	}
 
 	return domain.RenjaBidangUrusan{
 		PenetapanId:      penetapanId,
@@ -323,6 +386,7 @@ func (ex *RenjaSyncExecutor) toBidangUrusanSnapshot(
 		BidangUrusan:     renjaBidangUrusan.Nama,
 		TahunAktif:       tahun,
 		CreatedBy:        createdBy,
+		PaguAnggaran:     paguAnggarans,
 	}, nil
 }
 
@@ -369,6 +433,18 @@ func (ex *RenjaSyncExecutor) toProgramSnapshot(
 		)
 	}
 
+	var paguAnggarans []domain.AnggaranRenja
+	for _, angg := range renjaProgram.Anggaran {
+		kodePagu := fmt.Sprintf("PAGU-PRG-%s-%s-%s", renjaProgram.Kode, angg.Tahun, renjaProgram.Jenis)
+		paguAnggarans = append(paguAnggarans,
+			domain.AnggaranRenja{
+				KodePagu:     kodePagu,
+				PaguAnggaran: angg.PaguAnggaran,
+				Tahun:        tahun,
+				JenisPagu:    angg.JenisPagu,
+			})
+	}
+
 	return domain.RenjaProgram{
 		PenetapanId:      penetapanId,
 		KodeOpd:          kodeOpd,
@@ -378,6 +454,7 @@ func (ex *RenjaSyncExecutor) toProgramSnapshot(
 		TahunAktif:       tahun,
 		CreatedBy:        createdBy,
 		Indikators:       indikators,
+		PaguAnggaran:     paguAnggarans,
 	}, nil
 }
 
@@ -423,6 +500,17 @@ func (ex *RenjaSyncExecutor) toKegiatanSnapshot(
 			},
 		)
 	}
+	var paguAnggarans []domain.AnggaranRenja
+	for _, angg := range renjaKegiatan.Anggaran {
+		kodePagu := fmt.Sprintf("PAGU-KEG-%s-%s-%s", renjaKegiatan.Kode, angg.Tahun, renjaKegiatan.Jenis)
+		paguAnggarans = append(paguAnggarans,
+			domain.AnggaranRenja{
+				KodePagu:     kodePagu,
+				PaguAnggaran: angg.PaguAnggaran,
+				Tahun:        tahun,
+				JenisPagu:    angg.JenisPagu,
+			})
+	}
 
 	return domain.RenjaKegiatan{
 		PenetapanId:  penetapanId,
@@ -433,6 +521,7 @@ func (ex *RenjaSyncExecutor) toKegiatanSnapshot(
 		TahunAktif:   tahun,
 		CreatedBy:    createdBy,
 		Indikators:   indikators,
+		PaguAnggaran: paguAnggarans,
 	}, nil
 }
 
@@ -478,6 +567,17 @@ func (ex *RenjaSyncExecutor) toSubkegiatanSnapshot(
 			},
 		)
 	}
+	var paguAnggarans []domain.AnggaranRenja
+	for _, angg := range renjaSubkegiatan.Anggaran {
+		kodePagu := fmt.Sprintf("PAGU-SUBKEG-%s-%s-%s", renjaSubkegiatan.Kode, angg.Tahun, renjaSubkegiatan.Jenis)
+		paguAnggarans = append(paguAnggarans,
+			domain.AnggaranRenja{
+				KodePagu:     kodePagu,
+				PaguAnggaran: angg.PaguAnggaran,
+				Tahun:        tahun,
+				JenisPagu:    angg.JenisPagu,
+			})
+	}
 
 	return domain.RenjaSubkegiatan{
 		PenetapanId:     penetapanId,
@@ -488,5 +588,6 @@ func (ex *RenjaSyncExecutor) toSubkegiatanSnapshot(
 		TahunAktif:      tahun,
 		CreatedBy:       createdBy,
 		Indikators:      indikators,
+		PaguAnggaran:    paguAnggarans,
 	}, nil
 }
