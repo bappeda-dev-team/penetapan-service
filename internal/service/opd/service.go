@@ -547,6 +547,20 @@ func (s *PenetapanOpdService) FindRenja(
 	}, nil
 }
 
+func (s *PenetapanOpdService) FindRenaksi(ctx context.Context, req domain.PenetapanOpdRequest) (web.RenaksiOpdPenetapanResponse, error) {
+	renaksi := make([]web.RenaksiOpdResponse, 0)
+	renaksi = append(renaksi, web.RenaksiOpdResponse{
+		Renaksi: "RENAKSI OPD X",
+	})
+	return web.RenaksiOpdPenetapanResponse{
+		KodeOpd:     req.KodeOpd,
+		TahunAktif:  req.Tahun,
+		Versi:       1,
+		IsLocked:    true,
+		RenaksiOpds: renaksi,
+	}, nil
+}
+
 func (s *PenetapanOpdService) markSyncAsFailed(ctx context.Context, syncId int64, msg string) error {
 	statusSync := domain.SyncStatusFailed
 	errorMessage := &msg

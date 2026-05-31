@@ -381,7 +381,7 @@ func (app *Application) SyncPenetapanRenjaOpdHandler(
 
 // RenjaOpdHandler godoc
 //
-// @Summary     Get sasaran OPD penetapan
+// @Summary     Get renja OPD penetapan
 // @Description Mengambil data renja OPD berdasarkan kode OPD dan tahun penetapan
 // @Tags        OPD
 // @Accept      json
@@ -447,6 +447,84 @@ func (app *Application) RenjaOpdHandler(
 	}
 
 	response := web.Response[web.RenjaPenetapanOpdResponse]{
+		Data: result,
+	}
+
+	err = app.WriteJSON(w, http.StatusOK, response, nil)
+	if err != nil {
+		app.ServerErrorResponse(w, r, err)
+		return
+	}
+}
+
+// RenaksiOpdHandler godoc
+//
+// @Summary     Get renaksi OPD penetapan
+// @Description Mengambil data renaksi OPD berdasarkan kode OPD dan tahun penetapan
+// @Tags        OPD
+// @Accept      json
+// @Produce     json
+//
+// @Param       kodeOpd query string true "Kode OPD"
+// @Param       tahun   query int    true "Tahun Penetapan"
+//
+// @Success     200 {object} web.Response[web.RenaksiOpdPenetapanResponse]   "Berhasil mengambil data renja OPD"
+// @Failure     400 {object} web.ValidationErrorResponse            	     "Bad Request"
+// @Failure     500 {object} web.ErrorResponse                      	     "Internal Server Error"
+//
+// @Router      /opd/renaksi [get]
+func (app *Application) RenaksiOpdHandler(
+	w http.ResponseWriter,
+	r *http.Request,
+) {
+	query := r.URL.Query()
+
+	errors := map[string]string{}
+
+	kodeOpd := query.Get("kodeOpd")
+
+	tahunStr := query.Get("tahun")
+
+	var tahun int
+
+	if kodeOpd == "" {
+		errors["kodeOpd"] = "required"
+	}
+
+	if tahunStr == "" {
+		errors["tahun"] = "required"
+	} else {
+		parsedTahun, err := strconv.Atoi(tahunStr)
+		if err != nil {
+			errors["tahun"] = "tahun tidak valid"
+		} else {
+			tahun = parsedTahun
+		}
+	}
+
+	if len(errors) > 0 {
+		app.BadRequestResponse(
+			w,
+			r,
+			web.ValidationErrorResponse{
+				Error: errors,
+			},
+		)
+		return
+	}
+
+	request := domain.PenetapanOpdRequest{
+		KodeOpd: kodeOpd,
+		Tahun:   tahun,
+	}
+
+	result, err := app.PenetapanOpdService.FindRenaksi(r.Context(), request)
+	if err != nil {
+		app.ServerErrorResponse(w, r, err)
+		return
+	}
+
+	response := web.Response[web.RenaksiOpdPenetapanResponse]{
 		Data: result,
 	}
 
