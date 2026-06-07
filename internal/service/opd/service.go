@@ -335,7 +335,7 @@ func (s *PenetapanOpdService) FindRenja(
 
 	// responses
 
-	var urusanResponses []web.RenjaUrusanResponse
+	urusanResponses := make([]web.RenjaUrusanResponse, 0, len(urusans))
 	for _, urusan := range urusans {
 		// pagu urusan
 		var anggarans []web.PaguAnggaranRenjaResponse
@@ -361,7 +361,7 @@ func (s *PenetapanOpdService) FindRenja(
 		)
 	}
 
-	var bidangUrusanResponses []web.RenjaBidangUrusanResponse
+	bidangUrusanResponses := make([]web.RenjaBidangUrusanResponse, 0, len(bidangUrusans))
 	for _, bidang := range bidangUrusans {
 		// pagu urusan
 		var anggarans []web.PaguAnggaranRenjaResponse
@@ -387,7 +387,7 @@ func (s *PenetapanOpdService) FindRenja(
 		)
 	}
 
-	var programResponses []web.RenjaProgramResponse
+	programResponses := make([]web.RenjaProgramResponse, 0, len(programs))
 	for _, program := range programs {
 		var indResp []web.IndikatorRenjaResponse
 		for _, ind := range program.Indikators {
@@ -436,7 +436,7 @@ func (s *PenetapanOpdService) FindRenja(
 		)
 	}
 
-	var kegiatanResponses []web.RenjaKegiatanResponse
+	kegiatanResponses := make([]web.RenjaKegiatanResponse, 0, len(kegiatans))
 	for _, kegiatan := range kegiatans {
 		var indResp []web.IndikatorRenjaResponse
 		for _, ind := range kegiatan.Indikators {
@@ -485,7 +485,7 @@ func (s *PenetapanOpdService) FindRenja(
 		)
 	}
 
-	var subkegiatanResponses []web.RenjaSubkegiatanResponse
+	subkegiatanResponses := make([]web.RenjaSubkegiatanResponse, 0, len(subkegiatans))
 	for _, sub := range subkegiatans {
 		var indResp []web.IndikatorRenjaResponse
 		for _, ind := range sub.Indikators {
@@ -617,7 +617,7 @@ func (s *PenetapanOpdService) getActiveSnapshot(
 		return nil, err
 	}
 	if snapshot == nil {
-		s.Logger.ErrorContext(
+		s.Logger.WarnContext(
 			ctx,
 			"get active snapshot failed",
 			"kode_opd", kodeOpd,
@@ -625,7 +625,7 @@ func (s *PenetapanOpdService) getActiveSnapshot(
 			"tahun", tahun,
 			"err", err,
 		)
-		return nil, nil
+		return &domain.ActiveSnapshot{}, nil
 	}
 
 	return snapshot, nil

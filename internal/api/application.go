@@ -3,6 +3,7 @@ package api
 import (
 	"log/slog"
 
+	"github.com/bappeda-dev-team/penetapan-service/internal/service/individu"
 	"github.com/bappeda-dev-team/penetapan-service/internal/service/opd"
 )
 
@@ -37,4 +38,5 @@ type Application struct {
 
 	// inject service
 	PenetapanOpdService *opd.PenetapanOpdService
+	IndividuService     *individu.PenetapanIndividuService
 }

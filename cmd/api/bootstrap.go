@@ -8,6 +8,7 @@ import (
 	"github.com/bappeda-dev-team/penetapan-service/internal/api"
 	"github.com/bappeda-dev-team/penetapan-service/internal/client/perencanaan"
 	"github.com/bappeda-dev-team/penetapan-service/internal/repository"
+	"github.com/bappeda-dev-team/penetapan-service/internal/service/individu"
 	"github.com/bappeda-dev-team/penetapan-service/internal/service/opd"
 	"github.com/bappeda-dev-team/penetapan-service/internal/service/opd/sync"
 
@@ -24,6 +25,7 @@ func buildApplication(
 
 	// repository
 	penetapanOpdRepo := repository.NewPenetapanOpdRepository(db)
+	penetapanIndiRepo := repository.NewPenetapanIndividuRepository(db)
 
 	// external service
 	// perencanaan
@@ -70,12 +72,20 @@ func buildApplication(
 		logger,
 	)
 
+	individuService := individu.NewPenetapanIndividuService(
+		penetapanIndiRepo,
+		perencanaanClient,
+		syncRegistry,
+		logger,
+	)
+
 	// application
 	app := &api.Application{
 		Config: cfg,
 		Logger: logger,
 
 		PenetapanOpdService: penetapanOpdService,
+		IndividuService:     individuService,
 	}
 
 	return app
