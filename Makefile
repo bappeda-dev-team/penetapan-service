@@ -23,7 +23,7 @@ test:
 	go test -race ./...
 
 swagger:
-	swag init -d cmd/api,internal/api,internal/model/domain,internal/model/web
+	swag init -d cmd/api,internal/api,internal/model/domain,internal/model/web,internal/individu/domain,internal/individu/web
 
 clean:
 	rm -f ./bin/$(APP_NAME)

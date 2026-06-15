@@ -1,8 +1,79 @@
 basePath: /
 definitions:
-  web.ErrorResponse:
+  github_com_bappeda-dev-team_penetapan-service_internal_individu_domain.JenisPenetapan:
+    enum:
+    - PK-INDIVIDU
+    type: string
+    x-enum-varnames:
+    - JenisPenetapanPk
+  github_com_bappeda-dev-team_penetapan-service_internal_individu_web.ErrorResponse:
     properties:
       error: {}
+    type: object
+  github_com_bappeda-dev-team_penetapan-service_internal_individu_web.Response-web_RekinIndividuResponse:
+    properties:
+      data:
+        $ref: '#/definitions/web.RekinIndividuResponse'
+    type: object
+  github_com_bappeda-dev-team_penetapan-service_internal_individu_web.Response-web_SyncPenetapanResponse:
+    properties:
+      data:
+        $ref: '#/definitions/web.SyncPenetapanResponse'
+    type: object
+  github_com_bappeda-dev-team_penetapan-service_internal_individu_web.ValidationErrorResponse:
+    properties:
+      error:
+        additionalProperties:
+          type: string
+        example:
+          kode_opd: required
+          pegawai_id: required
+          tahun: required
+        type: object
+    type: object
+  github_com_bappeda-dev-team_penetapan-service_internal_model_web.ErrorResponse:
+    properties:
+      error: {}
+    type: object
+  github_com_bappeda-dev-team_penetapan-service_internal_model_web.Response-web_HealthcheckResponse:
+    properties:
+      data:
+        $ref: '#/definitions/web.HealthcheckResponse'
+    type: object
+  github_com_bappeda-dev-team_penetapan-service_internal_model_web.Response-web_RenaksiOpdPenetapanResponse:
+    properties:
+      data:
+        $ref: '#/definitions/web.RenaksiOpdPenetapanResponse'
+    type: object
+  github_com_bappeda-dev-team_penetapan-service_internal_model_web.Response-web_RenjaPenetapanOpdResponse:
+    properties:
+      data:
+        $ref: '#/definitions/web.RenjaPenetapanOpdResponse'
+    type: object
+  github_com_bappeda-dev-team_penetapan-service_internal_model_web.Response-web_SasaranPenetapanOpdResponse:
+    properties:
+      data:
+        $ref: '#/definitions/web.SasaranPenetapanOpdResponse'
+    type: object
+  github_com_bappeda-dev-team_penetapan-service_internal_model_web.Response-web_SyncPenetapanOpdResponse:
+    properties:
+      data:
+        $ref: '#/definitions/web.SyncPenetapanOpdResponse'
+    type: object
+  github_com_bappeda-dev-team_penetapan-service_internal_model_web.Response-web_TujuanPenetapanOpdResponse:
+    properties:
+      data:
+        $ref: '#/definitions/web.TujuanPenetapanOpdResponse'
+    type: object
+  github_com_bappeda-dev-team_penetapan-service_internal_model_web.ValidationErrorResponse:
+    properties:
+      error:
+        additionalProperties:
+          type: string
+        example:
+          kode_opd: required
+          tahun: required
+        type: object
     type: object
   web.HealthcheckResponse:
     properties:
@@ -17,6 +88,46 @@ definitions:
         type: string
       version:
         type: string
+    type: object
+  web.IndikatorPkResponse:
+    properties:
+      definisi_operasional:
+        example: Persentase responden yang menyatakan puas
+        type: string
+      id:
+        example: 1
+        type: integer
+      kode_indikator_pk:
+        example: IKU-001
+        type: string
+      nama_indikator_pk:
+        example: Persentase kepuasan masyarakat
+        type: string
+      rumus_perhitungan:
+        example: Jumlah puas / total responden x 100%
+        type: string
+      sumber_data:
+        example: Survei Kepuasan Masyarakat
+        type: string
+      target_pk:
+        items:
+          $ref: '#/definitions/web.TargetPkResponse'
+        type: array
+    type: object
+  web.IndikatorRenjaResponse:
+    properties:
+      id:
+        type: integer
+      indikator:
+        example: TEST-INDIKATOR
+        type: string
+      kode_indikator:
+        example: IND-123
+        type: string
+      targets:
+        items:
+          $ref: '#/definitions/web.TargetIndikatorResponse'
+        type: array
     type: object
   web.IndikatorSasaranPenetapanResponse:
     properties:
@@ -74,6 +185,73 @@ definitions:
           $ref: '#/definitions/web.TargetIndikatorResponse'
         type: array
     type: object
+  web.PaguAnggaranRenjaResponse:
+    properties:
+      id:
+        type: integer
+      jenis_pagu:
+        example: PENETAPAN
+        type: string
+      kode_pagu:
+        example: PAGU-UR-123
+        type: string
+      pagu:
+        example: 100000
+        type: integer
+    type: object
+  web.RekinIndividuResponse:
+    properties:
+      id:
+        example: 1
+        type: integer
+      indikator_pk:
+        items:
+          $ref: '#/definitions/web.IndikatorPkResponse'
+        type: array
+      keterangan_pk:
+        example: Kinerja utama individu
+        type: string
+      kode_pk:
+        example: RK-001
+        type: string
+      level_pk:
+        example: 2
+        type: integer
+      nama_pemilik_pk:
+        example: Budi Santoso
+        type: string
+      rekin:
+        example: Terwujudnya pelayanan publik yang berkualitas
+        type: string
+      versi:
+        example: 1
+        type: integer
+    type: object
+  web.RenaksiOpdPenetapanResponse:
+    properties:
+      is_locked:
+        example: true
+        type: boolean
+      kode_opd:
+        example: 1.02.0.00.0.00.01.0000
+        type: string
+      renaksiOpds:
+        items:
+          $ref: '#/definitions/web.RenaksiOpdResponse'
+        type: array
+      tahun_aktif:
+        example: 2025
+        type: integer
+      versi:
+        example: 1
+        type: integer
+    type: object
+  web.RenaksiOpdResponse:
+    properties:
+      renaksi:
+        example: terwujudnya xx
+        type: string
+    type: object
   web.RenjaBidangUrusanResponse:
     properties:
       bidang_urusan:
@@ -87,11 +265,19 @@ definitions:
       kode_bidang_urusan:
         example: "1.01"
         type: string
+      pagu_anggaran:
+        items:
+          $ref: '#/definitions/web.PaguAnggaranRenjaResponse'
+        type: array
     type: object
   web.RenjaKegiatanResponse:
     properties:
       id:
         type: integer
+      indikators:
+        items:
+          $ref: '#/definitions/web.IndikatorRenjaResponse'
+        type: array
       is_locked:
         example: true
         type: boolean
@@ -101,6 +287,10 @@ definitions:
       kode_kegiatan:
         example: 1.01.01.01.01.01
         type: string
+      pagu_anggaran:
+        items:
+          $ref: '#/definitions/web.PaguAnggaranRenjaResponse'
+        type: array
     type: object
   web.RenjaPenetapanOpdResponse:
     properties:
@@ -141,12 +331,20 @@ definitions:
     properties:
       id:
         type: integer
+      indikators:
+        items:
+          $ref: '#/definitions/web.IndikatorRenjaResponse'
+        type: array
       is_locked:
         example: true
         type: boolean
       kode_program:
         example: 1.01.01.01
         type: string
+      pagu_anggaran:
+        items:
+          $ref: '#/definitions/web.PaguAnggaranRenjaResponse'
+        type: array
       program:
         example: PROGRAM X
         type: string
@@ -155,12 +353,20 @@ definitions:
     properties:
       id:
         type: integer
+      indikators:
+        items:
+          $ref: '#/definitions/web.IndikatorRenjaResponse'
+        type: array
       is_locked:
         example: true
         type: boolean
       kode_subkegiatan:
         example: 1.01.01.01.01.01.0001
         type: string
+      pagu_anggaran:
+        items:
+          $ref: '#/definitions/web.PaguAnggaranRenjaResponse'
+        type: array
       subkegiatan:
         example: SUBKEGIATAN X
         type: string
@@ -175,34 +381,13 @@ definitions:
       kode_urusan:
         example: "1"
         type: string
+      pagu_anggaran:
+        items:
+          $ref: '#/definitions/web.PaguAnggaranRenjaResponse'
+        type: array
       urusan:
         example: URUSAN PENUNJANG
         type: string
-    type: object
-  web.Response-web_HealthcheckResponse:
-    properties:
-      data:
-        $ref: '#/definitions/web.HealthcheckResponse'
-    type: object
-  web.Response-web_RenjaPenetapanOpdResponse:
-    properties:
-      data:
-        $ref: '#/definitions/web.RenjaPenetapanOpdResponse'
-    type: object
-  web.Response-web_SasaranPenetapanOpdResponse:
-    properties:
-      data:
-        $ref: '#/definitions/web.SasaranPenetapanOpdResponse'
-    type: object
-  web.Response-web_SyncPenetapanOpdResponse:
-    properties:
-      data:
-        $ref: '#/definitions/web.SyncPenetapanOpdResponse'
-    type: object
-  web.Response-web_TujuanPenetapanOpdResponse:
-    properties:
-      data:
-        $ref: '#/definitions/web.TujuanPenetapanOpdResponse'
     type: object
   web.SasaranOpdResponse:
     properties:
@@ -290,6 +475,56 @@ definitions:
         example: 1
         type: integer
     type: object
+  web.SyncPenetapanRequest:
+    properties:
+      kode_opd:
+        example: 1.22.33
+        type: string
+      pegawai_id:
+        example: "199887766"
+        type: string
+      tahun:
+        example: 2025
+        type: integer
+    type: object
+  web.SyncPenetapanResponse:
+    properties:
+      jenis_penetapan:
+        allOf:
+        - $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_individu_domain.JenisPenetapan'
+        example: REKIN
+      kode_opd:
+        example: 1.22.33
+        type: string
+      pegawai_id:
+        example: "1998877665544"
+        type: string
+      processed_at:
+        type: string
+      processed_summary:
+        $ref: '#/definitions/web.SyncPenetapanSummary'
+      status:
+        example: SUCCESS
+        type: string
+      sync_id:
+        example: 155
+        type: integer
+      tahun:
+        example: 2025
+        type: integer
+    type: object
+  web.SyncPenetapanSummary:
+    properties:
+      indikator:
+        example: 3
+        type: integer
+      rencana_kinerja:
+        example: 1
+        type: integer
+      target:
+        example: 4
+        type: integer
+    type: object
   web.TargetIndikatorResponse:
     properties:
       id:
@@ -306,6 +541,24 @@ definitions:
         type: integer
       target:
         example: 100
+        type: number
+    type: object
+  web.TargetPkResponse:
+    properties:
+      id:
+        example: 1
+        type: integer
+      kode_target_pk:
+        example: TGT-001
+        type: string
+      satuan:
+        example: persen
+        type: string
+      tahun:
+        example: 2025
+        type: integer
+      target:
+        example: 95
         type: number
     type: object
   web.TujuanOpdResponse:
@@ -346,16 +599,6 @@ definitions:
         example: 1
         type: integer
     type: object
-  web.ValidationErrorResponse:
-    properties:
-      error:
-        additionalProperties:
-          type: string
-        example:
-          kode_opd: required
-          tahun: required
-        type: object
-    type: object
 info:
   contact:
     name: Kertaskerja Dev Team
@@ -374,14 +617,119 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/web.Response-web_HealthcheckResponse'
+            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.Response-web_HealthcheckResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/web.ErrorResponse'
+            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.ErrorResponse'
       summary: healthcheck
       tags:
       - healthcheck
+  /individu/rekin:
+    get:
+      consumes:
+      - application/json
+      description: Mengambil data rencana kinerja individu berdasarkan id_pegawai,
+        kode OPD dan tahun penetapan
+      parameters:
+      - description: Id Pegawai
+        in: query
+        name: pegawaiId
+        required: true
+        type: string
+      - description: Kode OPD
+        in: query
+        name: kodeOpd
+        required: true
+        type: string
+      - description: Tahun Penetapan
+        in: query
+        name: tahun
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Berhasil mengambil data rekin individu
+          schema:
+            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_individu_web.Response-web_RekinIndividuResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_individu_web.ValidationErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_individu_web.ErrorResponse'
+      summary: Get rencana kinerja individu penetapan
+      tags:
+      - Individu
+  /individu/rekin/sync:
+    post:
+      consumes:
+      - application/json
+      description: Sinkron data pk penetapan berdasarkan id_pegawai, kode OPD dan
+        tahun penetapan
+      parameters:
+      - description: Payload sync penetapan individu
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/web.SyncPenetapanRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_individu_web.Response-web_SyncPenetapanResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_individu_web.ValidationErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_individu_web.ErrorResponse'
+      summary: Sync Rekin individu
+      tags:
+      - Individu
+  /opd/renaksi:
+    get:
+      consumes:
+      - application/json
+      description: Mengambil data renaksi OPD berdasarkan kode OPD dan tahun penetapan
+      parameters:
+      - description: Kode OPD
+        in: query
+        name: kodeOpd
+        required: true
+        type: string
+      - description: Tahun Penetapan
+        in: query
+        name: tahun
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Berhasil mengambil data renja OPD
+          schema:
+            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.Response-web_RenaksiOpdPenetapanResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.ValidationErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.ErrorResponse'
+      summary: Get renaksi OPD penetapan
+      tags:
+      - OPD
   /opd/renja:
     get:
       consumes:
@@ -404,16 +752,16 @@ paths:
         "200":
           description: Berhasil mengambil data renja OPD
           schema:
-            $ref: '#/definitions/web.Response-web_RenjaPenetapanOpdResponse'
+            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.Response-web_RenjaPenetapanOpdResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/web.ValidationErrorResponse'
+            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.ValidationErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/web.ErrorResponse'
-      summary: Get sasaran OPD penetapan
+            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.ErrorResponse'
+      summary: Get renja OPD penetapan
       tags:
       - OPD
   /opd/renja/sync:
@@ -435,15 +783,15 @@ paths:
         "200":
           description: Success
           schema:
-            $ref: '#/definitions/web.Response-web_SyncPenetapanOpdResponse'
+            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.Response-web_SyncPenetapanOpdResponse'
         "422":
           description: Unprocessable Entity
           schema:
-            $ref: '#/definitions/web.ValidationErrorResponse'
+            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.ValidationErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/web.ErrorResponse'
+            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.ErrorResponse'
       summary: Sync Penetapan Renja OPD
       tags:
       - Sync
@@ -469,15 +817,15 @@ paths:
         "200":
           description: Berhasil mengambil data sasaran OPD
           schema:
-            $ref: '#/definitions/web.Response-web_SasaranPenetapanOpdResponse'
+            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.Response-web_SasaranPenetapanOpdResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/web.ValidationErrorResponse'
+            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.ValidationErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/web.ErrorResponse'
+            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.ErrorResponse'
       summary: Get sasaran OPD penetapan
       tags:
       - OPD
@@ -500,15 +848,15 @@ paths:
         "200":
           description: Success
           schema:
-            $ref: '#/definitions/web.Response-web_SyncPenetapanOpdResponse'
+            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.Response-web_SyncPenetapanOpdResponse'
         "422":
           description: Unprocessable Entity
           schema:
-            $ref: '#/definitions/web.ValidationErrorResponse'
+            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.ValidationErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/web.ErrorResponse'
+            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.ErrorResponse'
       summary: Sync Penetapan Sasaran OPD
       tags:
       - Sync
@@ -534,15 +882,15 @@ paths:
         "200":
           description: Berhasil mengambil data tujuan OPD
           schema:
-            $ref: '#/definitions/web.Response-web_TujuanPenetapanOpdResponse'
+            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.Response-web_TujuanPenetapanOpdResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/web.ValidationErrorResponse'
+            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.ValidationErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/web.ErrorResponse'
+            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.ErrorResponse'
       summary: Get tujuan OPD penetapan
       tags:
       - OPD
@@ -565,15 +913,15 @@ paths:
         "200":
           description: Success
           schema:
-            $ref: '#/definitions/web.Response-web_SyncPenetapanOpdResponse'
+            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.Response-web_SyncPenetapanOpdResponse'
         "422":
           description: Unprocessable Entity
           schema:
-            $ref: '#/definitions/web.ValidationErrorResponse'
+            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.ValidationErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/web.ErrorResponse'
+            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.ErrorResponse'
       summary: Sync Penetapan Tujuan OPD
       tags:
       - Sync

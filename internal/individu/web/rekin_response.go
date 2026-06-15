@@ -4,11 +4,35 @@ type RekinPenetapanIndividuResponse struct {
 	IdPegawai  string                  `json:"pegawai_id" example:"12345"`
 	Nama       string                  `json:"nama" example:"Pegawai X"`
 	KodeOpd    string                  `json:"kode_opd" example:"1.23.456"`
-	NamaOpd    string                  `json:"nama_opd" example:"OPD X"`
 	TahunAktif int                     `json:"tahun_aktif" example:"2025"`
 	Rekins     []RekinIndividuResponse `json:"rekins"`
 }
 
 type RekinIndividuResponse struct {
-	Rekin string `json:"rekin" example:"terwujudnya xxx"`
+	Id              int64                 `json:"id" example:"1"`
+	LevelPk         int                   `json:"level_pk" example:"2"`
+	KodePk          string                `json:"kode_pk" example:"RK-001"`
+	Rekin           string                `json:"rekin" example:"Terwujudnya pelayanan publik yang berkualitas"`
+	KeteranganPk    string                `json:"keterangan_pk,omitempty" example:"Kinerja utama individu"`
+	NamaPemilikPk   string                `json:"nama_pemilik_pk" example:"Budi Santoso"`
+	Versi           int                   `json:"versi" example:"1"`
+	IndikatorPkList []IndikatorPkResponse `json:"indikator_pk"`
+}
+
+type IndikatorPkResponse struct {
+	Id                  int64              `json:"id" example:"1"`
+	KodeIndikatorPk     string             `json:"kode_indikator_pk" example:"IKU-001"`
+	NamaIndikatorPk     string             `json:"nama_indikator_pk" example:"Persentase kepuasan masyarakat"`
+	RumusPerhitungan    *string            `json:"rumus_perhitungan,omitempty" example:"Jumlah puas / total responden x 100%"`
+	SumberData          *string            `json:"sumber_data,omitempty" example:"Survei Kepuasan Masyarakat"`
+	DefinisiOperasional *string            `json:"definisi_operasional,omitempty" example:"Persentase responden yang menyatakan puas"`
+	TargetPkList        []TargetPkResponse `json:"target_pk"`
+}
+
+type TargetPkResponse struct {
+	Id           int64   `json:"id" example:"1"`
+	KodeTargetPk string  `json:"kode_target_pk" example:"TGT-001"`
+	Tahun        int     `json:"tahun" example:"2025"`
+	Target       float64 `json:"target" example:"95"`
+	Satuan       string  `json:"satuan" example:"persen"`
 }

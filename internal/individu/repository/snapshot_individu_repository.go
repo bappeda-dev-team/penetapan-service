@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"errors"
 
 	"github.com/bappeda-dev-team/penetapan-service/internal/individu/domain"
 )
@@ -102,4 +103,43 @@ func (repo *PenetapanIndividuRepository) SaveSnapshot(
 	}
 
 	return id, nil
+}
+
+func (repo *PenetapanIndividuRepository) GetActiveSnapshot(
+	ctx context.Context,
+	pegawaiId, kodeOpd string,
+	tahun int,
+	jenisPenetapan domain.JenisPenetapan,
+) (*domain.ActiveSnapshot, error) {
+	query := `
+	    SELECT id, versi
+	    FROM penetapan_individu
+	    WHERE
+		pegawai_id = $1
+	    	AND kode_opd = $2
+	    	AND tahun = $3
+	    	AND jenis_penetapan = $4
+	    	AND is_active = TRUE
+	    ORDER BY versi DESC
+	    LIMIT 1`
+
+	var result domain.ActiveSnapshot
+	err := repo.DB.QueryRowContext(
+		ctx,
+		query,
+		pegawaiId,
+		kodeOpd,
+		tahun,
+		jenisPenetapan,
+	).Scan(
+		&result.Id,
+		&result.Versi,
+	)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return &result, nil
 }

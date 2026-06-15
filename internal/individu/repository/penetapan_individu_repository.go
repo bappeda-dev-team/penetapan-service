@@ -3,6 +3,8 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"fmt"
+	"strings"
 
 	"github.com/bappeda-dev-team/penetapan-service/internal/individu/domain"
 )
@@ -17,11 +19,223 @@ func NewPenetapanIndividuRepository(db *sql.DB) *PenetapanIndividuRepository {
 	}
 }
 
-func (repo *PenetapanIndividuRepository) FindRekinBySnapshot(
+func (repo *PenetapanIndividuRepository) FindPkIndividus(
 	ctx context.Context,
 	req domain.SnapshotPenetapan,
-) error {
-	return nil
+) ([]domain.PkPenetapan, error) {
+
+	const query = `
+		SELECT
+			pk.id,
+			pk.pegawai_id,
+			pk.kode_opd,
+			pk.tahun_aktif,
+			pk.level_pk,
+			pk.kode_pk,
+			pk.nama_pk,
+			pk.keterangan_pk,
+			pk.nama_pemilik_pk,
+			pk.created_date,
+			pk.last_modified_date,
+			pk.created_by,
+			pk.penetapan_individu_id,
+			pi.versi
+		FROM pk_individu pk
+		JOIN penetapan_individu pi ON pi.id = pk.penetapan_individu_id
+		WHERE pk.pegawai_id = $1
+		AND pk.kode_opd = $2
+		AND pk.tahun_aktif = $3
+		AND pk.penetapan_individu_id = $4
+		ORDER BY level_pk ASC, kode_pk ASC
+	`
+	rows, err := repo.DB.QueryContext(ctx, query,
+		req.PegawaiId,
+		req.KodeOpd,
+		req.Tahun,
+		req.SnapshotId,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	pks := make([]domain.PkPenetapan, 0)
+	for rows.Next() {
+		var pk domain.PkPenetapan
+		err := rows.Scan(
+			&pk.Id,
+			&pk.PegawaiId,
+			&pk.KodeOpd,
+			&pk.TahunAktif,
+			&pk.LevelPk,
+			&pk.KodePk,
+			&pk.NamaPk,
+			&pk.KeteranganPk,
+			&pk.NamaPemilikPk,
+			&pk.CreatedDate,
+			&pk.LastModifiedDate,
+			&pk.CreatedBy,
+			&pk.PenetapanIndividuId,
+			&pk.Versi,
+		)
+		if err != nil {
+			return nil, err
+		}
+		pk.IndikatorPk = make([]domain.IndikatorPk, 0)
+		pks = append(pks, pk)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return pks, nil
+
+}
+
+func (repo *PenetapanIndividuRepository) FindIndikatorPkByPkIds(
+	ctx context.Context,
+	pkIds []int64,
+) ([]domain.IndikatorPk, error) {
+	if len(pkIds) == 0 {
+		return []domain.IndikatorPk{}, nil
+	}
+
+	var (
+		placeholders []string
+		args         []any
+	)
+
+	for i, id := range pkIds {
+		placeholders = append(placeholders, fmt.Sprintf("$%d", i+1))
+		args = append(args, id)
+	}
+
+	query := fmt.Sprintf(`
+		SELECT
+			id,
+			pk_individu_id,
+			kode_opd,
+			tahun_aktif,
+			kode_indikator_pk,
+			nama_indikator_pk,
+			rumus_perhitungan,
+			sumber_data,
+			definisi_operasional,
+			created_date,
+			last_modified_date,
+			created_by
+		FROM indikator_pk
+		WHERE pk_individu_id IN (%s)
+		ORDER BY pk_individu_id, kode_indikator_pk
+	`, strings.Join(placeholders, ","))
+
+	rows, err := repo.DB.QueryContext(ctx, query, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	result := make([]domain.IndikatorPk, 0)
+
+	for rows.Next() {
+		var item domain.IndikatorPk
+
+		err := rows.Scan(
+			&item.Id,
+			&item.IdPk,
+			&item.KodeOpd,
+			&item.TahunAktif,
+			&item.KodeIndikatorPk,
+			&item.NamaIndikatorPk,
+			&item.RumusPerhitungan,
+			&item.SumberData,
+			&item.DefinisiOperasional,
+			&item.CreatedDate,
+			&item.LastModifiedDate,
+			&item.CreatedBy,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		item.TargetPk = make([]domain.TargetPk, 0)
+
+		result = append(result, item)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+func (repo *PenetapanIndividuRepository) FindTargetPkByIndikatorIds(
+	ctx context.Context,
+	indikatorIds []int64,
+) ([]domain.TargetPk, error) {
+	if len(indikatorIds) == 0 {
+		return []domain.TargetPk{}, nil
+	}
+
+	var (
+		placeholders []string
+		args         []any
+	)
+
+	for i, id := range indikatorIds {
+		placeholders = append(placeholders, fmt.Sprintf("$%d", i+1))
+		args = append(args, id)
+	}
+
+	query := fmt.Sprintf(`
+		SELECT
+			id,
+			indikator_pk_id,
+			kode_target_pk,
+			tahun,
+			target,
+			satuan,
+			created_date,
+			last_modified_date,
+			created_by
+		FROM target_pk
+		WHERE indikator_pk_id IN (%s)
+		ORDER BY indikator_pk_id, tahun
+	`, strings.Join(placeholders, ","))
+
+	rows, err := repo.DB.QueryContext(ctx, query, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	result := make([]domain.TargetPk, 0)
+
+	for rows.Next() {
+		var item domain.TargetPk
+
+		err := rows.Scan(
+			&item.Id,
+			&item.IdIndikatorPk,
+			&item.KodeTargetPk,
+			&item.Tahun,
+			&item.Target,
+			&item.Satuan,
+			&item.CreatedDate,
+			&item.LastModifiedDate,
+			&item.CreatedBy,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		result = append(result, item)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return result, nil
 }
 
 func (repo *PenetapanIndividuRepository) SavePkPenetapan(

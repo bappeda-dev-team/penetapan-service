@@ -32,21 +32,125 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/web.Response-web_HealthcheckResponse"
+                            "$ref": "#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.Response-web_HealthcheckResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/web.ErrorResponse"
+                            "$ref": "#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.ErrorResponse"
                         }
                     }
                 }
             }
         },
-        "/opd/renja": {
+        "/individu/rekin": {
             "get": {
-                "description": "Mengambil data renja OPD berdasarkan kode OPD dan tahun penetapan",
+                "description": "Mengambil data rencana kinerja individu berdasarkan id_pegawai, kode OPD dan tahun penetapan",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Individu"
+                ],
+                "summary": "Get rencana kinerja individu penetapan",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Id Pegawai",
+                        "name": "pegawaiId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Kode OPD",
+                        "name": "kodeOpd",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Tahun Penetapan",
+                        "name": "tahun",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Berhasil mengambil data rekin individu",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_individu_web.Response-web_RekinIndividuResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_individu_web.ValidationErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_individu_web.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/individu/rekin/sync": {
+            "post": {
+                "description": "Sinkron data pk penetapan berdasarkan id_pegawai, kode OPD dan tahun penetapan",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Individu"
+                ],
+                "summary": "Sync Rekin individu",
+                "parameters": [
+                    {
+                        "description": "Payload sync penetapan individu",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/web.SyncPenetapanRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_individu_web.Response-web_SyncPenetapanResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_individu_web.ValidationErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_individu_web.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/opd/renaksi": {
+            "get": {
+                "description": "Mengambil data renaksi OPD berdasarkan kode OPD dan tahun penetapan",
                 "consumes": [
                     "application/json"
                 ],
@@ -56,7 +160,7 @@ const docTemplate = `{
                 "tags": [
                     "OPD"
                 ],
-                "summary": "Get sasaran OPD penetapan",
+                "summary": "Get renaksi OPD penetapan",
                 "parameters": [
                     {
                         "type": "string",
@@ -77,19 +181,70 @@ const docTemplate = `{
                     "200": {
                         "description": "Berhasil mengambil data renja OPD",
                         "schema": {
-                            "$ref": "#/definitions/web.Response-web_RenjaPenetapanOpdResponse"
+                            "$ref": "#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.Response-web_RenaksiOpdPenetapanResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/web.ValidationErrorResponse"
+                            "$ref": "#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.ValidationErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/web.ErrorResponse"
+                            "$ref": "#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/opd/renja": {
+            "get": {
+                "description": "Mengambil data renja OPD berdasarkan kode OPD dan tahun penetapan",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "OPD"
+                ],
+                "summary": "Get renja OPD penetapan",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Kode OPD",
+                        "name": "kodeOpd",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Tahun Penetapan",
+                        "name": "tahun",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Berhasil mengambil data renja OPD",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.Response-web_RenjaPenetapanOpdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.ValidationErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.ErrorResponse"
                         }
                     }
                 }
@@ -123,19 +278,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Success",
                         "schema": {
-                            "$ref": "#/definitions/web.Response-web_SyncPenetapanOpdResponse"
+                            "$ref": "#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.Response-web_SyncPenetapanOpdResponse"
                         }
                     },
                     "422": {
                         "description": "Unprocessable Entity",
                         "schema": {
-                            "$ref": "#/definitions/web.ValidationErrorResponse"
+                            "$ref": "#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.ValidationErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/web.ErrorResponse"
+                            "$ref": "#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.ErrorResponse"
                         }
                     }
                 }
@@ -174,19 +329,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Berhasil mengambil data sasaran OPD",
                         "schema": {
-                            "$ref": "#/definitions/web.Response-web_SasaranPenetapanOpdResponse"
+                            "$ref": "#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.Response-web_SasaranPenetapanOpdResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/web.ValidationErrorResponse"
+                            "$ref": "#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.ValidationErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/web.ErrorResponse"
+                            "$ref": "#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.ErrorResponse"
                         }
                     }
                 }
@@ -220,19 +375,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Success",
                         "schema": {
-                            "$ref": "#/definitions/web.Response-web_SyncPenetapanOpdResponse"
+                            "$ref": "#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.Response-web_SyncPenetapanOpdResponse"
                         }
                     },
                     "422": {
                         "description": "Unprocessable Entity",
                         "schema": {
-                            "$ref": "#/definitions/web.ValidationErrorResponse"
+                            "$ref": "#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.ValidationErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/web.ErrorResponse"
+                            "$ref": "#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.ErrorResponse"
                         }
                     }
                 }
@@ -271,19 +426,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Berhasil mengambil data tujuan OPD",
                         "schema": {
-                            "$ref": "#/definitions/web.Response-web_TujuanPenetapanOpdResponse"
+                            "$ref": "#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.Response-web_TujuanPenetapanOpdResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/web.ValidationErrorResponse"
+                            "$ref": "#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.ValidationErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/web.ErrorResponse"
+                            "$ref": "#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.ErrorResponse"
                         }
                     }
                 }
@@ -317,19 +472,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Success",
                         "schema": {
-                            "$ref": "#/definitions/web.Response-web_SyncPenetapanOpdResponse"
+                            "$ref": "#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.Response-web_SyncPenetapanOpdResponse"
                         }
                     },
                     "422": {
                         "description": "Unprocessable Entity",
                         "schema": {
-                            "$ref": "#/definitions/web.ValidationErrorResponse"
+                            "$ref": "#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.ValidationErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/web.ErrorResponse"
+                            "$ref": "#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.ErrorResponse"
                         }
                     }
                 }
@@ -337,10 +492,120 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "web.ErrorResponse": {
+        "github_com_bappeda-dev-team_penetapan-service_internal_individu_domain.JenisPenetapan": {
+            "type": "string",
+            "enum": [
+                "PK-INDIVIDU"
+            ],
+            "x-enum-varnames": [
+                "JenisPenetapanPk"
+            ]
+        },
+        "github_com_bappeda-dev-team_penetapan-service_internal_individu_web.ErrorResponse": {
             "type": "object",
             "properties": {
                 "error": {}
+            }
+        },
+        "github_com_bappeda-dev-team_penetapan-service_internal_individu_web.Response-web_RekinIndividuResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/web.RekinIndividuResponse"
+                }
+            }
+        },
+        "github_com_bappeda-dev-team_penetapan-service_internal_individu_web.Response-web_SyncPenetapanResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/web.SyncPenetapanResponse"
+                }
+            }
+        },
+        "github_com_bappeda-dev-team_penetapan-service_internal_individu_web.ValidationErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "kode_opd": "required",
+                        "pegawai_id": "required",
+                        "tahun": "required"
+                    }
+                }
+            }
+        },
+        "github_com_bappeda-dev-team_penetapan-service_internal_model_web.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {}
+            }
+        },
+        "github_com_bappeda-dev-team_penetapan-service_internal_model_web.Response-web_HealthcheckResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/web.HealthcheckResponse"
+                }
+            }
+        },
+        "github_com_bappeda-dev-team_penetapan-service_internal_model_web.Response-web_RenaksiOpdPenetapanResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/web.RenaksiOpdPenetapanResponse"
+                }
+            }
+        },
+        "github_com_bappeda-dev-team_penetapan-service_internal_model_web.Response-web_RenjaPenetapanOpdResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/web.RenjaPenetapanOpdResponse"
+                }
+            }
+        },
+        "github_com_bappeda-dev-team_penetapan-service_internal_model_web.Response-web_SasaranPenetapanOpdResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/web.SasaranPenetapanOpdResponse"
+                }
+            }
+        },
+        "github_com_bappeda-dev-team_penetapan-service_internal_model_web.Response-web_SyncPenetapanOpdResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/web.SyncPenetapanOpdResponse"
+                }
+            }
+        },
+        "github_com_bappeda-dev-team_penetapan-service_internal_model_web.Response-web_TujuanPenetapanOpdResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/web.TujuanPenetapanOpdResponse"
+                }
+            }
+        },
+        "github_com_bappeda-dev-team_penetapan-service_internal_model_web.ValidationErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "kode_opd": "required",
+                        "tahun": "required"
+                    }
+                }
             }
         },
         "web.HealthcheckResponse": {
@@ -362,6 +627,63 @@ const docTemplate = `{
                 },
                 "version": {
                     "type": "string"
+                }
+            }
+        },
+        "web.IndikatorPkResponse": {
+            "type": "object",
+            "properties": {
+                "definisi_operasional": {
+                    "type": "string",
+                    "example": "Persentase responden yang menyatakan puas"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "kode_indikator_pk": {
+                    "type": "string",
+                    "example": "IKU-001"
+                },
+                "nama_indikator_pk": {
+                    "type": "string",
+                    "example": "Persentase kepuasan masyarakat"
+                },
+                "rumus_perhitungan": {
+                    "type": "string",
+                    "example": "Jumlah puas / total responden x 100%"
+                },
+                "sumber_data": {
+                    "type": "string",
+                    "example": "Survei Kepuasan Masyarakat"
+                },
+                "target_pk": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/web.TargetPkResponse"
+                    }
+                }
+            }
+        },
+        "web.IndikatorRenjaResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "indikator": {
+                    "type": "string",
+                    "example": "TEST-INDIKATOR"
+                },
+                "kode_indikator": {
+                    "type": "string",
+                    "example": "IND-123"
+                },
+                "targets": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/web.TargetIndikatorResponse"
+                    }
                 }
             }
         },
@@ -443,6 +765,101 @@ const docTemplate = `{
                 }
             }
         },
+        "web.PaguAnggaranRenjaResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "jenis_pagu": {
+                    "type": "string",
+                    "example": "PENETAPAN"
+                },
+                "kode_pagu": {
+                    "type": "string",
+                    "example": "PAGU-UR-123"
+                },
+                "pagu": {
+                    "type": "integer",
+                    "example": 100000
+                }
+            }
+        },
+        "web.RekinIndividuResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "indikator_pk": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/web.IndikatorPkResponse"
+                    }
+                },
+                "keterangan_pk": {
+                    "type": "string",
+                    "example": "Kinerja utama individu"
+                },
+                "kode_pk": {
+                    "type": "string",
+                    "example": "RK-001"
+                },
+                "level_pk": {
+                    "type": "integer",
+                    "example": 2
+                },
+                "nama_pemilik_pk": {
+                    "type": "string",
+                    "example": "Budi Santoso"
+                },
+                "rekin": {
+                    "type": "string",
+                    "example": "Terwujudnya pelayanan publik yang berkualitas"
+                },
+                "versi": {
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
+        "web.RenaksiOpdPenetapanResponse": {
+            "type": "object",
+            "properties": {
+                "is_locked": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "kode_opd": {
+                    "type": "string",
+                    "example": "1.02.0.00.0.00.01.0000"
+                },
+                "renaksiOpds": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/web.RenaksiOpdResponse"
+                    }
+                },
+                "tahun_aktif": {
+                    "type": "integer",
+                    "example": 2025
+                },
+                "versi": {
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
+        "web.RenaksiOpdResponse": {
+            "type": "object",
+            "properties": {
+                "renaksi": {
+                    "type": "string",
+                    "example": "terwujudnya xx"
+                }
+            }
+        },
         "web.RenjaBidangUrusanResponse": {
             "type": "object",
             "properties": {
@@ -460,6 +877,12 @@ const docTemplate = `{
                 "kode_bidang_urusan": {
                     "type": "string",
                     "example": "1.01"
+                },
+                "pagu_anggaran": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/web.PaguAnggaranRenjaResponse"
+                    }
                 }
             }
         },
@@ -468,6 +891,12 @@ const docTemplate = `{
             "properties": {
                 "id": {
                     "type": "integer"
+                },
+                "indikators": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/web.IndikatorRenjaResponse"
+                    }
                 },
                 "is_locked": {
                     "type": "boolean",
@@ -480,6 +909,12 @@ const docTemplate = `{
                 "kode_kegiatan": {
                     "type": "string",
                     "example": "1.01.01.01.01.01"
+                },
+                "pagu_anggaran": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/web.PaguAnggaranRenjaResponse"
+                    }
                 }
             }
         },
@@ -540,6 +975,12 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
+                "indikators": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/web.IndikatorRenjaResponse"
+                    }
+                },
                 "is_locked": {
                     "type": "boolean",
                     "example": true
@@ -547,6 +988,12 @@ const docTemplate = `{
                 "kode_program": {
                     "type": "string",
                     "example": "1.01.01.01"
+                },
+                "pagu_anggaran": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/web.PaguAnggaranRenjaResponse"
+                    }
                 },
                 "program": {
                     "type": "string",
@@ -560,6 +1007,12 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
+                "indikators": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/web.IndikatorRenjaResponse"
+                    }
+                },
                 "is_locked": {
                     "type": "boolean",
                     "example": true
@@ -567,6 +1020,12 @@ const docTemplate = `{
                 "kode_subkegiatan": {
                     "type": "string",
                     "example": "1.01.01.01.01.01.0001"
+                },
+                "pagu_anggaran": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/web.PaguAnggaranRenjaResponse"
+                    }
                 },
                 "subkegiatan": {
                     "type": "string",
@@ -588,49 +1047,15 @@ const docTemplate = `{
                     "type": "string",
                     "example": "1"
                 },
+                "pagu_anggaran": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/web.PaguAnggaranRenjaResponse"
+                    }
+                },
                 "urusan": {
                     "type": "string",
                     "example": "URUSAN PENUNJANG"
-                }
-            }
-        },
-        "web.Response-web_HealthcheckResponse": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "$ref": "#/definitions/web.HealthcheckResponse"
-                }
-            }
-        },
-        "web.Response-web_RenjaPenetapanOpdResponse": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "$ref": "#/definitions/web.RenjaPenetapanOpdResponse"
-                }
-            }
-        },
-        "web.Response-web_SasaranPenetapanOpdResponse": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "$ref": "#/definitions/web.SasaranPenetapanOpdResponse"
-                }
-            }
-        },
-        "web.Response-web_SyncPenetapanOpdResponse": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "$ref": "#/definitions/web.SyncPenetapanOpdResponse"
-                }
-            }
-        },
-        "web.Response-web_TujuanPenetapanOpdResponse": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "$ref": "#/definitions/web.TujuanPenetapanOpdResponse"
                 }
             }
         },
@@ -756,6 +1181,79 @@ const docTemplate = `{
                 }
             }
         },
+        "web.SyncPenetapanRequest": {
+            "type": "object",
+            "properties": {
+                "kode_opd": {
+                    "type": "string",
+                    "example": "1.22.33"
+                },
+                "pegawai_id": {
+                    "type": "string",
+                    "example": "199887766"
+                },
+                "tahun": {
+                    "type": "integer",
+                    "example": 2025
+                }
+            }
+        },
+        "web.SyncPenetapanResponse": {
+            "type": "object",
+            "properties": {
+                "jenis_penetapan": {
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_individu_domain.JenisPenetapan"
+                        }
+                    ],
+                    "example": "REKIN"
+                },
+                "kode_opd": {
+                    "type": "string",
+                    "example": "1.22.33"
+                },
+                "pegawai_id": {
+                    "type": "string",
+                    "example": "1998877665544"
+                },
+                "processed_at": {
+                    "type": "string"
+                },
+                "processed_summary": {
+                    "$ref": "#/definitions/web.SyncPenetapanSummary"
+                },
+                "status": {
+                    "type": "string",
+                    "example": "SUCCESS"
+                },
+                "sync_id": {
+                    "type": "integer",
+                    "example": 155
+                },
+                "tahun": {
+                    "type": "integer",
+                    "example": 2025
+                }
+            }
+        },
+        "web.SyncPenetapanSummary": {
+            "type": "object",
+            "properties": {
+                "indikator": {
+                    "type": "integer",
+                    "example": 3
+                },
+                "rencana_kinerja": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "target": {
+                    "type": "integer",
+                    "example": 4
+                }
+            }
+        },
         "web.TargetIndikatorResponse": {
             "type": "object",
             "properties": {
@@ -778,6 +1276,31 @@ const docTemplate = `{
                 "target": {
                     "type": "number",
                     "example": 100
+                }
+            }
+        },
+        "web.TargetPkResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "kode_target_pk": {
+                    "type": "string",
+                    "example": "TGT-001"
+                },
+                "satuan": {
+                    "type": "string",
+                    "example": "persen"
+                },
+                "tahun": {
+                    "type": "integer",
+                    "example": 2025
+                },
+                "target": {
+                    "type": "number",
+                    "example": 95
                 }
             }
         },
@@ -832,21 +1355,6 @@ const docTemplate = `{
                 "versi": {
                     "type": "integer",
                     "example": 1
-                }
-            }
-        },
-        "web.ValidationErrorResponse": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    },
-                    "example": {
-                        "kode_opd": "required",
-                        "tahun": "required"
-                    }
                 }
             }
         }

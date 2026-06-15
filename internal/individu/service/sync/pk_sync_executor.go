@@ -98,8 +98,6 @@ func (ex *PkSyncExecutor) Sync(
 
 	// SAVE PK
 	summary := SummaryCounter{}
-	summary.AddIndikator(10)
-	summary.AddTarget(12)
 	for _, pk := range pkPegawais {
 		pkPenetapan := domain.PkPenetapan{
 			PegawaiId:           snapshot.PegawaiId,
@@ -138,6 +136,7 @@ func (ex *PkSyncExecutor) Sync(
 				}
 				targetPk := domain.TargetPk{
 					IdIndikatorPk: indPkId,
+					KodeTargetPk:  tgt.IdTarget,
 					Target:        targetFloat,
 					Satuan:        tgt.Satuan,
 					Tahun:         snapshot.Tahun,

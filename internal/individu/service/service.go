@@ -39,7 +39,105 @@ func (s *PenetapanIndividuService) FindRekinsIndividu(
 	ctx context.Context,
 	req web.SyncPenetapanRequest,
 ) (web.RekinPenetapanIndividuResponse, error) {
-	return web.RekinPenetapanIndividuResponse{}, nil
+	s.Logger.Info("FindRekinsIndividu")
+
+	snapshot := domain.SnapshotPenetapan{
+		JenisSnapshot: domain.JenisPenetapanPk,
+		PegawaiId:     req.PegawaiId,
+		KodeOpd:       req.KodeOpd,
+		Tahun:         req.Tahun,
+	}
+	activeSnapshot, err := s.getActiveSnapshot(ctx, snapshot)
+	if err != nil {
+		return web.RekinPenetapanIndividuResponse{}, err
+	}
+	snapshot.SnapshotId = &activeSnapshot.Id
+	snapshot.Versi = activeSnapshot.Versi
+
+	pkIndividus, err := s.Repo.FindPkIndividus(ctx, snapshot)
+	if err != nil {
+		return web.RekinPenetapanIndividuResponse{}, err
+	}
+	pkIndividuIds := make([]int64, 0, len(pkIndividus))
+	for _, pk := range pkIndividus {
+		pkIndividuIds = append(pkIndividuIds, pk.Id)
+	}
+	indikators, err := s.Repo.FindIndikatorPkByPkIds(ctx, pkIndividuIds)
+	if err != nil {
+		return web.RekinPenetapanIndividuResponse{}, err
+	}
+	indikatorIds := make([]int64, 0, len(indikators))
+	for _, ind := range indikators {
+		indikatorIds = append(indikatorIds, ind.Id)
+	}
+	targets, err := s.Repo.FindTargetPkByIndikatorIds(ctx, indikatorIds)
+	if err != nil {
+		return web.RekinPenetapanIndividuResponse{}, err
+	}
+	// To Response DTO
+	// target -> indikator
+	targetMap := make(map[int64][]web.TargetPkResponse)
+
+	for _, target := range targets {
+		targetMap[target.IdIndikatorPk] = append(
+			targetMap[target.IdIndikatorPk],
+			web.TargetPkResponse{
+				Id:           target.Id,
+				KodeTargetPk: target.KodeTargetPk,
+				Tahun:        target.Tahun,
+				Target:       target.Target,
+				Satuan:       target.Satuan,
+			},
+		)
+	}
+
+	// indikator -> pk
+	indikatorMap := make(map[int64][]web.IndikatorPkResponse)
+
+	for _, indikator := range indikators {
+		indikatorMap[indikator.IdPk] = append(
+			indikatorMap[indikator.IdPk],
+			web.IndikatorPkResponse{
+				Id:                  indikator.Id,
+				KodeIndikatorPk:     indikator.KodeIndikatorPk,
+				NamaIndikatorPk:     indikator.NamaIndikatorPk,
+				RumusPerhitungan:    indikator.RumusPerhitungan,
+				SumberData:          indikator.SumberData,
+				DefinisiOperasional: indikator.DefinisiOperasional,
+				TargetPkList:        targetMap[indikator.Id],
+			},
+		)
+	}
+
+	// pk -> response
+	rekins := make([]web.RekinIndividuResponse, 0, len(pkIndividus))
+
+	for _, pk := range pkIndividus {
+		rekins = append(rekins, web.RekinIndividuResponse{
+			Id:              pk.Id,
+			LevelPk:         pk.LevelPk,
+			KodePk:          pk.KodePk,
+			Rekin:           pk.NamaPk,
+			KeteranganPk:    pk.KeteranganPk,
+			NamaPemilikPk:   pk.NamaPemilikPk,
+			Versi:           pk.Versi,
+			IndikatorPkList: indikatorMap[pk.Id],
+		})
+	}
+
+	resp := web.RekinPenetapanIndividuResponse{
+		IdPegawai:  snapshot.PegawaiId,
+		KodeOpd:    snapshot.KodeOpd,
+		TahunAktif: snapshot.Tahun,
+		Rekins:     rekins,
+	}
+
+	// untuk cek apkaah request pegawaiId sesuai dengan nama pemilik
+	if len(pkIndividus) > 0 {
+		resp.Nama = pkIndividus[0].NamaPemilikPk
+	}
+
+	return resp, nil
 }
 
 func (s *PenetapanIndividuService) SyncPenetapanPkIndividu(
@@ -90,6 +188,7 @@ func (s *PenetapanIndividuService) SyncPenetapanPkIndividu(
 		return web.SyncPenetapanResponse{}, err
 	}
 
+	// SYNC AND SAVE
 	summary, err := executor.Sync(ctx, syncId, req, currentUser)
 	if err != nil {
 		return web.SyncPenetapanResponse{}, s.failSync(ctx, syncId, err)
@@ -154,4 +253,30 @@ func (s *PenetapanIndividuService) failSync(ctx context.Context, syncId int64, c
 		return updateErr
 	}
 	return cause
+}
+
+func (s *PenetapanIndividuService) getActiveSnapshot(
+	ctx context.Context,
+	snap domain.SnapshotPenetapan,
+) (*domain.ActiveSnapshot, error) {
+
+	snapshot, err := s.Repo.GetActiveSnapshot(ctx, snap.PegawaiId, snap.KodeOpd, snap.Tahun, snap.JenisSnapshot)
+	if err != nil {
+		s.Logger.Error("GetActiveSnapshot")
+		return nil, err
+	}
+	if snapshot == nil {
+		s.Logger.WarnContext(
+			ctx,
+			"get active snapshot individu failed",
+			"pegawaiId", snap.PegawaiId,
+			"kode_opd", snap.KodeOpd,
+			"jenis", snap.JenisSnapshot,
+			"tahun", snap.Tahun,
+			"err", err,
+		)
+		return &domain.ActiveSnapshot{}, nil
+	}
+
+	return snapshot, nil
 }
