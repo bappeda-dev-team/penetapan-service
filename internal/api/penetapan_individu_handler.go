@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/bappeda-dev-team/penetapan-service/internal/model/web"
-	"github.com/bappeda-dev-team/penetapan-service/internal/model/web/individu"
+	"github.com/bappeda-dev-team/penetapan-service/internal/individu/web"
+	"github.com/bappeda-dev-team/penetapan-service/internal/validator"
 )
 
 // RekinIndividuHandler godoc
@@ -16,7 +16,7 @@ import (
 // @Accept      json
 // @Produce     json
 //
-// @Param       idPegawai query string true "Id Pegawai"
+// @Param       pegawaiId query string true "Id Pegawai"
 // @Param       kodeOpd query string true "Kode OPD"
 // @Param       tahun   query int    true "Tahun Penetapan"
 //
@@ -34,7 +34,7 @@ func (app *Application) RekinIndividuHandler(
 
 	errors := map[string]string{}
 
-	idPegawai := query.Get("idPegawai")
+	pegawaiId := query.Get("pegawaiId")
 
 	kodeOpd := query.Get("kodeOpd")
 
@@ -42,8 +42,8 @@ func (app *Application) RekinIndividuHandler(
 
 	var tahun int
 
-	if idPegawai == "" {
-		errors["idPegawai"] = "required"
+	if pegawaiId == "" {
+		errors["pegawaiId"] = "required"
 	}
 
 	if kodeOpd == "" {
@@ -72,8 +72,8 @@ func (app *Application) RekinIndividuHandler(
 		return
 	}
 
-	request := individu.SyncPenetapanIndividuRequest{
-		IdPegawai: idPegawai,
+	request := web.SyncPenetapanRequest{
+		PegawaiId: pegawaiId,
 		KodeOpd:   kodeOpd,
 		Tahun:     tahun,
 	}
@@ -87,7 +87,74 @@ func (app *Application) RekinIndividuHandler(
 		return
 	}
 
-	response := web.Response[individu.RekinPenetapanIndividuResponse]{
+	response := web.Response[web.RekinPenetapanIndividuResponse]{
+		Data: result,
+	}
+
+	err = app.WriteJSON(w, http.StatusOK, response, nil)
+	if err != nil {
+		app.ServerErrorResponse(w, r, err)
+		return
+	}
+}
+
+// SyncRekinIndividuHandler godoc
+//
+// @Summary     Sync Rekin individu
+// @Description Sinkron data pk penetapan berdasarkan id_pegawai, kode OPD dan tahun penetapan
+// @Tags        Individu
+// @Accept      json
+// @Produce     json
+//
+// @Param       payload body web.SyncPenetapanRequest true "Payload sync penetapan individu"
+//
+// @Success     200 {object} web.Response[web.SyncPenetapanResponse] 	"Success"
+// @Failure     400 {object} web.ValidationErrorResponse                "Bad Request"
+// @Failure     500 {object} web.ErrorResponse                          "Internal Server Error"
+//
+// @Router      /individu/rekin/sync [post]
+func (app *Application) SyncRekinIndividuHandler(
+	w http.ResponseWriter,
+	r *http.Request,
+) {
+
+	input := web.SyncPenetapanRequest{}
+	errors := map[string]string{}
+
+	err := app.ReadJSON(w, r, &input)
+	if err != nil {
+		errors["invalid_request"] = err.Error()
+		app.BadRequestResponse(
+			w,
+			r,
+			web.ValidationErrorResponse{
+				Error: errors,
+			},
+		)
+		return
+	}
+
+	request := &web.SyncPenetapanRequest{
+		PegawaiId: input.PegawaiId,
+		KodeOpd:   input.KodeOpd,
+		Tahun:     input.Tahun,
+	}
+	v := validator.New()
+	if web.ValidateSyncPenetapanRequest(v, request); !v.Valid() {
+		app.FailedValidationResponse(w, r, v.Errors)
+		return
+	}
+
+	result, err := app.IndividuService.SyncPenetapanPkIndividu(
+		r.Context(),
+		request,
+	)
+	if err != nil {
+		app.ServerErrorResponse(w, r, err)
+		return
+	}
+
+	response := web.Response[web.SyncPenetapanResponse]{
 		Data: result,
 	}
 

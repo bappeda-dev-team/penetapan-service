@@ -8,9 +8,14 @@ import (
 	"github.com/bappeda-dev-team/penetapan-service/internal/api"
 	"github.com/bappeda-dev-team/penetapan-service/internal/client/perencanaan"
 	"github.com/bappeda-dev-team/penetapan-service/internal/repository"
-	"github.com/bappeda-dev-team/penetapan-service/internal/service/individu"
-	"github.com/bappeda-dev-team/penetapan-service/internal/service/opd"
-	"github.com/bappeda-dev-team/penetapan-service/internal/service/opd/sync"
+
+	clientIndividu "github.com/bappeda-dev-team/penetapan-service/internal/individu/client"
+	repoIndividu "github.com/bappeda-dev-team/penetapan-service/internal/individu/repository"
+	serviceIndividu "github.com/bappeda-dev-team/penetapan-service/internal/individu/service"
+	syncIndividu "github.com/bappeda-dev-team/penetapan-service/internal/individu/service/sync"
+
+	serviceOpd "github.com/bappeda-dev-team/penetapan-service/internal/service/opd"
+	syncOpd "github.com/bappeda-dev-team/penetapan-service/internal/service/opd/sync"
 
 	"net/http"
 )
@@ -25,10 +30,8 @@ func buildApplication(
 
 	// repository
 	penetapanOpdRepo := repository.NewPenetapanOpdRepository(db)
-	penetapanIndiRepo := repository.NewPenetapanIndividuRepository(db)
 
 	// external service
-	// perencanaan
 	perencanaanClient := perencanaan.NewPerencanaanClient(
 		cfg.Services.Perencanaan.BaseURL,
 		cfg.Services.Perencanaan.ApiPath,
@@ -37,45 +40,67 @@ func buildApplication(
 
 	// executor
 	//// tujuan
-	tujuanSyncExecutor := sync.NewTujuanSyncExecutor(
+	tujuanSyncExecutor := syncOpd.NewTujuanSyncExecutor(
 		penetapanOpdRepo,
 		perencanaanClient,
 		logger,
 	)
 
 	//// sasaran
-	sasaranSyncExecutor := sync.NewSasaranSyncExecutor(
+	sasaranSyncExecutor := syncOpd.NewSasaranSyncExecutor(
 		penetapanOpdRepo,
 		perencanaanClient,
 		logger,
 	)
 
 	//// renja
-	renjaSyncExecutor := sync.NewRenjaSyncExecutor(
+	renjaSyncExecutor := syncOpd.NewRenjaSyncExecutor(
 		penetapanOpdRepo,
 		perencanaanClient,
 		logger,
 	)
 
 	// register executor
-	syncRegistry := &sync.Registry{
+	syncRegistry := &syncOpd.Registry{
 		TujuanSyncExecutor:  tujuanSyncExecutor,
 		SasaranSyncExecutor: sasaranSyncExecutor,
 		RenjaSyncExecutor:   renjaSyncExecutor,
 	}
 
 	// service
-	penetapanOpdService := opd.NewPenetapanOpdService(
+	penetapanOpdService := serviceOpd.NewPenetapanOpdService(
 		penetapanOpdRepo,
 		perencanaanClient,
 		syncRegistry,
 		logger,
 	)
 
-	individuService := individu.NewPenetapanIndividuService(
+	// individu
+	// external service
+	individuClient := clientIndividu.NewClient(
+		cfg.Services.Individu.BaseURL,
+		cfg.Services.Individu.ApiPath,
+		&http.Client{Timeout: 60 * time.Second},
+	)
+	// repository
+	penetapanIndiRepo := repoIndividu.NewPenetapanIndividuRepository(db)
+	// executor
+	//// tujuan
+	pkSyncExecutor := syncIndividu.NewPkSyncExecutor(
 		penetapanIndiRepo,
-		perencanaanClient,
-		syncRegistry,
+		individuClient,
+		logger,
+	)
+
+	// exeuctor individu
+	syncIndividuRegistry := &syncIndividu.Registry{
+		PkSyncExecutor: pkSyncExecutor,
+	}
+
+	individuService := serviceIndividu.NewPenetapanIndividuService(
+		penetapanIndiRepo,
+		individuClient,
+		syncIndividuRegistry,
 		logger,
 	)
 

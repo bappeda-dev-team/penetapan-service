@@ -3,6 +3,7 @@ package api
 import (
 	"fmt"
 	"net/http"
+	"runtime/debug"
 )
 
 func (app *Application) recoverPanic(next http.Handler) http.Handler {
@@ -13,6 +14,13 @@ func (app *Application) recoverPanic(next http.Handler) http.Handler {
 			pv := recover()
 
 			if pv != nil {
+				//log it
+				app.Logger.ErrorContext(
+					r.Context(),
+					"panic",
+					"error", pv,
+					"stack", string(debug.Stack()),
+				)
 				w.Header().Set("Connection", "close")
 
 				app.ServerErrorResponse(w, r, fmt.Errorf("%v", pv))

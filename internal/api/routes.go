@@ -26,6 +26,7 @@ func (app *Application) Routes() http.Handler {
 	router.HandlerFunc(http.MethodGet, "/healthcheck", app.HealthcheckHandler)
 
 	router.HandlerFunc(http.MethodGet, "/individu/rekin", app.RekinIndividuHandler)
+	router.HandlerFunc(http.MethodPost, "/individu/rekin/sync", app.SyncRekinIndividuHandler)
 
 	// opd
 	// renaksi

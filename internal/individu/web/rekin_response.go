@@ -1,7 +1,7 @@
-package individu
+package web
 
 type RekinPenetapanIndividuResponse struct {
-	IdPegawai  string                  `json:"id_pegawai" example:"12345"`
+	IdPegawai  string                  `json:"pegawai_id" example:"12345"`
 	Nama       string                  `json:"nama" example:"Pegawai X"`
 	KodeOpd    string                  `json:"kode_opd" example:"1.23.456"`
 	NamaOpd    string                  `json:"nama_opd" example:"OPD X"`

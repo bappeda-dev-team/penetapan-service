@@ -44,6 +44,16 @@ func loadConfig(logger *slog.Logger) api.Config {
 		"",
 	)
 
+	cfg.Services.Individu.BaseURL = getEnv(
+		"SERVICES_INDIVIDU_BASE_URL",
+		"http://localhost:8080",
+	)
+
+	cfg.Services.Individu.ApiPath = getEnv(
+		"SERVICES_INDIVIDU_API_PATH",
+		"",
+	)
+
 	return cfg
 }
 

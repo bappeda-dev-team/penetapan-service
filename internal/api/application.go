@@ -3,7 +3,7 @@ package api
 import (
 	"log/slog"
 
-	"github.com/bappeda-dev-team/penetapan-service/internal/service/individu"
+	individu "github.com/bappeda-dev-team/penetapan-service/internal/individu/service"
 	"github.com/bappeda-dev-team/penetapan-service/internal/service/opd"
 )
 
@@ -21,6 +21,7 @@ type Config struct {
 
 	Services struct {
 		Perencanaan ServiceConfig
+		Individu    ServiceConfig
 	}
 }
 

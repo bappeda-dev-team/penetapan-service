@@ -64,7 +64,7 @@ func (ex *TujuanSyncExecutor) Sync(
 	if versiPenetapan > 1 {
 		errDeact := ex.Repo.DeactivateOldSnapshot(ctx, tx, req.KodeOpd, domain.JenisPenetapanTujuan, req.Tahun)
 		if errDeact != nil {
-			return web.SyncPenetapanOpdSummary{}, err
+			return web.SyncPenetapanOpdSummary{}, errDeact
 		}
 	}
 

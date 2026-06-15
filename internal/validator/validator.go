@@ -6,7 +6,8 @@ import (
 )
 
 var (
-	KodeOpdRX = regexp.MustCompile(`^\d\.\d{2}\.\d\.\d{2}\.\d\.\d{2}\.\d{2}\.\d{4}$`)
+	KodeOpdRX   = regexp.MustCompile(`^\d\.\d{2}\.\d\.\d{2}\.\d\.\d{2}\.\d{2}\.\d{4}$`)
+	PegawaiIdRX = regexp.MustCompile(`^\d{18}(_plt)?$`)
 )
 
 type Validator struct {
