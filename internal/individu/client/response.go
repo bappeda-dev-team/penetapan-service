@@ -1,7 +1,6 @@
 package client
 
 type PkPenetapanResponse struct {
-
 	Id               string        `json:"id"`
 	KodeOpd          string        `json:"kode_opd"`
 	NamaOpd          string        `json:"nama_opd"`
@@ -9,6 +8,7 @@ type PkPenetapanResponse struct {
 	NipPemilikPk     string        `json:"nip_pemilik_pk"`
 	NamaPemilikPk    string        `json:"nama_pemilik_pk"`
 	IdRekinPemilikPk string        `json:"id_rekin_pemilik_pk"`
+	SasaranOpdId     int64         `json:"id_sasaran_opd"`
 	RekinPemilikPk   string        `json:"rekin_pemilik_pk"`
 	Tahun            int           `json:"tahun"`
 	Keterangan       string        `json:"keterangan"`

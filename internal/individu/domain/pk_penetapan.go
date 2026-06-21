@@ -8,11 +8,12 @@ type PkPenetapan struct {
 	KodeOpd    string
 	TahunAktif int
 
-	LevelPk       int
-	KodePk        string // id rekin
-	NamaPk        string // rekin
-	KeteranganPk  string // Ket PK
-	NamaPemilikPk string // nama pegawai
+	LevelPk        int
+	KodeSasaranOpd string
+	KodePk         string // id rekin
+	NamaPk         string // rekin
+	KeteranganPk   string // Ket PK
+	NamaPemilikPk  string // nama pegawai
 
 	CreatedDate         time.Time
 	LastModifiedDate    time.Time

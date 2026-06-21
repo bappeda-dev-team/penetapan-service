@@ -11,6 +11,7 @@ type RekinPenetapanIndividuResponse struct {
 type RekinIndividuResponse struct {
 	Id              int64                 `json:"id" example:"1"`
 	LevelPk         int                   `json:"level_pk" example:"2"`
+	KodeSasaranOpd  string                `json:"kode_sasaran_opd" example:"SAS-OPD-1"`
 	KodePk          string                `json:"kode_pk" example:"RK-001"`
 	Rekin           string                `json:"rekin" example:"Terwujudnya pelayanan publik yang berkualitas"`
 	KeteranganPk    string                `json:"keterangan_pk,omitempty" example:"Kinerja utama individu"`

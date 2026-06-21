@@ -116,6 +116,7 @@ func (s *PenetapanIndividuService) FindRekinsIndividu(
 		rekins = append(rekins, web.RekinIndividuResponse{
 			Id:              pk.Id,
 			LevelPk:         pk.LevelPk,
+			KodeSasaranOpd:  pk.KodeSasaranOpd,
 			KodePk:          pk.KodePk,
 			Rekin:           pk.NamaPk,
 			KeteranganPk:    pk.KeteranganPk,

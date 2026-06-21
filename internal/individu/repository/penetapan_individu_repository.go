@@ -31,6 +31,7 @@ func (repo *PenetapanIndividuRepository) FindPkIndividus(
 			pk.kode_opd,
 			pk.tahun_aktif,
 			pk.level_pk,
+			pk.kode_sasaran_opd,
 			pk.kode_pk,
 			pk.nama_pk,
 			pk.keterangan_pk,
@@ -67,6 +68,7 @@ func (repo *PenetapanIndividuRepository) FindPkIndividus(
 			&pk.KodeOpd,
 			&pk.TahunAktif,
 			&pk.LevelPk,
+			&pk.KodeSasaranOpd,
 			&pk.KodePk,
 			&pk.NamaPk,
 			&pk.KeteranganPk,
@@ -250,6 +252,7 @@ func (repo *PenetapanIndividuRepository) SavePkPenetapan(
 			kode_opd,
 			tahun_aktif,
 			level_pk,
+			kode_sasaran_opd,
 			kode_pk,
 			nama_pk,
 			keterangan_pk,
@@ -259,7 +262,7 @@ func (repo *PenetapanIndividuRepository) SavePkPenetapan(
 		) VALUES (
 			$1, $2, $3, $4, $5,
 			$6, $7, $8, $9, $10,
-			$11
+			$11, $12
 		)
 		RETURNING id
 	`
@@ -274,6 +277,7 @@ func (repo *PenetapanIndividuRepository) SavePkPenetapan(
 		req.KodeOpd,
 		req.TahunAktif,
 		req.LevelPk,
+		req.KodeSasaranOpd,
 		req.KodePk,
 		req.NamaPk,
 		req.KeteranganPk,

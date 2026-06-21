@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/bappeda-dev-team/penetapan-service/internal/client/perencanaan"
+	"github.com/bappeda-dev-team/penetapan-service/internal/kode"
 	"github.com/bappeda-dev-team/penetapan-service/internal/model/domain"
 	"github.com/bappeda-dev-team/penetapan-service/internal/model/web"
 	"github.com/bappeda-dev-team/penetapan-service/internal/repository"
@@ -189,13 +190,13 @@ func (ex *SasaranSyncExecutor) toSasaranSnapshot(
 	createdBy *string,
 	indikators []domain.IndikatorSasaranPenetapanOpd,
 ) domain.SasaranPenetapanOpd {
-	kodeSasaran := fmt.Sprintf("SAS-OPD-%s", sasaran.Id)
+	kodeSasaranOpd := kode.KodeSasaranOpd(sasaran.Id)
 	periodeTujuan := fmt.Sprintf("%s-%s",
 		sasaran.TahunAwal,
 		sasaran.TahunAkhir)
 	return domain.SasaranPenetapanOpd{
 		KodeOpd:        kodeOpd,
-		KodeSasaranOpd: kodeSasaran,
+		KodeSasaranOpd: kodeSasaranOpd,
 		SasaranOpd:     sasaran.NamaSasaranOpd,
 		Periode:        periodeTujuan,
 		TahunAktif:     tahunAktif,

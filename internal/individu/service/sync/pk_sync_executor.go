@@ -9,6 +9,7 @@ import (
 	"github.com/bappeda-dev-team/penetapan-service/internal/individu/domain"
 	"github.com/bappeda-dev-team/penetapan-service/internal/individu/repository"
 	"github.com/bappeda-dev-team/penetapan-service/internal/individu/web"
+	"github.com/bappeda-dev-team/penetapan-service/internal/kode"
 )
 
 type PkSyncExecutor struct {
@@ -99,16 +100,20 @@ func (ex *PkSyncExecutor) Sync(
 	// SAVE PK
 	summary := SummaryCounter{}
 	for _, pk := range pkPegawais {
+		sasaranOpdIdStr := strconv.Itoa(int(pk.SasaranOpdId))
+		kodeSasaranOpd := kode.KodeSasaranOpd(sasaranOpdIdStr)
 		pkPenetapan := domain.PkPenetapan{
 			PegawaiId:           snapshot.PegawaiId,
 			KodeOpd:             snapshot.KodeOpd,
 			TahunAktif:          snapshot.Tahun,
 			LevelPk:             pk.LevelPk,
+			KodeSasaranOpd:      kodeSasaranOpd,
 			KodePk:              pk.IdRekinPemilikPk,
 			NamaPk:              pk.RekinPemilikPk,
 			KeteranganPk:        pk.Keterangan,
 			NamaPemilikPk:       pk.NamaPemilikPk,
 			PenetapanIndividuId: snapshotId,
+			CreatedBy:           &currentUser,
 		}
 		pkId, err := ex.Repo.SavePkPenetapan(ctx, tx, pkPenetapan)
 		if err != nil {
