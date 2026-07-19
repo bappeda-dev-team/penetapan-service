@@ -377,3 +377,206 @@ func (repo *PenetapanIndividuRepository) SaveTargetPkPenetapan(
 
 	return id, nil
 }
+
+func (repo *PenetapanIndividuRepository) SaveRenaksiIndividuPkPenetapan(
+	ctx context.Context,
+	tx *sql.Tx,
+	req domain.RenaksiIndividu,
+) (int64, error) {
+	const query = `
+		INSERT INTO renaksi_individu (
+			pk_individu_id,
+			kode_opd,
+			tahun_aktif,
+			kode_renaksi,
+			urutan,
+			nama_rencana_aksi,
+			created_by
+		) VALUES (
+			$1, $2, $3, $4, $5, $6, $7
+		)
+		RETURNING id
+	`
+
+	var id int64
+
+	err := tx.QueryRowContext(
+		ctx,
+		query,
+		req.IdPk,
+		req.KodeOpd,
+		req.TahunAktif,
+		req.KodeRenaksi,
+		req.Urutan,
+		req.NamaRencanaAksi,
+		req.CreatedBy,
+	).Scan(&id)
+
+	if err != nil {
+		return 0, err
+	}
+
+	return id, nil
+}
+
+func (repo *PenetapanIndividuRepository) FindRenaksiIndividuByPkIds(
+	ctx context.Context,
+	pkIds []int64,
+) ([]domain.RenaksiIndividu, error) {
+	if len(pkIds) == 0 {
+		return []domain.RenaksiIndividu{}, nil
+	}
+
+	var (
+		placeholders []string
+		args         []any
+	)
+
+	for i, id := range pkIds {
+		placeholders = append(placeholders, fmt.Sprintf("$%d", i+1))
+		args = append(args, id)
+	}
+
+	query := fmt.Sprintf(`
+		SELECT
+			id,
+			pk_individu_id,
+			kode_opd,
+			tahun_aktif,
+			kode_renaksi,
+			urutan,
+			nama_rencana_aksi,
+			created_by
+		FROM renaksi_individu
+		WHERE pk_individu_id IN (%s)
+		ORDER BY pk_individu_id, level_pohon, id
+	`, strings.Join(placeholders, ","))
+
+	rows, err := repo.DB.QueryContext(ctx, query, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var result []domain.RenaksiIndividu
+
+	for rows.Next() {
+		var item domain.RenaksiIndividu
+
+		err := rows.Scan(
+			&item.Id,
+			&item.IdPk,
+			&item.TahunAktif,
+			&item.KodeRenaksi,
+			&item.Urutan,
+			&item.NamaRencanaAksi,
+			&item.CreatedBy,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		result = append(result, item)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+func (repo *PenetapanIndividuRepository) SavePelaksananRenaksiIndividuPkPenetapan(
+	ctx context.Context,
+	tx *sql.Tx,
+	req domain.PelaksanaanRenaksi,
+) (int64, error) {
+	const query = `
+		INSERT INTO renaksi_individu_pelaksanaan (
+			renaksi_individu_id,
+			bulan,
+			bobot,
+			created_by
+		) VALUES (
+			$1, $2, $3, $4
+		)
+		RETURNING id
+	`
+
+	var id int64
+
+	err := tx.QueryRowContext(
+		ctx,
+		query,
+		req.IdRenaksiIndividu,
+		req.Bulan,
+		req.Bobot,
+		req.CreatedBy,
+	).Scan(&id)
+
+	if err != nil {
+		return 0, err
+	}
+
+	return id, nil
+}
+
+func (repo *PenetapanIndividuRepository) FindPelaksanaanByRenaksiIndividuIds(
+	ctx context.Context,
+	renaksiIds []int64,
+) ([]domain.PelaksanaanRenaksi, error) {
+	if len(renaksiIds) == 0 {
+		return []domain.PelaksanaanRenaksi{}, nil
+	}
+
+	var (
+		placeholders []string
+		args         []any
+	)
+
+	for i, id := range renaksiIds {
+		placeholders = append(placeholders, fmt.Sprintf("$%d", i+1))
+		args = append(args, id)
+	}
+
+	query := fmt.Sprintf(`
+		SELECT
+			id,
+			renaksi_individu_id,
+			bulan,
+			bobot
+		FROM renaksi_individu_pelaksanaan
+		WHERE renaksi_individu_id IN (%s)
+		ORDER BY renaksi_individu_id, tahun
+	`, strings.Join(placeholders, ","))
+
+	rows, err := repo.DB.QueryContext(ctx, query, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	result := make([]domain.PelaksanaanRenaksi, 0)
+
+	for rows.Next() {
+		var item domain.PelaksanaanRenaksi
+
+		err := rows.Scan(
+			&item.Id,
+			&item.IdRenaksiIndividu,
+			&item.Bulan,
+			&item.Bobot,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		result = append(result, item)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}

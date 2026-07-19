@@ -23,6 +23,7 @@ type SyncPenetapanSummary struct {
 
 	Indikator int `json:"indikator" example:"3"`
 	Target    int `json:"target" example:"4"`
+	Renaksi   int `json:"renaksi" example:"3"`
 }
 
 type SyncPenetapanRequest struct {

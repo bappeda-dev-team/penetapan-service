@@ -41,8 +41,6 @@ func (c *Client) SyncPkPenetapan(
 	req.URL.RawQuery = params.Encode()
 	req.Header.Set("Content-Type", "application/json")
 
-	log.Printf("THE REQUEST: %v", req)
-
 	// set session id
 	sessionID := client.GetSessionID(ctx)
 	if sessionID != "" {

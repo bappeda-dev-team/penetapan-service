@@ -18,6 +18,7 @@ type RekinIndividuResponse struct {
 	NamaPemilikPk   string                `json:"nama_pemilik_pk" example:"Budi Santoso"`
 	Versi           int                   `json:"versi" example:"1"`
 	IndikatorPkList []IndikatorPkResponse `json:"indikator_pk"`
+	Renaksis        []RenaksiPkResponse   `json:"renaksis"`
 }
 
 type IndikatorPkResponse struct {
@@ -36,4 +37,18 @@ type TargetPkResponse struct {
 	Tahun        int     `json:"tahun" example:"2025"`
 	Target       float64 `json:"target" example:"95"`
 	Satuan       string  `json:"satuan" example:"persen"`
+}
+
+type RenaksiPkResponse struct {
+	Id           int64                          `json:"id"`
+	KodeRenaksi  string                         `json:"kode_renaksi"`
+	NamaRenaksi  string                         `json:"nama_renaksi"`
+	Urutan       int                            `json:"urutan"`
+	Pelaksanaans []PelaksanaanRenaksiPkResponse `json:"pelaksanaans"`
+}
+
+type PelaksanaanRenaksiPkResponse struct {
+	Id    int64 `json:"id"`
+	Bulan int   `json:"bulan"`
+	Bobot int   `json:"bobot"`
 }

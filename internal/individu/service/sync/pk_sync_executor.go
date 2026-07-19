@@ -154,6 +154,34 @@ func (ex *PkSyncExecutor) Sync(
 				summary.AddTarget(1)
 			}
 		}
+		for _, ren := range pk.Renaksis {
+			renaksiIndividu := domain.RenaksiIndividu{
+				IdPk:            pkId,
+				KodeOpd:         snapshot.KodeOpd,
+				TahunAktif:      snapshot.Tahun,
+				KodeRenaksi:     ren.Id,
+				Urutan:          ren.Urutan,
+				NamaRencanaAksi: ren.NamaRencanaAksi,
+				CreatedBy:       &currentUser,
+			}
+			renId, err := ex.Repo.SaveRenaksiIndividuPkPenetapan(ctx, tx, renaksiIndividu)
+			if err != nil {
+				return web.SyncPenetapanSummary{}, err
+			}
+			summary.AddRenaksi(1)
+			for _, pl := range ren.Pelaksanaan {
+				pelRenaksi := domain.PelaksanaanRenaksi{
+					IdRenaksiIndividu: renId,
+					Bulan:             pl.Bulan,
+					Bobot:             pl.Bobot,
+					CreatedBy:         &currentUser,
+				}
+				_, err := ex.Repo.SavePelaksananRenaksiIndividuPkPenetapan(ctx, tx, pelRenaksi)
+				if err != nil {
+					return web.SyncPenetapanSummary{}, err
+				}
+			}
+		}
 	}
 
 	err = tx.Commit()

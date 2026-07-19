@@ -10,17 +10,19 @@ type PkPenetapan struct {
 
 	LevelPk        int
 	KodeSasaranOpd string
-	KodePk         string // id rekin
-	NamaPk         string // rekin
-	KeteranganPk   string // Ket PK
-	NamaPemilikPk  string // nama pegawai
+	KodePk         string // Snapshot Rekin
+	NamaPk         string // Nama Rekin
+	KeteranganPk   string // Keterangan PK
+	NamaPemilikPk  string // Nama Pegawai
 
 	CreatedDate         time.Time
 	LastModifiedDate    time.Time
 	CreatedBy           *string
 	PenetapanIndividuId int64
 	Versi               int
-	IndikatorPk         []IndikatorPk
+
+	IndikatorPk []IndikatorPk
+	Renaksi     []RenaksiIndividu
 }
 
 type IndikatorPk struct {
@@ -28,10 +30,10 @@ type IndikatorPk struct {
 	IdPk       int64
 	KodeOpd    string
 	TahunAktif int
-	// indikator
+
 	KodeIndikatorPk string
 	NamaIndikatorPk string
-	// tambahan
+
 	RumusPerhitungan    *string
 	SumberData          *string
 	DefinisiOperasional *string
@@ -39,16 +41,48 @@ type IndikatorPk struct {
 	CreatedDate      time.Time
 	LastModifiedDate time.Time
 	CreatedBy        *string
-	TargetPk         []TargetPk
+
+	TargetPk []TargetPk
 }
 
 type TargetPk struct {
-	Id               int64
-	IdIndikatorPk    int64
-	KodeTargetPk     string
-	Tahun            int
-	Target           float64
-	Satuan           string
+	Id            int64
+	IdIndikatorPk int64
+
+	KodeTargetPk string
+	Tahun        int
+	Target       float64
+	Satuan       string
+
+	CreatedDate      time.Time
+	LastModifiedDate time.Time
+	CreatedBy        *string
+}
+
+type RenaksiIndividu struct {
+	Id         int64
+	IdPk       int64
+	KodeOpd    string
+	TahunAktif int
+
+	KodeRenaksi     string
+	Urutan          int
+	NamaRencanaAksi string
+
+	CreatedDate      time.Time
+	LastModifiedDate time.Time
+	CreatedBy        *string
+
+	Pelaksanaan []PelaksanaanRenaksi
+}
+
+type PelaksanaanRenaksi struct {
+	Id                int64
+	IdRenaksiIndividu int64
+
+	Bulan int
+	Bobot int
+
 	CreatedDate      time.Time
 	LastModifiedDate time.Time
 	CreatedBy        *string

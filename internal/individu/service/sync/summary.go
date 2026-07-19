@@ -6,6 +6,7 @@ type SummaryCounter struct {
 	Rekin     int
 	Indikator int
 	Target    int
+	Renaksi   int
 }
 
 func (s *SummaryCounter) AddRekin(n int) {
@@ -20,6 +21,10 @@ func (s *SummaryCounter) AddTarget(n int) {
 	s.Target += n
 }
 
+func (s *SummaryCounter) AddRenaksi(n int) {
+	s.Renaksi += n
+}
+
 func (s SummaryCounter) Response() web.SyncPenetapanSummary {
 	var rekin *int
 	if s.Rekin > 0 {
@@ -29,6 +34,7 @@ func (s SummaryCounter) Response() web.SyncPenetapanSummary {
 		Rekin:     rekin,
 		Indikator: s.Indikator,
 		Target:    s.Target,
+		Renaksi:   s.Renaksi,
 	}
 
 }

@@ -74,7 +74,40 @@ func (s *PenetapanIndividuService) FindRekinsIndividu(
 	if err != nil {
 		return web.RekinPenetapanIndividuResponse{}, err
 	}
+	renaksis, err := s.Repo.FindRenaksiIndividuByPkIds(ctx, pkIndividuIds)
+	if err != nil {
+		return web.RekinPenetapanIndividuResponse{}, err
+	}
+	renaksiIds := make([]int64, 0, len(renaksis))
+	pelaksanaans, err := s.Repo.FindPelaksanaanByRenaksiIndividuIds(ctx, renaksiIds)
+	if err != nil {
+		return web.RekinPenetapanIndividuResponse{}, err
+	}
+
 	// To Response DTO
+	// pelaksanaan -> renaksi
+	pelaksanaanMap := make(map[int64][]web.PelaksanaanRenaksiPkResponse)
+	for _, pel := range pelaksanaans {
+		pelaksanaanMap[pel.IdRenaksiIndividu] = append(
+			pelaksanaanMap[pel.IdRenaksiIndividu],
+			web.PelaksanaanRenaksiPkResponse{
+				Id:    pel.Id,
+				Bulan: pel.Bulan,
+				Bobot: pel.Bobot,
+			})
+	}
+	renaksiMap := make(map[int64][]web.RenaksiPkResponse)
+	for _, ren := range renaksis {
+		renaksiMap[ren.IdPk] = append(
+			renaksiMap[ren.IdPk],
+			web.RenaksiPkResponse{
+				Id:           ren.Id,
+				KodeRenaksi:  ren.KodeRenaksi,
+				NamaRenaksi:  ren.NamaRencanaAksi,
+				Urutan:       ren.Urutan,
+				Pelaksanaans: pelaksanaanMap[ren.Id],
+			})
+	}
 	// target -> indikator
 	targetMap := make(map[int64][]web.TargetPkResponse)
 
@@ -87,8 +120,7 @@ func (s *PenetapanIndividuService) FindRekinsIndividu(
 				Tahun:        target.Tahun,
 				Target:       target.Target,
 				Satuan:       target.Satuan,
-			},
-		)
+			})
 	}
 
 	// indikator -> pk
@@ -123,6 +155,7 @@ func (s *PenetapanIndividuService) FindRekinsIndividu(
 			NamaPemilikPk:   pk.NamaPemilikPk,
 			Versi:           pk.Versi,
 			IndikatorPkList: indikatorMap[pk.Id],
+			Renaksis:        renaksiMap[pk.Id],
 		})
 	}
 
