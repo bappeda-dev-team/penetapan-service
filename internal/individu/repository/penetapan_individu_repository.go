@@ -449,7 +449,7 @@ func (repo *PenetapanIndividuRepository) FindRenaksiIndividuByPkIds(
 			created_by
 		FROM renaksi_individu
 		WHERE pk_individu_id IN (%s)
-		ORDER BY pk_individu_id, level_pohon, id
+		ORDER BY pk_individu_id, id
 	`, strings.Join(placeholders, ","))
 
 	rows, err := repo.DB.QueryContext(ctx, query, args...)
@@ -466,6 +466,7 @@ func (repo *PenetapanIndividuRepository) FindRenaksiIndividuByPkIds(
 		err := rows.Scan(
 			&item.Id,
 			&item.IdPk,
+			&item.KodeOpd,
 			&item.TahunAktif,
 			&item.KodeRenaksi,
 			&item.Urutan,
