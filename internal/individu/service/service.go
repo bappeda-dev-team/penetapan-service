@@ -79,6 +79,9 @@ func (s *PenetapanIndividuService) FindRekinsIndividu(
 		return web.RekinPenetapanIndividuResponse{}, err
 	}
 	renaksiIds := make([]int64, 0, len(renaksis))
+	for _, ren := range renaksis {
+		renaksiIds = append(renaksiIds, ren.Id)
+	}
 	pelaksanaans, err := s.Repo.FindPelaksanaanByRenaksiIndividuIds(ctx, renaksiIds)
 	if err != nil {
 		return web.RekinPenetapanIndividuResponse{}, err

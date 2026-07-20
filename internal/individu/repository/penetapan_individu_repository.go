@@ -548,7 +548,7 @@ func (repo *PenetapanIndividuRepository) FindPelaksanaanByRenaksiIndividuIds(
 			bobot
 		FROM renaksi_individu_pelaksanaan
 		WHERE renaksi_individu_id IN (%s)
-		ORDER BY renaksi_individu_id, tahun
+		ORDER BY renaksi_individu_id, bulan
 	`, strings.Join(placeholders, ","))
 
 	rows, err := repo.DB.QueryContext(ctx, query, args...)
