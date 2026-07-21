@@ -40,6 +40,7 @@ func (repo *PenetapanIndividuRepository) FindPkIndividus(
 			pk.last_modified_date,
 			pk.created_by,
 			pk.penetapan_individu_id,
+			pk.anggaran_pk,
 			pi.versi
 		FROM pk_individu pk
 		JOIN penetapan_individu pi ON pi.id = pk.penetapan_individu_id
@@ -77,6 +78,7 @@ func (repo *PenetapanIndividuRepository) FindPkIndividus(
 			&pk.LastModifiedDate,
 			&pk.CreatedBy,
 			&pk.PenetapanIndividuId,
+			&pk.AnggaranPk,
 			&pk.Versi,
 		)
 		if err != nil {
@@ -257,12 +259,13 @@ func (repo *PenetapanIndividuRepository) SavePkPenetapan(
 			nama_pk,
 			keterangan_pk,
 			nama_pemilik_pk,
+			anggaran_pk,
 			versi,
 			created_by
 		) VALUES (
 			$1, $2, $3, $4, $5,
 			$6, $7, $8, $9, $10,
-			$11, $12
+			$11, $12, $13
 		)
 		RETURNING id
 	`
@@ -282,6 +285,7 @@ func (repo *PenetapanIndividuRepository) SavePkPenetapan(
 		req.NamaPk,
 		req.KeteranganPk,
 		req.NamaPemilikPk,
+		req.AnggaranPk,
 		req.Versi,
 		req.CreatedBy,
 	).Scan(&id)
@@ -391,9 +395,10 @@ func (repo *PenetapanIndividuRepository) SaveRenaksiIndividuPkPenetapan(
 			kode_renaksi,
 			urutan,
 			nama_rencana_aksi,
+			anggaran,
 			created_by
 		) VALUES (
-			$1, $2, $3, $4, $5, $6, $7
+			$1, $2, $3, $4, $5, $6, $7, $8
 		)
 		RETURNING id
 	`
@@ -409,6 +414,7 @@ func (repo *PenetapanIndividuRepository) SaveRenaksiIndividuPkPenetapan(
 		req.KodeRenaksi,
 		req.Urutan,
 		req.NamaRencanaAksi,
+		req.Anggaran,
 		req.CreatedBy,
 	).Scan(&id)
 
@@ -441,11 +447,10 @@ func (repo *PenetapanIndividuRepository) FindRenaksiIndividuByPkIds(
 		SELECT
 			id,
 			pk_individu_id,
-			kode_opd,
-			tahun_aktif,
 			kode_renaksi,
 			urutan,
 			nama_rencana_aksi,
+			anggaran,
 			created_by
 		FROM renaksi_individu
 		WHERE pk_individu_id IN (%s)
@@ -466,11 +471,10 @@ func (repo *PenetapanIndividuRepository) FindRenaksiIndividuByPkIds(
 		err := rows.Scan(
 			&item.Id,
 			&item.IdPk,
-			&item.KodeOpd,
-			&item.TahunAktif,
 			&item.KodeRenaksi,
 			&item.Urutan,
 			&item.NamaRencanaAksi,
+			&item.Anggaran,
 			&item.CreatedBy,
 		)
 		if err != nil {
@@ -495,11 +499,12 @@ func (repo *PenetapanIndividuRepository) SavePelaksananRenaksiIndividuPkPenetapa
 	const query = `
 		INSERT INTO renaksi_individu_pelaksanaan (
 			renaksi_individu_id,
+			kode_pelaksanaan,
 			bulan,
 			bobot,
 			created_by
 		) VALUES (
-			$1, $2, $3, $4
+			$1, $2, $3, $4, $5
 		)
 		RETURNING id
 	`
@@ -510,6 +515,7 @@ func (repo *PenetapanIndividuRepository) SavePelaksananRenaksiIndividuPkPenetapa
 		ctx,
 		query,
 		req.IdRenaksiIndividu,
+		req.KodePelaksanaan,
 		req.Bulan,
 		req.Bobot,
 		req.CreatedBy,
@@ -543,6 +549,7 @@ func (repo *PenetapanIndividuRepository) FindPelaksanaanByRenaksiIndividuIds(
 	query := fmt.Sprintf(`
 		SELECT
 			id,
+			kode_pelaksanaan,
 			renaksi_individu_id,
 			bulan,
 			bobot
@@ -564,6 +571,7 @@ func (repo *PenetapanIndividuRepository) FindPelaksanaanByRenaksiIndividuIds(
 
 		err := rows.Scan(
 			&item.Id,
+			&item.KodePelaksanaan,
 			&item.IdRenaksiIndividu,
 			&item.Bulan,
 			&item.Bobot,

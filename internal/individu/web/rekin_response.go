@@ -16,6 +16,7 @@ type RekinIndividuResponse struct {
 	Rekin           string                `json:"rekin" example:"Terwujudnya pelayanan publik yang berkualitas"`
 	KeteranganPk    string                `json:"keterangan_pk,omitempty" example:"Kinerja utama individu"`
 	NamaPemilikPk   string                `json:"nama_pemilik_pk" example:"Budi Santoso"`
+	AnggaranPk      int                   `json:"anggaran_pk" example:"500000"`
 	Versi           int                   `json:"versi" example:"1"`
 	IndikatorPkList []IndikatorPkResponse `json:"indikator_pk"`
 	Renaksis        []RenaksiPkResponse   `json:"renaksis"`
@@ -40,15 +41,17 @@ type TargetPkResponse struct {
 }
 
 type RenaksiPkResponse struct {
-	Id           int64                          `json:"id"`
-	KodeRenaksi  string                         `json:"kode_renaksi"`
-	NamaRenaksi  string                         `json:"nama_renaksi"`
-	Urutan       int                            `json:"urutan"`
-	Pelaksanaans []PelaksanaanRenaksiPkResponse `json:"pelaksanaans"`
+	Id              int64                          `json:"id" example:"1"`
+	UrutanRenaksi   int                            `json:"urutan_renaksi" example:"1"`
+	KodeRenaksi     string                         `json:"kode_renaksi" example:"REN-001"`
+	NamaRenaksi     string                         `json:"nama_renaksi" example:"Rapat Koordinasi"`
+	AnggaranRenaksi int                            `json:"anggaran_renaksi" example:"100000"`
+	Pelaksanaans    []PelaksanaanRenaksiPkResponse `json:"pelaksanaans"`
 }
 
 type PelaksanaanRenaksiPkResponse struct {
-	Id    int64 `json:"id"`
-	Bulan int   `json:"bulan"`
-	Bobot int   `json:"bobot"`
+	Id               int64  `json:"id" example:"1"`
+	KodePelaksanaan  string `json:"kode_pelaksanaan" example:"PEL-001"`
+	BulanPelaksanaan int    `json:"bulan_pelaksanaan" example:"12"`
+	BobotPelaksanaan int    `json:"bobot_pelaksanaan" example:"10"`
 }

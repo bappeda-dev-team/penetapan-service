@@ -20,6 +20,7 @@ type PkPenetapan struct {
 	CreatedBy           *string
 	PenetapanIndividuId int64
 	Versi               int
+	AnggaranPk          int
 
 	IndikatorPk []IndikatorPk
 	Renaksi     []RenaksiIndividu
@@ -68,6 +69,7 @@ type RenaksiIndividu struct {
 	KodeRenaksi     string
 	Urutan          int
 	NamaRencanaAksi string
+	Anggaran        int
 
 	CreatedDate      time.Time
 	LastModifiedDate time.Time
@@ -80,8 +82,9 @@ type PelaksanaanRenaksi struct {
 	Id                int64
 	IdRenaksiIndividu int64
 
-	Bulan int
-	Bobot int
+	KodePelaksanaan string
+	Bulan           int
+	Bobot           int
 
 	CreatedDate      time.Time
 	LastModifiedDate time.Time

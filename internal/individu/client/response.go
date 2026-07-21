@@ -12,6 +12,7 @@ type PkPenetapanResponse struct {
 	RekinPemilikPk   string        `json:"rekin_pemilik_pk"`
 	Tahun            int           `json:"tahun"`
 	Keterangan       string        `json:"keterangan"`
+	AnggaranPk       int           `json:"anggaran_pk"`
 	Indikators       []IndikatorPk `json:"indikators"`
 	Renaksis         []RenaksiItem `json:"renaksi"`
 }
@@ -36,10 +37,12 @@ type RenaksiItem struct {
 	KodeOpd          string         `json:"kode_opd,omitempty"`
 	Urutan           int            `json:"urutan"`
 	NamaRencanaAksi  string         `json:"nama_rencana_aksi"`
+	Anggaran         int            `json:"anggaran"`
 	Pelaksanaan      []BobotBulanan `json:"pelaksanaan"`
 }
 
 type BobotBulanan struct {
-	Bulan int `json:"bulan"`
-	Bobot int `json:"bobot"`
+	Id    string `json:"id_pelaksanaan"`
+	Bulan int    `json:"bulan"`
+	Bobot int    `json:"bobot"`
 }
