@@ -4,6 +4,7 @@ import (
 	"log/slog"
 
 	individu "github.com/bappeda-dev-team/penetapan-service/internal/individu/service"
+	pemda "github.com/bappeda-dev-team/penetapan-service/internal/pemda/service"
 	"github.com/bappeda-dev-team/penetapan-service/internal/service/opd"
 )
 
@@ -22,6 +23,7 @@ type Config struct {
 	Services struct {
 		Perencanaan ServiceConfig
 		Individu    ServiceConfig
+		Pemda       ServiceConfig
 	}
 }
 
@@ -40,4 +42,5 @@ type Application struct {
 	// inject service
 	PenetapanOpdService *opd.PenetapanOpdService
 	IndividuService     *individu.PenetapanIndividuService
+	PemdaService        *pemda.PenetapanPemdaService
 }

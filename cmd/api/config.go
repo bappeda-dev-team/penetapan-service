@@ -54,6 +54,16 @@ func loadConfig(logger *slog.Logger) api.Config {
 		"",
 	)
 
+	cfg.Services.Pemda.BaseURL = getEnv(
+		"SERVICES_PEMDA_BASE_URL",
+		"http://localhost:8080",
+	)
+
+	cfg.Services.Pemda.ApiPath = getEnv(
+		"SERVICES_PEMDA_API_PATH",
+		"",
+	)
+
 	return cfg
 }
 

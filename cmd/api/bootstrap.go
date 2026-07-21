@@ -14,6 +14,11 @@ import (
 	serviceIndividu "github.com/bappeda-dev-team/penetapan-service/internal/individu/service"
 	syncIndividu "github.com/bappeda-dev-team/penetapan-service/internal/individu/service/sync"
 
+	clientPemda "github.com/bappeda-dev-team/penetapan-service/internal/pemda/client"
+	repoPemda "github.com/bappeda-dev-team/penetapan-service/internal/pemda/repository"
+	servicePemda "github.com/bappeda-dev-team/penetapan-service/internal/pemda/service"
+	syncPemda "github.com/bappeda-dev-team/penetapan-service/internal/pemda/service/sync"
+
 	serviceOpd "github.com/bappeda-dev-team/penetapan-service/internal/service/opd"
 	syncOpd "github.com/bappeda-dev-team/penetapan-service/internal/service/opd/sync"
 
@@ -104,6 +109,37 @@ func buildApplication(
 		logger,
 	)
 
+	// pemda
+	// repository
+	penetapanPemdaRepo := repoPemda.NewPenetapanPemdaRepository(db)
+
+	// external service
+	pemdaClient := clientPemda.NewClient(
+		cfg.Services.Pemda.BaseURL,
+		cfg.Services.Pemda.ApiPath,
+		&http.Client{Timeout: 60 * time.Second},
+	)
+
+	// executor
+	//// tujuan pemda
+	tujuanPemdaSyncExecutor := syncPemda.NewTujuanSyncExecutor(
+		penetapanPemdaRepo,
+		pemdaClient,
+		logger,
+	)
+
+	// sync registry
+	syncPemdaRegistry := &syncPemda.Registry{
+		TujuanPemdaSyncExecutor: tujuanPemdaSyncExecutor,
+	}
+
+	pemdaService := servicePemda.NewPenetapanPemdaService(
+		penetapanPemdaRepo,
+		pemdaClient,
+		syncPemdaRegistry,
+		logger,
+	)
+
 	// application
 	app := &api.Application{
 		Config: cfg,
@@ -111,6 +147,7 @@ func buildApplication(
 
 		PenetapanOpdService: penetapanOpdService,
 		IndividuService:     individuService,
+		PemdaService:        pemdaService,
 	}
 
 	return app

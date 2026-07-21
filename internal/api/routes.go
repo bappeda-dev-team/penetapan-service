@@ -44,5 +44,9 @@ func (app *Application) Routes() http.Handler {
 	router.HandlerFunc(http.MethodGet, "/opd/tujuan", app.TujuanOpdHandler)
 	router.HandlerFunc(http.MethodPost, "/opd/tujuan/sync", app.SyncPenetapanTujuanOpdHandler)
 
+	// pemda
+	// tujuan pemda
+	router.HandlerFunc(http.MethodPost, "/pemda/tujuan/sync", app.SyncPenetapanTujuanPemdaHandler)
+
 	return app.recoverPanic(router)
 }
