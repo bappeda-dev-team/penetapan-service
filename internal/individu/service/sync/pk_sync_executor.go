@@ -112,6 +112,7 @@ func (ex *PkSyncExecutor) Sync(
 			NamaPk:              pk.RekinPemilikPk,
 			KeteranganPk:        pk.Keterangan,
 			NamaPemilikPk:       pk.NamaPemilikPk,
+			AnggaranPk:          pk.AnggaranPk,
 			PenetapanIndividuId: snapshotId,
 			CreatedBy:           &currentUser,
 		}
@@ -162,6 +163,7 @@ func (ex *PkSyncExecutor) Sync(
 				KodeRenaksi:     ren.Id,
 				Urutan:          ren.Urutan,
 				NamaRencanaAksi: ren.NamaRencanaAksi,
+				Anggaran:        ren.Anggaran,
 				CreatedBy:       &currentUser,
 			}
 			renId, err := ex.Repo.SaveRenaksiIndividuPkPenetapan(ctx, tx, renaksiIndividu)
@@ -172,6 +174,7 @@ func (ex *PkSyncExecutor) Sync(
 			for _, pl := range ren.Pelaksanaan {
 				pelRenaksi := domain.PelaksanaanRenaksi{
 					IdRenaksiIndividu: renId,
+					KodePelaksanaan:   pl.Id,
 					Bulan:             pl.Bulan,
 					Bobot:             pl.Bobot,
 					CreatedBy:         &currentUser,
