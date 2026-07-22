@@ -10,15 +10,68 @@ definitions:
     properties:
       error: {}
     type: object
+  ? github_com_bappeda-dev-team_penetapan-service_internal_individu_web.Response-github_com_bappeda-dev-team_penetapan-service_internal_individu_web_SyncPenetapanResponse
+  : properties:
+      data:
+        $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_individu_web.SyncPenetapanResponse'
+    type: object
   github_com_bappeda-dev-team_penetapan-service_internal_individu_web.Response-web_RekinIndividuResponse:
     properties:
       data:
         $ref: '#/definitions/web.RekinIndividuResponse'
     type: object
-  github_com_bappeda-dev-team_penetapan-service_internal_individu_web.Response-web_SyncPenetapanResponse:
+  github_com_bappeda-dev-team_penetapan-service_internal_individu_web.SyncPenetapanRequest:
     properties:
-      data:
-        $ref: '#/definitions/web.SyncPenetapanResponse'
+      kode_opd:
+        example: 1.22.33
+        type: string
+      pegawai_id:
+        example: "199887766"
+        type: string
+      tahun:
+        example: 2025
+        type: integer
+    type: object
+  github_com_bappeda-dev-team_penetapan-service_internal_individu_web.SyncPenetapanResponse:
+    properties:
+      jenis_penetapan:
+        allOf:
+        - $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_individu_domain.JenisPenetapan'
+        example: REKIN
+      kode_opd:
+        example: 1.22.33
+        type: string
+      pegawai_id:
+        example: "1998877665544"
+        type: string
+      processed_at:
+        type: string
+      processed_summary:
+        $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_individu_web.SyncPenetapanSummary'
+      status:
+        example: SUCCESS
+        type: string
+      sync_id:
+        example: 155
+        type: integer
+      tahun:
+        example: 2025
+        type: integer
+    type: object
+  github_com_bappeda-dev-team_penetapan-service_internal_individu_web.SyncPenetapanSummary:
+    properties:
+      indikator:
+        example: 3
+        type: integer
+      renaksi:
+        example: 3
+        type: integer
+      rencana_kinerja:
+        example: 1
+        type: integer
+      target:
+        example: 4
+        type: integer
     type: object
   github_com_bappeda-dev-team_penetapan-service_internal_individu_web.ValidationErrorResponse:
     properties:
@@ -75,6 +128,83 @@ definitions:
           tahun: required
         type: object
     type: object
+  github_com_bappeda-dev-team_penetapan-service_internal_pemda_domain.JenisPenetapan:
+    enum:
+    - TUJUAN-PEMDA
+    - SASARAN-PEMDA
+    type: string
+    x-enum-varnames:
+    - JenisPenetapanTujuanPemda
+    - JenisPenetapanSasaranPemda
+  github_com_bappeda-dev-team_penetapan-service_internal_pemda_web.ErrorResponse:
+    properties:
+      error: {}
+    type: object
+  ? github_com_bappeda-dev-team_penetapan-service_internal_pemda_web.Response-github_com_bappeda-dev-team_penetapan-service_internal_pemda_web_SyncPenetapanResponse
+  : properties:
+      data:
+        $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_pemda_web.SyncPenetapanResponse'
+    type: object
+  github_com_bappeda-dev-team_penetapan-service_internal_pemda_web.Response-web_SasaranPenetapanPemdaResponse:
+    properties:
+      data:
+        $ref: '#/definitions/web.SasaranPenetapanPemdaResponse'
+    type: object
+  github_com_bappeda-dev-team_penetapan-service_internal_pemda_web.Response-web_TujuanPenetapanPemdaResponse:
+    properties:
+      data:
+        $ref: '#/definitions/web.TujuanPenetapanPemdaResponse'
+    type: object
+  github_com_bappeda-dev-team_penetapan-service_internal_pemda_web.SyncPenetapanRequest:
+    properties:
+      tahun:
+        example: 2025
+        type: integer
+    type: object
+  github_com_bappeda-dev-team_penetapan-service_internal_pemda_web.SyncPenetapanResponse:
+    properties:
+      jenis_penetapan:
+        allOf:
+        - $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_pemda_domain.JenisPenetapan'
+        example: TUJUAN-PEMDA
+      processed_at:
+        type: string
+      processed_summary:
+        $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_pemda_web.SyncPenetapanSummary'
+      status:
+        example: SUCCESS
+        type: string
+      sync_id:
+        example: 155
+        type: integer
+      tahun:
+        example: 2025
+        type: integer
+    type: object
+  github_com_bappeda-dev-team_penetapan-service_internal_pemda_web.SyncPenetapanSummary:
+    properties:
+      indikator:
+        example: 3
+        type: integer
+      sasaran_pemda:
+        example: 1
+        type: integer
+      target:
+        example: 4
+        type: integer
+      tujuan_pemda:
+        example: 1
+        type: integer
+    type: object
+  github_com_bappeda-dev-team_penetapan-service_internal_pemda_web.ValidationErrorResponse:
+    properties:
+      error:
+        additionalProperties:
+          type: string
+        example:
+          tahun: required
+        type: object
+    type: object
   web.HealthcheckResponse:
     properties:
       status:
@@ -88,6 +218,27 @@ definitions:
         type: string
       version:
         type: string
+    type: object
+  web.IndikatorPemdaPenetapanResponse:
+    properties:
+      definisi_operasional:
+        type: string
+      id:
+        type: integer
+      indikator:
+        type: string
+      kode_indikator:
+        type: string
+      rumus_perhitungan:
+        type: string
+      sumber_data:
+        type: string
+      tahun_aktif:
+        type: integer
+      targets:
+        items:
+          $ref: '#/definitions/web.TargetPemdaResponse'
+        type: array
     type: object
   web.IndikatorPkResponse:
     properties:
@@ -199,8 +350,26 @@ definitions:
         example: 100000
         type: integer
     type: object
+  web.PelaksanaanRenaksiPkResponse:
+    properties:
+      bobot_pelaksanaan:
+        example: 10
+        type: integer
+      bulan_pelaksanaan:
+        example: 12
+        type: integer
+      id:
+        example: 1
+        type: integer
+      kode_pelaksanaan:
+        example: PEL-001
+        type: string
+    type: object
   web.RekinIndividuResponse:
     properties:
+      anggaran_pk:
+        example: 500000
+        type: integer
       id:
         example: 1
         type: integer
@@ -214,6 +383,9 @@ definitions:
       kode_pk:
         example: RK-001
         type: string
+      kode_sasaran_opd:
+        example: SAS-OPD-1
+        type: string
       level_pk:
         example: 2
         type: integer
@@ -223,6 +395,10 @@ definitions:
       rekin:
         example: Terwujudnya pelayanan publik yang berkualitas
         type: string
+      renaksis:
+        items:
+          $ref: '#/definitions/web.RenaksiPkResponse'
+        type: array
       versi:
         example: 1
         type: integer
@@ -251,6 +427,28 @@ definitions:
       renaksi:
         example: terwujudnya xx
         type: string
+    type: object
+  web.RenaksiPkResponse:
+    properties:
+      anggaran_renaksi:
+        example: 100000
+        type: integer
+      id:
+        example: 1
+        type: integer
+      kode_renaksi:
+        example: REN-001
+        type: string
+      nama_renaksi:
+        example: Rapat Koordinasi
+        type: string
+      pelaksanaans:
+        items:
+          $ref: '#/definitions/web.PelaksanaanRenaksiPkResponse'
+        type: array
+      urutan_renaksi:
+        example: 1
+        type: integer
     type: object
   web.RenjaBidangUrusanResponse:
     properties:
@@ -407,6 +605,21 @@ definitions:
         example: Meningkatnya Nilai SAKIP
         type: string
     type: object
+  web.SasaranPemdaResponse:
+    properties:
+      id:
+        type: integer
+      indikators:
+        items:
+          $ref: '#/definitions/web.IndikatorPemdaPenetapanResponse'
+        type: array
+      kode_sasaran_pemda:
+        type: string
+      periode:
+        type: string
+      sasaran_pemda:
+        type: string
+    type: object
   web.SasaranPenetapanOpdResponse:
     properties:
       is_locked:
@@ -418,6 +631,22 @@ definitions:
       sasaran_opds:
         items:
           $ref: '#/definitions/web.SasaranOpdResponse'
+        type: array
+      tahun_aktif:
+        example: 2025
+        type: integer
+      versi:
+        example: 1
+        type: integer
+    type: object
+  web.SasaranPenetapanPemdaResponse:
+    properties:
+      is_locked:
+        example: true
+        type: boolean
+      sasaran_pemdas:
+        items:
+          $ref: '#/definitions/web.SasaranPemdaResponse'
         type: array
       tahun_aktif:
         example: 2025
@@ -475,56 +704,6 @@ definitions:
         example: 1
         type: integer
     type: object
-  web.SyncPenetapanRequest:
-    properties:
-      kode_opd:
-        example: 1.22.33
-        type: string
-      pegawai_id:
-        example: "199887766"
-        type: string
-      tahun:
-        example: 2025
-        type: integer
-    type: object
-  web.SyncPenetapanResponse:
-    properties:
-      jenis_penetapan:
-        allOf:
-        - $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_individu_domain.JenisPenetapan'
-        example: REKIN
-      kode_opd:
-        example: 1.22.33
-        type: string
-      pegawai_id:
-        example: "1998877665544"
-        type: string
-      processed_at:
-        type: string
-      processed_summary:
-        $ref: '#/definitions/web.SyncPenetapanSummary'
-      status:
-        example: SUCCESS
-        type: string
-      sync_id:
-        example: 155
-        type: integer
-      tahun:
-        example: 2025
-        type: integer
-    type: object
-  web.SyncPenetapanSummary:
-    properties:
-      indikator:
-        example: 3
-        type: integer
-      rencana_kinerja:
-        example: 1
-        type: integer
-      target:
-        example: 4
-        type: integer
-    type: object
   web.TargetIndikatorResponse:
     properties:
       id:
@@ -541,6 +720,19 @@ definitions:
         type: integer
       target:
         example: 100
+        type: number
+    type: object
+  web.TargetPemdaResponse:
+    properties:
+      id:
+        type: integer
+      kode_target:
+        type: string
+      satuan:
+        type: string
+      tahun:
+        type: integer
+      target:
         type: number
     type: object
   web.TargetPkResponse:
@@ -580,6 +772,21 @@ definitions:
         example: Meningkatkan kualitas pelayanan publik
         type: string
     type: object
+  web.TujuanPemdaResponse:
+    properties:
+      id:
+        type: integer
+      indikators:
+        items:
+          $ref: '#/definitions/web.IndikatorPemdaPenetapanResponse'
+        type: array
+      kode_tujuan_pemda:
+        type: string
+      periode:
+        type: string
+      tujuan_pemda:
+        type: string
+    type: object
   web.TujuanPenetapanOpdResponse:
     properties:
       is_locked:
@@ -594,6 +801,22 @@ definitions:
       tujuan_opds:
         items:
           $ref: '#/definitions/web.TujuanOpdResponse'
+        type: array
+      versi:
+        example: 1
+        type: integer
+    type: object
+  web.TujuanPenetapanPemdaResponse:
+    properties:
+      is_locked:
+        example: true
+        type: boolean
+      tahun_aktif:
+        example: 2025
+        type: integer
+      tujuan_pemdas:
+        items:
+          $ref: '#/definitions/web.TujuanPemdaResponse'
         type: array
       versi:
         example: 1
@@ -677,14 +900,14 @@ paths:
         name: payload
         required: true
         schema:
-          $ref: '#/definitions/web.SyncPenetapanRequest'
+          $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_individu_web.SyncPenetapanRequest'
       produces:
       - application/json
       responses:
         "200":
           description: Success
           schema:
-            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_individu_web.Response-web_SyncPenetapanResponse'
+            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_individu_web.Response-github_com_bappeda-dev-team_penetapan-service_internal_individu_web_SyncPenetapanResponse'
         "400":
           description: Bad Request
           schema:
@@ -925,6 +1148,124 @@ paths:
       summary: Sync Penetapan Tujuan OPD
       tags:
       - Sync
+  /pemda/sasaran:
+    get:
+      consumes:
+      - application/json
+      description: Mengambil snapshot sasaran Pemda aktif berdasarkan tahun
+      parameters:
+      - description: Tahun Penetapan
+        in: query
+        name: tahun
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_pemda_web.Response-web_SasaranPenetapanPemdaResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_pemda_web.ValidationErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_pemda_web.ErrorResponse'
+      summary: Get sasaran Pemda penetapan
+      tags:
+      - Pemda
+  /pemda/sasaran/sync:
+    post:
+      consumes:
+      - application/json
+      description: Sinkron data sasaran Pemda berdasarkan tahun
+      parameters:
+      - description: Payload sync penetapan Pemda
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_pemda_web.SyncPenetapanRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_pemda_web.Response-github_com_bappeda-dev-team_penetapan-service_internal_pemda_web_SyncPenetapanResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_pemda_web.ValidationErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_pemda_web.ErrorResponse'
+      summary: Sync sasaran Pemda
+      tags:
+      - Pemda
+  /pemda/tujuan:
+    get:
+      consumes:
+      - application/json
+      description: Mengambil snapshot tujuan Pemda aktif berdasarkan tahun
+      parameters:
+      - description: Tahun Penetapan
+        in: query
+        name: tahun
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_pemda_web.Response-web_TujuanPenetapanPemdaResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_pemda_web.ValidationErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_pemda_web.ErrorResponse'
+      summary: Get tujuan Pemda penetapan
+      tags:
+      - Pemda
+  /pemda/tujuan/sync:
+    post:
+      consumes:
+      - application/json
+      description: Sinkron data tujuan pemda berdasarkan tahun
+      parameters:
+      - description: Payload sync penetapan pemda
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_pemda_web.SyncPenetapanRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_pemda_web.Response-github_com_bappeda-dev-team_penetapan-service_internal_pemda_web_SyncPenetapanResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_pemda_web.ValidationErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_pemda_web.ErrorResponse'
+      summary: Sync Tujuan pemda
+      tags:
+      - Pemda
 schemes:
 - http
 - https
