@@ -2,6 +2,7 @@ package sync
 
 import (
 	"context"
+	"database/sql"
 	"log/slog"
 	"strconv"
 
@@ -57,7 +58,6 @@ func (ex *PkSyncExecutor) Sync(
 		_ = tx.Rollback()
 	}()
 
-	// Find Last Active Snapshot Version
 	snapshot := domain.SnapshotPenetapan{
 		JenisSnapshot: domain.JenisPenetapanPk,
 		PegawaiId:     req.PegawaiId,
@@ -65,35 +65,8 @@ func (ex *PkSyncExecutor) Sync(
 		Tahun:         req.Tahun,
 	}
 
-	activeSnapshotVersion, err := ex.Repo.GetPenetapanNextVersion(
-		ctx, tx, snapshot)
+	snapshotId, err := ex.createActiveSnapshot(ctx, tx, snapshot, currentUser)
 	if err != nil {
-		return web.SyncPenetapanSummary{}, err
-	}
-	if activeSnapshotVersion > 1 {
-		errDeact := ex.Repo.DeactivateOldSnapshot(
-			ctx, tx, snapshot)
-		if errDeact != nil {
-			return web.SyncPenetapanSummary{}, errDeact
-		}
-	}
-
-	// save new snapshot
-	snapshotPk := domain.SnapshotPenetapan{
-		JenisSnapshot:  snapshot.JenisSnapshot,
-		PegawaiId:      snapshot.PegawaiId,
-		KodeOpd:        snapshot.KodeOpd,
-		Tahun:          snapshot.Tahun,
-		Versi:          activeSnapshotVersion,
-		SnapshotStatus: domain.SnapshotStatusActive,
-		GeneratedBy:    &currentUser,
-		IsActive:       true,
-	}
-
-	snapshotId, err := ex.Repo.SaveSnapshot(ctx, tx, snapshotPk)
-	if err != nil {
-		ex.Logger.Error("save penetapan individu error",
-			"penetapanPk", snapshotPk)
 		return web.SyncPenetapanSummary{}, err
 	}
 
@@ -193,4 +166,35 @@ func (ex *PkSyncExecutor) Sync(
 	}
 
 	return summary.Response(), nil
+}
+
+func (ex *PkSyncExecutor) createActiveSnapshot(
+	ctx context.Context,
+	tx *sql.Tx,
+	snapshot domain.SnapshotPenetapan,
+	currentUser string,
+) (int64, error) {
+	versi, err := ex.Repo.GetPenetapanNextVersion(ctx, tx, snapshot)
+	if err != nil {
+		return 0, err
+	}
+
+	if versi > 1 {
+		if err := ex.Repo.DeactivateOldSnapshot(ctx, tx, snapshot); err != nil {
+			return 0, err
+		}
+	}
+
+	snapshot.Versi = versi
+	snapshot.SnapshotStatus = domain.SnapshotStatusActive
+	snapshot.GeneratedBy = &currentUser
+	snapshot.IsActive = true
+
+	snapshotID, err := ex.Repo.SaveSnapshot(ctx, tx, snapshot)
+	if err != nil {
+		ex.Logger.Error("save penetapan individu error", "snapshot", snapshot)
+		return 0, err
+	}
+
+	return snapshotID, nil
 }

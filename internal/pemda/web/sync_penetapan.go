@@ -21,7 +21,8 @@ type SyncPenetapanRequest struct {
 }
 
 type SyncPenetapanSummary struct {
-	TujuanPemda *int `json:"tujuan_pemda,omitempty" example:"1"`
+	TujuanPemda  *int `json:"tujuan_pemda,omitempty" example:"1"`
+	SasaranPemda *int `json:"sasaran_pemda,omitempty" example:"1"`
 
 	Indikator int `json:"indikator" example:"3"`
 	Target    int `json:"target" example:"4"`

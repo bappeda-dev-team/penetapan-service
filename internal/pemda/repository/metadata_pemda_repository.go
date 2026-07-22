@@ -15,8 +15,8 @@ func (repo *PenetapanPemdaRepository) InsertMetadata(
 		  sync_penetapan_metadata_pemda
              	  (tahun,
  		   jenis_penetapan, status,
- 		   started_at)
-                  VALUES ($1, $2, $3, $4)
+ 		   sync_by, started_at)
+                  VALUES ($1, $2, $3, $4, $5)
 	   	  RETURNING id`
 
 	var id int64
@@ -26,6 +26,7 @@ func (repo *PenetapanPemdaRepository) InsertMetadata(
 		metadata.Tahun,
 		metadata.JenisPenetapan,
 		metadata.Status,
+		metadata.SyncBy,
 		metadata.StartedAt,
 	).Scan(&id)
 	if err != nil {
