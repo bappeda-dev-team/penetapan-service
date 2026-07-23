@@ -1,9 +1,11 @@
 package api
 
 import (
+	"errors"
 	"net/http"
 	"strconv"
 
+	"github.com/bappeda-dev-team/penetapan-service/internal/common"
 	"github.com/bappeda-dev-team/penetapan-service/internal/pemda/web"
 	"github.com/bappeda-dev-team/penetapan-service/internal/validator"
 )
@@ -28,15 +30,15 @@ func (app *Application) SyncPenetapanTujuanPemdaHandler(
 	r *http.Request,
 ) {
 	input := web.SyncPenetapanRequest{}
-	errors := map[string]string{}
+	errorRequests := map[string]string{}
 
 	err := app.ReadJSON(w, r, &input)
 	if err != nil {
-		errors["invalid_request"] = err.Error()
+		errorRequests["invalid_request"] = err.Error()
 		app.BadRequestResponse(
 			w, r,
 			web.ValidationErrorResponse{
-				Error: errors,
+				Error: errorRequests,
 			},
 		)
 		return
@@ -57,6 +59,21 @@ func (app *Application) SyncPenetapanTujuanPemdaHandler(
 		request,
 	)
 	if err != nil {
+		var appErr common.AppError
+		if errors.As(err, &appErr) {
+			switch appErr.Type {
+			case common.Validation:
+				app.UnprocessableResponse(w, r, appErr.Message)
+				return
+			case common.NotFound:
+				app.NotFoundResponse(w, r)
+				return
+			default:
+				app.ServerErrorResponse(w, r, err)
+				return
+			}
+		}
+
 		app.ServerErrorResponse(w, r, err)
 		return
 	}
@@ -194,11 +211,31 @@ func (app *Application) SyncPenetapanSasaranPemdaHandler(
 
 	result, err := app.PemdaService.SyncPenetapanSasaranPemda(r.Context(), request)
 	if err != nil {
+		var appErr common.AppError
+		if errors.As(err, &appErr) {
+			switch appErr.Type {
+			case common.Validation:
+				app.UnprocessableResponse(w, r, appErr.Message)
+				return
+			case common.NotFound:
+				app.NotFoundResponse(w, r)
+				return
+			default:
+				app.ServerErrorResponse(w, r, err)
+				return
+			}
+		}
+
 		app.ServerErrorResponse(w, r, err)
 		return
 	}
 
-	if err := app.WriteJSON(w, http.StatusOK, web.Response[web.SyncPenetapanResponse]{Data: result}, nil); err != nil {
+	response := web.Response[web.SyncPenetapanResponse]{
+		Data: result,
+	}
+
+	err = app.WriteJSON(w, http.StatusOK, response, nil)
+	if err != nil {
 		app.ServerErrorResponse(w, r, err)
 	}
 }

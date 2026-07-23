@@ -88,3 +88,9 @@ func (app *Application) FailedValidationResponse(w http.ResponseWriter, r *http.
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 }
+
+// the UnprocessableResponse() method will be used to send a 422 Unprocessable Entity with message
+// to prevent unacceptable data to be processed
+func (app *Application) UnprocessableResponse(w http.ResponseWriter, r *http.Request, message string) {
+	app.errorResponse(w, r, http.StatusUnprocessableEntity, message)
+}

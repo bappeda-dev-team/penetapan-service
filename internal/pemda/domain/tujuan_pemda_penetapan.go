@@ -4,6 +4,8 @@ import "time"
 
 type TujuanPemdaPenetapan struct {
 	Id               int64
+	Visi             string
+	Misi             string
 	KodeTujuanPemda  string
 	TujuanPemda      string
 	Periode          string

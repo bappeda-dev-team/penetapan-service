@@ -5,10 +5,13 @@ import (
 	"database/sql"
 	"fmt"
 	"log/slog"
+	"slices"
 	"strconv"
 
+	"github.com/bappeda-dev-team/penetapan-service/internal/common"
 	"github.com/bappeda-dev-team/penetapan-service/internal/pemda/client"
 	"github.com/bappeda-dev-team/penetapan-service/internal/pemda/domain"
+	helperPemda "github.com/bappeda-dev-team/penetapan-service/internal/pemda/helper"
 	"github.com/bappeda-dev-team/penetapan-service/internal/pemda/repository"
 	"github.com/bappeda-dev-team/penetapan-service/internal/pemda/web"
 )
@@ -46,6 +49,11 @@ func (ex *TujuanSyncExecutor) Sync(
 		return web.SyncPenetapanSummary{}, err
 	}
 
+	if !hasValidTujuanPemda(tujuanPemdas) {
+		return web.SyncPenetapanSummary{}, common.NewValidation(
+			"tidak ada data penetapan yang siap disinkronkan",
+		)
+	}
 	// db
 	tx, err := ex.Repo.DB.BeginTx(ctx, nil)
 	if err != nil {
@@ -74,9 +82,14 @@ func (ex *TujuanSyncExecutor) Sync(
 			tujuan.Periode.TahunAwal,
 			tujuan.Periode.TahunAkhir)
 		tahunAktif := req.Tahun
+		visiPemda := helperPemda.TextCleaner(tujuan.Visi)
+		misiPemda := helperPemda.TextCleaner(tujuan.Misi)
+		tujuanClean := helperPemda.TextCleaner(tujuan.TujuanPemda)
 		tujuanPemda := domain.TujuanPemdaPenetapan{
 			KodeTujuanPemda:  kodeTujuan,
-			TujuanPemda:      tujuan.TujuanPemda,
+			Visi:             visiPemda,
+			Misi:             misiPemda,
+			TujuanPemda:      tujuanClean,
 			Periode:          periodeTujuan,
 			TahunAktif:       tahunAktif,
 			CreatedBy:        &currentUser,
@@ -89,10 +102,11 @@ func (ex *TujuanSyncExecutor) Sync(
 		summary.AddTujuanPemda(1)
 
 		for _, indikator := range tujuan.Indikator {
+			indikatorClean := helperPemda.TextCleaner(indikator.Indikator)
 			indikatorTujuan := domain.IndikatorTujuanPemdaPenetapan{
 				IdTujuanPemda:       tujuanID,
 				KodeIndikator:       fmt.Sprintf("IND-%d", indikator.Id),
-				Indikator:           indikator.Indikator,
+				Indikator:           indikatorClean,
 				RumusPerhitungan:    &indikator.RumusPerhitungan,
 				SumberData:          &indikator.SumberData,
 				DefinisiOperasional: &indikator.DefinisiOperasional,
@@ -170,4 +184,24 @@ func (ex *TujuanSyncExecutor) createActiveSnapshot(
 	}
 
 	return snapshotID, nil
+}
+
+func hasValidTujuanPemda(tujuanPemdas []client.TujuanPemdaPenetapanResponse) bool {
+	for _, tujuan := range tujuanPemdas {
+		if !helperPemda.IsValidTujuan(tujuan) {
+			continue
+		}
+
+		for _, indikator := range tujuan.Indikator {
+			if !helperPemda.IsValidIndikator(indikator) {
+				continue
+			}
+
+			if slices.ContainsFunc(indikator.TargetPenetapan, helperPemda.IsValidTarget) {
+				return true
+			}
+		}
+	}
+
+	return false
 }

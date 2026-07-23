@@ -102,6 +102,8 @@ func (s *PenetapanPemdaService) FindTujuanPemda(
 		response = append(response, web.TujuanPemdaResponse{
 			Id:              tujuan.Id,
 			KodeTujuanPemda: tujuan.KodeTujuanPemda,
+			Visi:            tujuan.Visi,
+			Misi:            tujuan.Misi,
 			TujuanPemda:     tujuan.TujuanPemda,
 			Periode:         tujuan.Periode,
 			Indikator:       indikatorMap[tujuan.Id],

@@ -9,10 +9,12 @@ type TujuanPenetapanPemdaResponse struct {
 }
 
 type TujuanPemdaResponse struct {
-	Id              int64                             `json:"id"`
-	KodeTujuanPemda string                            `json:"kode_tujuan_pemda"`
-	TujuanPemda     string                            `json:"tujuan_pemda"`
-	Periode         string                            `json:"periode"`
+	Id              int64                             `json:"id" example:"1"`
+	Visi            string                            `json:"visi" example:"Terpenuhinya ..."`
+	Misi            string                            `json:"misi" example:"Misi Kota 1"`
+	KodeTujuanPemda string                            `json:"kode_tujuan_pemda" example:"TUJ-PEM-1"`
+	TujuanPemda     string                            `json:"tujuan_pemda" example:"Tujuan Pemda 1"`
+	Periode         string                            `json:"periode" example:"2025-2030"`
 	Indikator       []IndikatorPemdaPenetapanResponse `json:"indikators"`
 }
 
@@ -24,10 +26,10 @@ type SasaranPenetapanPemdaResponse struct {
 }
 
 type SasaranPemdaResponse struct {
-	Id               int64                             `json:"id"`
-	KodeSasaranPemda string                            `json:"kode_sasaran_pemda"`
-	SasaranPemda     string                            `json:"sasaran_pemda"`
-	Periode          string                            `json:"periode"`
+	Id               int64                             `json:"id" example:"1"`
+	KodeSasaranPemda string                            `json:"kode_sasaran_pemda" example:"SAS-PEM-1"`
+	SasaranPemda     string                            `json:"sasaran_pemda" example:"SASARAN PENUNJANG"`
+	Periode          string                            `json:"periode" example:"2025-2030"`
 	Indikator        []IndikatorPemdaPenetapanResponse `json:"indikators"`
 }
 

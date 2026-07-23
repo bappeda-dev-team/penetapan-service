@@ -15,8 +15,8 @@ func (repo *PenetapanPemdaRepository) SaveTujuanPemdaPenetapan(
 ) (int64, error) {
 	const query = `
 		INSERT INTO tujuan_pemda_penetapan
-			(penetapan_pemda_id, kode_tujuan_pemda, tujuan_pemda, periode, tahun_aktif, created_by)
-		VALUES ($1, $2, $3, $4, $5, $6)
+			(penetapan_pemda_id, kode_tujuan_pemda, visi, misi, tujuan_pemda, periode, tahun_aktif, created_by)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 		RETURNING id`
 
 	var id int64
@@ -25,6 +25,8 @@ func (repo *PenetapanPemdaRepository) SaveTujuanPemdaPenetapan(
 		query,
 		tujuan.PenetapanPemdaId,
 		tujuan.KodeTujuanPemda,
+		tujuan.Visi,
+		tujuan.Misi,
 		tujuan.TujuanPemda,
 		tujuan.Periode,
 		tujuan.TahunAktif,
