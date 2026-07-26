@@ -148,6 +148,110 @@ const docTemplate = `{
                 }
             }
         },
+        "/individu/renja": {
+            "get": {
+                "description": "Mengambil data renja individu berdasarkan id_pegawai, kode OPD dan tahun penetapan",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Individu"
+                ],
+                "summary": "Get rencana kinerja individu penetapan",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Id Pegawai",
+                        "name": "pegawaiId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Kode OPD",
+                        "name": "kodeOpd",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Tahun Penetapan",
+                        "name": "tahun",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Berhasil mengambil data rekin individu",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_individu_web.Response-web_RenjaIndividuResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_individu_web.ValidationErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_individu_web.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/individu/renja/sync": {
+            "post": {
+                "description": "Sinkron data pk renja individu berdasarkan id_pegawai, kode OPD dan tahun penetapan",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Individu"
+                ],
+                "summary": "Sync Renja individu",
+                "parameters": [
+                    {
+                        "description": "Payload sync penetapan individu",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_individu_web.SyncPenetapanRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_individu_web.Response-github_com_bappeda-dev-team_penetapan-service_internal_individu_web_SyncPenetapanResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_individu_web.ValidationErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_individu_web.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/opd/renaksi": {
             "get": {
                 "description": "Mengambil data renaksi OPD berdasarkan kode OPD dan tahun penetapan",
@@ -675,10 +779,12 @@ const docTemplate = `{
         "github_com_bappeda-dev-team_penetapan-service_internal_individu_domain.JenisPenetapan": {
             "type": "string",
             "enum": [
-                "PK-INDIVIDU"
+                "PK-INDIVIDU",
+                "RENJA-INDIVIDU"
             ],
             "x-enum-varnames": [
-                "JenisPenetapanPk"
+                "JenisPenetapanPk",
+                "JenisPenetapanRenjaIndividu"
             ]
         },
         "github_com_bappeda-dev-team_penetapan-service_internal_individu_web.ErrorResponse": {
@@ -700,6 +806,14 @@ const docTemplate = `{
             "properties": {
                 "data": {
                     "$ref": "#/definitions/web.RekinIndividuResponse"
+                }
+            }
+        },
+        "github_com_bappeda-dev-team_penetapan-service_internal_individu_web.Response-web_RenjaIndividuResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/web.RenjaIndividuResponse"
                 }
             }
         },
@@ -773,6 +887,10 @@ const docTemplate = `{
                 "rencana_kinerja": {
                     "type": "integer",
                     "example": 1
+                },
+                "renja_individu": {
+                    "type": "integer",
+                    "example": 6
                 },
                 "target": {
                     "type": "integer",
@@ -1357,6 +1475,94 @@ const docTemplate = `{
                 }
             }
         },
+        "web.RenjaIndividu": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "kode_kegiatan": {
+                    "type": "string",
+                    "example": "8.01.05.2.01"
+                },
+                "kode_pk": {
+                    "type": "string",
+                    "example": "RK-001"
+                },
+                "kode_program": {
+                    "type": "string",
+                    "example": "8.01.05"
+                },
+                "kode_subkegiatan": {
+                    "type": "string",
+                    "example": "8.01.05.2.01.0003"
+                },
+                "level_pk": {
+                    "type": "integer",
+                    "example": 5
+                },
+                "nama_kegiatan": {
+                    "type": "string",
+                    "example": "KEGIATAN XX"
+                },
+                "nama_pegawai": {
+                    "type": "string",
+                    "example": "Pegawai X"
+                },
+                "nama_program": {
+                    "type": "string",
+                    "example": "PROGRAM ABC"
+                },
+                "nama_subkegiatan": {
+                    "type": "string",
+                    "example": "SUBKEGIATAN X"
+                },
+                "pagu_kegiatan": {
+                    "type": "integer",
+                    "example": 1250000000
+                },
+                "pagu_program": {
+                    "type": "integer",
+                    "example": 2500000000
+                },
+                "pagu_subkegiatan": {
+                    "type": "integer",
+                    "example": 500000000
+                },
+                "pegawai_id": {
+                    "type": "string",
+                    "example": "12345"
+                }
+            }
+        },
+        "web.RenjaIndividuResponse": {
+            "type": "object",
+            "properties": {
+                "kode_opd": {
+                    "type": "string",
+                    "example": "1.23.456"
+                },
+                "nama": {
+                    "type": "string",
+                    "example": "Pegawai X"
+                },
+                "pegawai_id": {
+                    "type": "string",
+                    "example": "12345777"
+                },
+                "renjas": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/web.RenjaIndividu"
+                    }
+                },
+                "tahun_aktif": {
+                    "type": "integer",
+                    "example": 2025
+                }
+            }
+        },
         "web.RenjaKegiatanResponse": {
             "type": "object",
             "properties": {
@@ -1560,7 +1766,8 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "indikators": {
                     "type": "array",
@@ -1569,13 +1776,16 @@ const docTemplate = `{
                     }
                 },
                 "kode_sasaran_pemda": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "SAS-PEM-1"
                 },
                 "periode": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "2025-2030"
                 },
                 "sasaran_pemda": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "SASARAN PENUNJANG"
                 }
             }
         },
@@ -1799,7 +2009,8 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "indikators": {
                     "type": "array",
@@ -1808,13 +2019,24 @@ const docTemplate = `{
                     }
                 },
                 "kode_tujuan_pemda": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "TUJ-PEM-1"
+                },
+                "misi": {
+                    "type": "string",
+                    "example": "Misi Kota 1"
                 },
                 "periode": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "2025-2030"
                 },
                 "tujuan_pemda": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Tujuan Pemda 1"
+                },
+                "visi": {
+                    "type": "string",
+                    "example": "Terpenuhinya ..."
                 }
             }
         },

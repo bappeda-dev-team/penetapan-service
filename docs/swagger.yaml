@@ -3,9 +3,11 @@ definitions:
   github_com_bappeda-dev-team_penetapan-service_internal_individu_domain.JenisPenetapan:
     enum:
     - PK-INDIVIDU
+    - RENJA-INDIVIDU
     type: string
     x-enum-varnames:
     - JenisPenetapanPk
+    - JenisPenetapanRenjaIndividu
   github_com_bappeda-dev-team_penetapan-service_internal_individu_web.ErrorResponse:
     properties:
       error: {}
@@ -19,6 +21,11 @@ definitions:
     properties:
       data:
         $ref: '#/definitions/web.RekinIndividuResponse'
+    type: object
+  github_com_bappeda-dev-team_penetapan-service_internal_individu_web.Response-web_RenjaIndividuResponse:
+    properties:
+      data:
+        $ref: '#/definitions/web.RenjaIndividuResponse'
     type: object
   github_com_bappeda-dev-team_penetapan-service_internal_individu_web.SyncPenetapanRequest:
     properties:
@@ -68,6 +75,9 @@ definitions:
         type: integer
       rencana_kinerja:
         example: 1
+        type: integer
+      renja_individu:
+        example: 6
         type: integer
       target:
         example: 4
@@ -468,6 +478,70 @@ definitions:
           $ref: '#/definitions/web.PaguAnggaranRenjaResponse'
         type: array
     type: object
+  web.RenjaIndividu:
+    properties:
+      id:
+        example: 1
+        type: integer
+      kode_kegiatan:
+        example: 8.01.05.2.01
+        type: string
+      kode_pk:
+        example: RK-001
+        type: string
+      kode_program:
+        example: 8.01.05
+        type: string
+      kode_subkegiatan:
+        example: 8.01.05.2.01.0003
+        type: string
+      level_pk:
+        example: 5
+        type: integer
+      nama_kegiatan:
+        example: KEGIATAN XX
+        type: string
+      nama_pegawai:
+        example: Pegawai X
+        type: string
+      nama_program:
+        example: PROGRAM ABC
+        type: string
+      nama_subkegiatan:
+        example: SUBKEGIATAN X
+        type: string
+      pagu_kegiatan:
+        example: 1250000000
+        type: integer
+      pagu_program:
+        example: 2500000000
+        type: integer
+      pagu_subkegiatan:
+        example: 500000000
+        type: integer
+      pegawai_id:
+        example: "12345"
+        type: string
+    type: object
+  web.RenjaIndividuResponse:
+    properties:
+      kode_opd:
+        example: 1.23.456
+        type: string
+      nama:
+        example: Pegawai X
+        type: string
+      pegawai_id:
+        example: "12345777"
+        type: string
+      renjas:
+        items:
+          $ref: '#/definitions/web.RenjaIndividu'
+        type: array
+      tahun_aktif:
+        example: 2025
+        type: integer
+    type: object
   web.RenjaKegiatanResponse:
     properties:
       id:
@@ -608,16 +682,20 @@ definitions:
   web.SasaranPemdaResponse:
     properties:
       id:
+        example: 1
         type: integer
       indikators:
         items:
           $ref: '#/definitions/web.IndikatorPemdaPenetapanResponse'
         type: array
       kode_sasaran_pemda:
+        example: SAS-PEM-1
         type: string
       periode:
+        example: 2025-2030
         type: string
       sasaran_pemda:
+        example: SASARAN PENUNJANG
         type: string
     type: object
   web.SasaranPenetapanOpdResponse:
@@ -775,16 +853,26 @@ definitions:
   web.TujuanPemdaResponse:
     properties:
       id:
+        example: 1
         type: integer
       indikators:
         items:
           $ref: '#/definitions/web.IndikatorPemdaPenetapanResponse'
         type: array
       kode_tujuan_pemda:
+        example: TUJ-PEM-1
+        type: string
+      misi:
+        example: Misi Kota 1
         type: string
       periode:
+        example: 2025-2030
         type: string
       tujuan_pemda:
+        example: Tujuan Pemda 1
+        type: string
+      visi:
+        example: Terpenuhinya ...
         type: string
     type: object
   web.TujuanPenetapanOpdResponse:
@@ -917,6 +1005,77 @@ paths:
           schema:
             $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_individu_web.ErrorResponse'
       summary: Sync Rekin individu
+      tags:
+      - Individu
+  /individu/renja:
+    get:
+      consumes:
+      - application/json
+      description: Mengambil data renja individu berdasarkan id_pegawai, kode OPD
+        dan tahun penetapan
+      parameters:
+      - description: Id Pegawai
+        in: query
+        name: pegawaiId
+        required: true
+        type: string
+      - description: Kode OPD
+        in: query
+        name: kodeOpd
+        required: true
+        type: string
+      - description: Tahun Penetapan
+        in: query
+        name: tahun
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Berhasil mengambil data rekin individu
+          schema:
+            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_individu_web.Response-web_RenjaIndividuResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_individu_web.ValidationErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_individu_web.ErrorResponse'
+      summary: Get rencana kinerja individu penetapan
+      tags:
+      - Individu
+  /individu/renja/sync:
+    post:
+      consumes:
+      - application/json
+      description: Sinkron data pk renja individu berdasarkan id_pegawai, kode OPD
+        dan tahun penetapan
+      parameters:
+      - description: Payload sync penetapan individu
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_individu_web.SyncPenetapanRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_individu_web.Response-github_com_bappeda-dev-team_penetapan-service_internal_individu_web_SyncPenetapanResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_individu_web.ValidationErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_individu_web.ErrorResponse'
+      summary: Sync Renja individu
       tags:
       - Individu
   /opd/renaksi:

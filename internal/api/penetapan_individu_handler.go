@@ -179,7 +179,7 @@ func (app *Application) SyncRekinIndividuHandler(
 // @Failure     400 {object} web.ValidationErrorResponse                "Bad Request"
 // @Failure     500 {object} web.ErrorResponse                          "Internal Server Error"
 //
-// @Router      /individu/rekin/sync [post]
+// @Router      /individu/renja/sync [post]
 func (app *Application) SyncRenjaIndividuHandler(
 	w http.ResponseWriter,
 	r *http.Request,
