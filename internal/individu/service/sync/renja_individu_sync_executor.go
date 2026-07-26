@@ -75,7 +75,9 @@ func (ex *RenjaIndividuSyncExecutor) Sync(
 			KodeOpd:    snapshot.KodeOpd,
 			TahunAktif: snapshot.Tahun,
 
-			KodePk: renja.RekinId,
+			KodePk:        renja.IdRekinPemilikPk,
+			NamaPemilikPk: renja.NamaPemilikPk,
+			LevelPk:       renja.LevelPk,
 
 			KodeProgram: renja.KodeProgram,
 			NamaProgram: renja.NamaProgram,

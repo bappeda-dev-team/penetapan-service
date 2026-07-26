@@ -48,7 +48,11 @@ type BobotBulanan struct {
 }
 
 type RenjaIndividuResponse struct {
-	RekinId     string `json:"rekin_id"`
+	NamaPemilikPk    string `json:"nama_pemilik_pk"`
+	NipPemilikPk     string `json:"nip_pemilik_pk"`
+	IdRekinPemilikPk string `json:"id_rekin_pemilik_pk"`
+	LevelPk          int    `json:"level_pk"`
+
 	KodeProgram string `json:"kode_program"`
 	NamaProgram string `json:"nama_program"`
 	PaguProgram int64  `json:"pagu_program"`

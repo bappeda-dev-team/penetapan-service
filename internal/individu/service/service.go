@@ -392,3 +392,67 @@ func (s *PenetapanIndividuService) SyncRenjaIndividu(
 		ProcessedSummary: summary,
 	}, nil
 }
+
+func (s *PenetapanIndividuService) FindRenjaIndividu(
+	ctx context.Context,
+	req web.SyncPenetapanRequest,
+) (web.RenjaIndividuResponse, error) {
+	s.Logger.Info("FindRenjaIndividu")
+
+	snapshot := domain.SnapshotPenetapan{
+		JenisSnapshot: domain.JenisPenetapanRenjaIndividu,
+		PegawaiId:     req.PegawaiId,
+		KodeOpd:       req.KodeOpd,
+		Tahun:         req.Tahun,
+	}
+	activeSnapshot, err := s.getActiveSnapshot(ctx, snapshot)
+	if err != nil {
+		return web.RenjaIndividuResponse{}, err
+	}
+	snapshot.SnapshotId = &activeSnapshot.Id
+	snapshot.Versi = activeSnapshot.Versi
+
+	renjas, err := s.Repo.FindRenjaIndividu(ctx, snapshot)
+	if err != nil {
+		return web.RenjaIndividuResponse{}, err
+	}
+
+	// To Response DTO
+	// pk -> response
+	renjaIndividus := make([]web.RenjaIndividu, 0, len(renjas))
+
+	for _, renja := range renjas {
+		renjaIndividus = append(renjaIndividus, web.RenjaIndividu{
+			Id:          renja.Id,
+			LevelPk:     renja.LevelPk,
+			KodePk:      renja.KodePk,
+			IdPegawai:   renja.PegawaiId,
+			NamaPegawai: renja.NamaPemilikPk,
+
+			KodeProgram: renja.KodeProgram,
+			NamaProgram: renja.NamaProgram,
+			PaguProgram: renja.PaguProgram,
+
+			KodeKegiatan: renja.KodeKegiatan,
+			NamaKegiatan: renja.NamaKegiatan,
+			PaguKegiatan: renja.PaguKegiatan,
+
+			KodeSubkegiatan: renja.KodeSubkegiatan,
+			NamaSubkegiatan: renja.NamaSubkegiatan,
+			PaguSubkegiatan: renja.PaguSubkegiatan,
+		})
+	}
+
+	resp := web.RenjaIndividuResponse{
+		IdPegawai:  snapshot.PegawaiId,
+		KodeOpd:    snapshot.KodeOpd,
+		TahunAktif: snapshot.Tahun,
+		Renjas:     renjaIndividus,
+	}
+
+	if len(renjas) > 0 {
+		resp.Nama = renjas[0].NamaPemilikPk
+	}
+
+	return resp, nil
+}

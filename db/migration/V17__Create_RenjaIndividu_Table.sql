@@ -9,7 +9,9 @@ CREATE TABLE renja_individu (
 
     tahun_aktif INTEGER NOT NULL,
 
+    nama_pemilik_pk VARCHAR(255) NOT NULL,
     kode_pk VARCHAR(255) NOT NULL,
+    level_pk INTEGER NOT NULL,
 
     kode_program VARCHAR(50) NOT NULL,
     nama_program TEXT NOT NULL,

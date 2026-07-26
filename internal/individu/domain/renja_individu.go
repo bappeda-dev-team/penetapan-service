@@ -9,6 +9,8 @@ type RenjaIndividu struct {
 
 	PenetapanIndividuId int64
 	KodePk              string
+	LevelPk             int
+	NamaPemilikPk       string
 
 	PegawaiId  string
 	KodeOpd    string
