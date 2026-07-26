@@ -3,11 +3,13 @@ package sync
 import "github.com/bappeda-dev-team/penetapan-service/internal/individu/web"
 
 type SummaryCounter struct {
-	Rekin         int
-	Indikator     int
-	Target        int
-	Renaksi       int
-	RenjaIndividu int
+	Rekin                  int
+	Indikator              int
+	Target                 int
+	Renaksi                int
+	RenjaIndividu          int
+	IndikatorRenjaIndividu int
+	TargetRenjaIndividu    int
 }
 
 func (s *SummaryCounter) AddRekin(n int) {
@@ -30,17 +32,27 @@ func (s *SummaryCounter) AddRenjaIndividu(n int) {
 	s.RenjaIndividu += n
 }
 
+func (s *SummaryCounter) AddIndikatorRenjaIndividu(n int) {
+	s.IndikatorRenjaIndividu += n
+}
+
+func (s *SummaryCounter) AddTargetRenjaIndividu(n int) {
+	s.TargetRenjaIndividu += n
+}
+
 func (s SummaryCounter) Response() web.SyncPenetapanSummary {
 	var rekin *int
 	if s.Rekin > 0 {
 		rekin = &s.Rekin
 	}
 	return web.SyncPenetapanSummary{
-		Rekin:         rekin,
-		Indikator:     s.Indikator,
-		Target:        s.Target,
-		Renaksi:       s.Renaksi,
-		RenjaIndividu: s.RenjaIndividu,
+		Rekin:                  rekin,
+		Indikator:              s.Indikator,
+		Target:                 s.Target,
+		Renaksi:                s.Renaksi,
+		RenjaIndividu:          s.RenjaIndividu,
+		IndikatorRenjaIndividu: s.IndikatorRenjaIndividu,
+		TargetRenjaIndividu:    s.TargetRenjaIndividu,
 	}
 
 }

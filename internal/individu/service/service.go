@@ -416,12 +416,66 @@ func (s *PenetapanIndividuService) FindRenjaIndividu(
 	if err != nil {
 		return web.RenjaIndividuResponse{}, err
 	}
+	renjaIds := make([]int64, 0, len(renjas))
+	for _, r := range renjas {
+		renjaIds = append(renjaIds, r.Id)
+	}
+
+	indikators, err := s.Repo.FindIndikatorRenjaByRenjaIds(ctx, renjaIds)
+	if err != nil {
+		return web.RenjaIndividuResponse{}, err
+	}
+
+	indikatorIds := make([]int64, 0, len(indikators))
+	for _, i := range indikators {
+		indikatorIds = append(indikatorIds, i.ID)
+	}
+
+	targets, err := s.Repo.FindTargetRenjaByIndikatorIds(ctx, indikatorIds)
+	if err != nil {
+		return web.RenjaIndividuResponse{}, err
+	}
+	targetMap := make(map[int64][]domain.TargetRenjaIndividu)
+
+	for _, t := range targets {
+		targetMap[t.IndikatorRenjaIndividuID] =
+			append(targetMap[t.IndikatorRenjaIndividuID], t)
+	}
+
+	indikatorMap := make(map[int64][]domain.IndikatorRenjaIndividu)
+
+	for _, ind := range indikators {
+		ind.Targets = targetMap[ind.ID]
+		indikatorMap[ind.RenjaIndividuID] =
+			append(indikatorMap[ind.RenjaIndividuID], ind)
+	}
 
 	// To Response DTO
 	// pk -> response
 	renjaIndividus := make([]web.RenjaIndividu, 0, len(renjas))
-
 	for _, renja := range renjas {
+		var indikatorResponses []web.IndikatorRenja
+		for _, ind := range indikatorMap[renja.Id] {
+			var targetResponses []web.TargetRenja
+
+			for _, target := range ind.Targets {
+				targetResponses = append(targetResponses, web.TargetRenja{
+					Id:         target.ID,
+					KodeTarget: target.KodeTargetRenja,
+					Target:     target.Target,
+					Satuan:     target.Satuan,
+					Tahun:      target.Tahun,
+				})
+			}
+
+			indikatorResponses = append(indikatorResponses, web.IndikatorRenja{
+				Id:            ind.ID,
+				KodeIndikator: ind.KodeIndikatorRenja,
+				Indikator:     ind.Indikator,
+				Targets:       targetResponses,
+			})
+		}
+
 		renjaIndividus = append(renjaIndividus, web.RenjaIndividu{
 			Id:          renja.Id,
 			LevelPk:     renja.LevelPk,
@@ -429,17 +483,21 @@ func (s *PenetapanIndividuService) FindRenjaIndividu(
 			IdPegawai:   renja.PegawaiId,
 			NamaPegawai: renja.NamaPemilikPk,
 
-			KodeProgram: renja.KodeProgram,
-			NamaProgram: renja.NamaProgram,
-			PaguProgram: renja.PaguProgram,
+			KodeProgram:       renja.KodeProgram,
+			NamaProgram:       renja.NamaProgram,
+			KodePaguProgram:   renja.KodePaguProgram,
+			PaguProgram:       renja.PaguProgram,
+			IndikatorPrograms: indikatorResponses,
 
-			KodeKegiatan: renja.KodeKegiatan,
-			NamaKegiatan: renja.NamaKegiatan,
-			PaguKegiatan: renja.PaguKegiatan,
+			KodeKegiatan:     renja.KodeKegiatan,
+			NamaKegiatan:     renja.NamaKegiatan,
+			KodePaguKegiatan: renja.KodePaguKegiatan,
+			PaguKegiatan:     renja.PaguKegiatan,
 
-			KodeSubkegiatan: renja.KodeSubkegiatan,
-			NamaSubkegiatan: renja.NamaSubkegiatan,
-			PaguSubkegiatan: renja.PaguSubkegiatan,
+			KodeSubkegiatan:     renja.KodeSubkegiatan,
+			NamaSubkegiatan:     renja.NamaSubkegiatan,
+			KodePaguSubkegiatan: renja.KodePaguSubkegiatan,
+			PaguSubkegiatan:     renja.PaguSubkegiatan,
 		})
 	}
 

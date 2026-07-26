@@ -3,6 +3,8 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"fmt"
+	"strings"
 
 	"github.com/bappeda-dev-team/penetapan-service/internal/individu/domain"
 )
@@ -23,19 +25,23 @@ func (repo *PenetapanIndividuRepository) SaveRenjaIndividu(
 			tahun_aktif,
 			kode_program,
 			nama_program,
+			kode_pagu_program,
 			pagu_program,
 			kode_kegiatan,
 			nama_kegiatan,
+			kode_pagu_kegiatan,
 			pagu_kegiatan,
 			kode_subkegiatan,
 			nama_subkegiatan,
+			kode_pagu_subkegiatan,
 			pagu_subkegiatan,
 			created_by
 		) VALUES (
 			$1, $2, $3, $4, $5,
 			$6, $7, $8, $9, $10,
 			$11, $12, $13, $14,
-			$15, $16, $17
+			$15, $16, $17, $18,
+			$19, $20
 		)
 		RETURNING id
 	`
@@ -54,14 +60,93 @@ func (repo *PenetapanIndividuRepository) SaveRenjaIndividu(
 		req.TahunAktif,
 		req.KodeProgram,
 		req.NamaProgram,
+		req.KodePaguProgram,
 		req.PaguProgram,
+
 		req.KodeKegiatan,
 		req.NamaKegiatan,
+		req.KodePaguKegiatan,
 		req.PaguKegiatan,
+
 		req.KodeSubkegiatan,
 		req.NamaSubkegiatan,
+		req.KodePaguSubkegiatan,
 		req.PaguSubkegiatan,
 		req.CreatedBy,
+	).Scan(&id)
+
+	if err != nil {
+		return 0, err
+	}
+
+	return id, nil
+}
+
+func (repo *PenetapanIndividuRepository) SaveIndikatorRenjaIndividu(
+	ctx context.Context,
+	tx *sql.Tx,
+	req domain.IndikatorRenjaIndividu,
+) (int64, error) {
+	const query = `
+		INSERT INTO indikator_renja_individu (
+			renja_individu_id,
+			jenis_indikator,
+			kode_indikator_renja,
+			indikator
+		) VALUES (
+			$1, $2, $3, $4
+		)
+		RETURNING id
+	`
+
+	var id int64
+
+	err := tx.QueryRowContext(
+		ctx,
+		query,
+		req.RenjaIndividuID,
+		req.JenisIndikator,
+		req.KodeIndikatorRenja,
+		req.Indikator,
+	).Scan(&id)
+
+	if err != nil {
+		return 0, err
+	}
+
+	return id, nil
+}
+
+func (repo *PenetapanIndividuRepository) SaveTargetRenjaIndividu(
+	ctx context.Context,
+	tx *sql.Tx,
+	req domain.TargetRenjaIndividu,
+) (int64, error) {
+	const query = `
+		INSERT INTO target_renja_individu (
+			indikator_renja_individu_id,
+			jenis_target,
+			kode_target_renja,
+			target,
+			satuan,
+			tahun
+		) VALUES (
+			$1, $2, $3, $4, $5, $6
+		)
+		RETURNING id
+	`
+
+	var id int64
+
+	err := tx.QueryRowContext(
+		ctx,
+		query,
+		req.IndikatorRenjaIndividuID,
+		req.JenisTarget,
+		req.KodeTargetRenja,
+		req.Target,
+		req.Satuan,
+		req.Tahun,
 	).Scan(&id)
 
 	if err != nil {
@@ -88,12 +173,15 @@ func (repo *PenetapanIndividuRepository) FindRenjaIndividu(
 			ri.tahun_aktif,
 			ri.kode_program,
 			ri.nama_program,
+			ri.kode_pagu_program,
 			ri.pagu_program,
 			ri.kode_kegiatan,
 			ri.nama_kegiatan,
+			ri.kode_pagu_kegiatan,
 			ri.pagu_kegiatan,
 			ri.kode_subkegiatan,
 			ri.nama_subkegiatan,
+			ri.kode_pagu_subkegiatan,
 			ri.pagu_subkegiatan,
 			ri.created_date,
 			ri.last_modified_date,
@@ -139,12 +227,15 @@ func (repo *PenetapanIndividuRepository) FindRenjaIndividu(
 			&renja.TahunAktif,
 			&renja.KodeProgram,
 			&renja.NamaProgram,
+			&renja.KodePaguProgram,
 			&renja.PaguProgram,
 			&renja.KodeKegiatan,
 			&renja.NamaKegiatan,
+			&renja.KodePaguKegiatan,
 			&renja.PaguKegiatan,
 			&renja.KodeSubkegiatan,
 			&renja.NamaSubkegiatan,
+			&renja.KodePaguSubkegiatan,
 			&renja.PaguSubkegiatan,
 			&renja.CreatedDate,
 			&renja.LastModifiedDate,
@@ -162,4 +253,124 @@ func (repo *PenetapanIndividuRepository) FindRenjaIndividu(
 	}
 
 	return renjas, nil
+}
+
+func (repo *PenetapanIndividuRepository) FindIndikatorRenjaByRenjaIds(
+	ctx context.Context,
+	renjaIds []int64,
+) ([]domain.IndikatorRenjaIndividu, error) {
+	if len(renjaIds) == 0 {
+		return []domain.IndikatorRenjaIndividu{}, nil
+	}
+
+	var (
+		placeholders []string
+		args         []any
+	)
+
+	for i, id := range renjaIds {
+		placeholders = append(placeholders, fmt.Sprintf("$%d", i+1))
+		args = append(args, id)
+	}
+
+	query := fmt.Sprintf(`
+		SELECT
+			id,
+			renja_individu_id,
+			jenis_indikator,
+			kode_indikator_renja,
+			indikator
+		FROM indikator_renja_individu
+		WHERE renja_individu_id IN (%s)
+		ORDER BY id
+	`, strings.Join(placeholders, ","))
+
+	rows, err := repo.DB.QueryContext(ctx, query, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var result []domain.IndikatorRenjaIndividu
+
+	for rows.Next() {
+		var item domain.IndikatorRenjaIndividu
+
+		err := rows.Scan(
+			&item.ID,
+			&item.RenjaIndividuID,
+			&item.JenisIndikator,
+			&item.KodeIndikatorRenja,
+			&item.Indikator,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		result = append(result, item)
+	}
+
+	return result, rows.Err()
+}
+
+func (repo *PenetapanIndividuRepository) FindTargetRenjaByIndikatorIds(
+	ctx context.Context,
+	indikatorIds []int64,
+) ([]domain.TargetRenjaIndividu, error) {
+	if len(indikatorIds) == 0 {
+		return []domain.TargetRenjaIndividu{}, nil
+	}
+
+	var (
+		placeholders []string
+		args         []any
+	)
+
+	for i, id := range indikatorIds {
+		placeholders = append(placeholders, fmt.Sprintf("$%d", i+1))
+		args = append(args, id)
+	}
+
+	query := fmt.Sprintf(`
+		SELECT
+			id,
+			indikator_renja_individu_id,
+			jenis_target,
+			kode_target_renja,
+			target,
+			satuan,
+			tahun
+		FROM target_renja_individu
+		WHERE indikator_renja_individu_id IN (%s)
+		ORDER BY tahun
+	`, strings.Join(placeholders, ","))
+
+	rows, err := repo.DB.QueryContext(ctx, query, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var result []domain.TargetRenjaIndividu
+
+	for rows.Next() {
+		var item domain.TargetRenjaIndividu
+
+		err := rows.Scan(
+			&item.ID,
+			&item.IndikatorRenjaIndividuID,
+			&item.JenisTarget,
+			&item.KodeTargetRenja,
+			&item.Target,
+			&item.Satuan,
+			&item.Tahun,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		result = append(result, item)
+	}
+
+	return result, rows.Err()
 }

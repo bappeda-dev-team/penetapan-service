@@ -3,7 +3,9 @@ package sync
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"log/slog"
+	"strconv"
 
 	"github.com/bappeda-dev-team/penetapan-service/internal/individu/client"
 	"github.com/bappeda-dev-team/penetapan-service/internal/individu/domain"
@@ -67,9 +69,12 @@ func (ex *RenjaIndividuSyncExecutor) Sync(
 		return web.SyncPenetapanSummary{}, err
 	}
 
-	// SAVE PK
+	// SAVE RENJA INDIVIDU
 	summary := SummaryCounter{}
 	for _, renja := range renjaIndividus {
+		kodePaguProgram := fmt.Sprintf("PAGU-PRG-%s-%d-%s", renja.KodeProgram, snapshot.Tahun, "programs")
+		kodePaguKegiatan := fmt.Sprintf("PAGU-KEG-%s-%d-%s", renja.KodeKegiatan, snapshot.Tahun, "kegiatans")
+		kodePaguSubkegiatan := fmt.Sprintf("PAGU-SUBKEG-%s-%d-%s", renja.KodeSubkegiatan, snapshot.Tahun, "subkegiatans")
 		renjaIndividu := domain.RenjaIndividu{
 			PegawaiId:  snapshot.PegawaiId,
 			KodeOpd:    snapshot.KodeOpd,
@@ -79,26 +84,62 @@ func (ex *RenjaIndividuSyncExecutor) Sync(
 			NamaPemilikPk: renja.NamaPemilikPk,
 			LevelPk:       renja.LevelPk,
 
-			KodeProgram: renja.KodeProgram,
-			NamaProgram: renja.NamaProgram,
-			PaguProgram: renja.PaguProgram,
+			KodeProgram:     renja.KodeProgram,
+			NamaProgram:     renja.NamaProgram,
+			KodePaguProgram: kodePaguProgram,
+			PaguProgram:     renja.PaguProgram,
 
-			KodeKegiatan: renja.KodeKegiatan,
-			NamaKegiatan: renja.NamaKegiatan,
-			PaguKegiatan: renja.PaguKegiatan,
+			KodeKegiatan:     renja.KodeKegiatan,
+			NamaKegiatan:     renja.NamaKegiatan,
+			KodePaguKegiatan: kodePaguKegiatan,
+			PaguKegiatan:     renja.PaguKegiatan,
 
-			KodeSubkegiatan: renja.KodeSubkegiatan,
-			NamaSubkegiatan: renja.NamaSubkegiatan,
-			PaguSubkegiatan: renja.PaguSubkegiatan,
+			KodeSubkegiatan:     renja.KodeSubkegiatan,
+			NamaSubkegiatan:     renja.NamaSubkegiatan,
+			KodePaguSubkegiatan: kodePaguSubkegiatan,
+			PaguSubkegiatan:     renja.PaguSubkegiatan,
 
 			PenetapanIndividuId: snapshotId,
 			CreatedBy:           &currentUser,
 		}
-		_, err := ex.Repo.SaveRenjaIndividu(ctx, tx, renjaIndividu)
+		idRenja, err := ex.Repo.SaveRenjaIndividu(ctx, tx, renjaIndividu)
 		if err != nil {
 			return web.SyncPenetapanSummary{}, err
 		}
 		summary.AddRenjaIndividu(1)
+		// INDIKATOR
+		if err := ex.saveIndikatorRenja(
+			ctx,
+			tx,
+			idRenja,
+			"PROGRAM",
+			renja.IndikatorPrograms,
+			&summary,
+		); err != nil {
+			return web.SyncPenetapanSummary{}, err
+		}
+
+		if err := ex.saveIndikatorRenja(
+			ctx,
+			tx,
+			idRenja,
+			"KEGIATAN",
+			renja.IndikatorKegiatans,
+			&summary,
+		); err != nil {
+			return web.SyncPenetapanSummary{}, err
+		}
+
+		if err := ex.saveIndikatorRenja(
+			ctx,
+			tx,
+			idRenja,
+			"SUB-KEGIATAN",
+			renja.IndikatorSubkegiatans,
+			&summary,
+		); err != nil {
+			return web.SyncPenetapanSummary{}, err
+		}
 	}
 
 	err = tx.Commit()
@@ -138,4 +179,61 @@ func (ex *RenjaIndividuSyncExecutor) createActiveSnapshot(
 	}
 
 	return snapshotID, nil
+}
+
+func (ex *RenjaIndividuSyncExecutor) saveIndikatorRenja(
+	ctx context.Context,
+	tx *sql.Tx,
+	renjaID int64,
+	jenis string,
+	indikators []client.IndikatorRenja,
+	summary *SummaryCounter,
+) error {
+	for _, ind := range indikators {
+		kodeIndikator := fmt.Sprintf("IND-%s", ind.Id)
+		indikator := domain.IndikatorRenjaIndividu{
+			RenjaIndividuID: renjaID,
+			JenisIndikator:  jenis,
+			// WARNING KODE INDIKATOR
+			KodeIndikatorRenja: kodeIndikator,
+			Indikator:          ind.Indikator,
+		}
+
+		idIndikator, err := ex.Repo.SaveIndikatorRenjaIndividu(ctx, tx, indikator)
+		if err != nil {
+			return err
+		}
+
+		summary.AddIndikatorRenjaIndividu(1)
+
+		for _, target := range ind.Targets {
+			kodeTarget := fmt.Sprintf("TGT-%s", target.Id)
+			targetFloat, err := strconv.ParseFloat(target.Target, 64)
+			if err != nil {
+				return fmt.Errorf(
+					"invalid target indikator %q value %q",
+					ind.Indikator,
+					target.Target,
+				)
+			}
+
+			targetRenja := domain.TargetRenjaIndividu{
+				IndikatorRenjaIndividuID: idIndikator,
+				JenisTarget:              jenis,
+				KodeTargetRenja:          kodeTarget,
+				Target:                   targetFloat,
+				Satuan:                   target.Satuan,
+				Tahun:                    target.Tahun,
+			}
+
+			_, err = ex.Repo.SaveTargetRenjaIndividu(ctx, tx, targetRenja)
+			if err != nil {
+				return err
+			}
+
+			summary.AddTargetRenjaIndividu(1)
+		}
+	}
+
+	return nil
 }

@@ -15,14 +15,17 @@ CREATE TABLE renja_individu (
 
     kode_program VARCHAR(50) NOT NULL,
     nama_program TEXT NOT NULL,
+    kode_pagu_program VARCHAR(255) NOT NULL,
     pagu_program BIGINT NOT NULL,
 
     kode_kegiatan VARCHAR(50) NOT NULL,
     nama_kegiatan TEXT NOT NULL,
+    kode_pagu_kegiatan VARCHAR(255) NOT NULL,
     pagu_kegiatan BIGINT NOT NULL,
 
     kode_subkegiatan VARCHAR(50) NOT NULL,
     nama_subkegiatan TEXT NOT NULL,
+    kode_pagu_subkegiatan VARCHAR(255) NOT NULL,
     pagu_subkegiatan BIGINT NOT NULL,
 
     created_date TIMESTAMPTZ NOT NULL DEFAULT NOW(),
