@@ -320,3 +320,75 @@ func (s *PenetapanIndividuService) getActiveSnapshot(
 
 	return snapshot, nil
 }
+
+func (s *PenetapanIndividuService) SyncRenjaIndividu(
+	ctx context.Context,
+	req *web.SyncPenetapanRequest,
+) (web.SyncPenetapanResponse, error) {
+	now := time.Now()
+	currentUser := "super_admin" // ambil dari ctx nanti
+	jenisPenetapan := domain.JenisPenetapanRenjaIndividu
+
+	executor, err := s.SyncExecutor.Get(jenisPenetapan)
+	if err != nil {
+		return web.SyncPenetapanResponse{}, err
+	}
+
+	// insert metadata pertama
+	metadata := domain.SyncPenetapanMetadata{
+		PegawaiId:      req.PegawaiId,
+		KodeOpd:        req.KodeOpd,
+		Tahun:          req.Tahun,
+		Status:         domain.SyncStatusPending,
+		StartedAt:      now,
+		SyncBy:         &currentUser,
+		JenisPenetapan: jenisPenetapan,
+	}
+
+	// log start
+	s.Logger.InfoContext(
+		ctx,
+		"sync penetapan renja individu started",
+		"pegawai_id", metadata.PegawaiId,
+		"kode_opd", metadata.KodeOpd,
+		"tahun", metadata.Tahun,
+		"jenis_sync", metadata.JenisPenetapan,
+		"sync_by", metadata.SyncBy,
+		"started_at", metadata.StartedAt,
+	)
+
+	syncId, err := s.Repo.InsertMetadata(ctx, metadata)
+	if err != nil {
+		log.Printf("ERROR: %v", err)
+		return web.SyncPenetapanResponse{}, err
+	}
+
+	// updateMetadata jadi InProgress
+	err = s.markSyncAsInProgress(ctx, syncId)
+	if err != nil {
+		return web.SyncPenetapanResponse{}, err
+	}
+
+	// SYNC AND SAVE
+	summary, err := executor.Sync(ctx, syncId, req, currentUser)
+	if err != nil {
+		return web.SyncPenetapanResponse{}, s.failSync(ctx, syncId, err)
+	}
+
+	// jika berhasil updateMetadata jadi Success
+	err = s.markSyncAsSuccess(ctx, syncId)
+	if err != nil {
+		return web.SyncPenetapanResponse{}, err
+	}
+
+	return web.SyncPenetapanResponse{
+		SyncId:           syncId,
+		Status:           domain.SyncStatusSuccess,
+		PegawaiId:        req.PegawaiId,
+		KodeOpd:          req.KodeOpd,
+		Tahun:            req.Tahun,
+		JenisPenetapan:   jenisPenetapan,
+		ProcessedAt:      time.Now(),
+		ProcessedSummary: summary,
+	}, nil
+}

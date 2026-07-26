@@ -21,9 +21,10 @@ type SyncPenetapanResponse struct {
 type SyncPenetapanSummary struct {
 	Rekin *int `json:"rencana_kinerja,omitempty" example:"1"`
 
-	Indikator int `json:"indikator" example:"3"`
-	Target    int `json:"target" example:"4"`
-	Renaksi   int `json:"renaksi" example:"3"`
+	Indikator     int `json:"indikator" example:"3"`
+	Target        int `json:"target" example:"4"`
+	Renaksi       int `json:"renaksi" example:"3"`
+	RenjaIndividu int `json:"renja_individu" example:"6"`
 }
 
 type SyncPenetapanRequest struct {

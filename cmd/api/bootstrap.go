@@ -90,8 +90,14 @@ func buildApplication(
 	// repository
 	penetapanIndiRepo := repoIndividu.NewPenetapanIndividuRepository(db)
 	// executor
-	//// tujuan
+	//// pk
 	pkSyncExecutor := syncIndividu.NewPkSyncExecutor(
+		penetapanIndiRepo,
+		individuClient,
+		logger,
+	)
+	//// renja individu
+	renjaIndividuSyncExecutor := syncIndividu.NewRenjaIndividuSyncExecutor(
 		penetapanIndiRepo,
 		individuClient,
 		logger,
@@ -99,7 +105,8 @@ func buildApplication(
 
 	// exeuctor individu
 	syncIndividuRegistry := &syncIndividu.Registry{
-		PkSyncExecutor: pkSyncExecutor,
+		PkSyncExecutor:            pkSyncExecutor,
+		RenjaIndividuSyncExecutor: renjaIndividuSyncExecutor,
 	}
 
 	individuService := serviceIndividu.NewPenetapanIndividuService(

@@ -46,3 +46,18 @@ type BobotBulanan struct {
 	Bulan int    `json:"bulan"`
 	Bobot int    `json:"bobot"`
 }
+
+type RenjaIndividuResponse struct {
+	RekinId     string `json:"rekin_id"`
+	KodeProgram string `json:"kode_program"`
+	NamaProgram string `json:"nama_program"`
+	PaguProgram int64  `json:"pagu_program"`
+
+	KodeKegiatan string `json:"kode_kegiatan"`
+	NamaKegiatan string `json:"nama_kegiatan"`
+	PaguKegiatan int64  `json:"pagu_kegiatan"`
+
+	KodeSubkegiatan string `json:"kode_subkegiatan"`
+	NamaSubkegiatan string `json:"nama_subkegiatan"`
+	PaguSubkegiatan int64  `json:"pagu_subkegiatan"`
+}
