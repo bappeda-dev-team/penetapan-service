@@ -43,6 +43,7 @@ func ToTargetIndikatorTujuanOpdResponse(target domain.TargetIndikatorTujuanPenet
 func ToSasaranOpdResponse(sasaranOpd domain.SasaranPenetapanOpd) web.SasaranOpdResponse {
 	return web.SasaranOpdResponse{
 		Id:             sasaranOpd.Id,
+		KodeTujuanOpd:  sasaranOpd.KodeTujuanOpd,
 		KodeSasaranOpd: sasaranOpd.KodeSasaranOpd,
 		SasaranOpd:     sasaranOpd.SasaranOpd,
 		Periode:        sasaranOpd.Periode,

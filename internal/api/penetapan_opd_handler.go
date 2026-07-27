@@ -534,3 +534,94 @@ func (app *Application) RenaksiOpdHandler(
 		return
 	}
 }
+
+// TujuanSasaranOpdHandler godoc
+//
+// @Summary     Get tujuan sasaran OPD penetapan
+// @Description Mengambil data tujuan dan sasaran OPD berdasarkan kode OPD dan tahun penetapan
+// @Tags        OPD
+// @Accept      json
+// @Produce     json
+//
+// @Param       kodeOpd query string true "Kode OPD"
+// @Param       tahun   query int    true "Tahun Penetapan"
+//
+// @Success     200 {object} web.Response[web.TujuanSasaranPenetapanOpdResponse] "Berhasil mengambil data tujuan OPD"
+// @Failure     400 {object} web.ValidationErrorResponse                  "Bad Request"
+// @Failure     500 {object} web.ErrorResponse                            "Internal Server Error"
+//
+// @Router      /opd/tujuan-with-sasaran [get]
+func (app *Application) TujuanSasaranOpdHandler(
+	w http.ResponseWriter,
+	r *http.Request,
+) {
+
+	query := r.URL.Query()
+
+	errors := map[string]string{}
+
+	kodeOpd := query.Get("kodeOpd")
+
+	tahunStr := query.Get("tahun")
+
+	var tahun int
+
+	if kodeOpd == "" {
+		errors["kodeOpd"] = "required"
+	}
+
+	if tahunStr == "" {
+
+		errors["tahun"] = "required"
+
+	} else {
+
+		parsedTahun, err := strconv.Atoi(tahunStr)
+
+		if err != nil {
+
+			errors["tahun"] = "tahun tidak valid"
+
+		} else {
+
+			tahun = parsedTahun
+		}
+	}
+
+	if len(errors) > 0 {
+
+		app.BadRequestResponse(
+			w,
+			r,
+			web.ValidationErrorResponse{
+				Error: errors,
+			},
+		)
+
+		return
+	}
+
+	request := domain.PenetapanOpdRequest{
+		KodeOpd: kodeOpd,
+		Tahun:   tahun,
+	}
+
+	result, err := app.PenetapanOpdService.FindTujuanWithSasaran(
+		r.Context(),
+		request,
+	)
+	if err != nil {
+		app.ServerErrorResponse(w, r, err)
+		return
+	}
+
+	response := web.Response[web.TujuanSasaranPenetapanOpdResponse]{
+		Data: result,
+	}
+
+	err = app.WriteJSON(w, http.StatusOK, response, nil)
+	if err != nil {
+		app.ServerErrorResponse(w, r, err)
+		return
+	}
+}

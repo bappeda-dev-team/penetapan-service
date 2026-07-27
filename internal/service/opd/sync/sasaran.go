@@ -194,8 +194,10 @@ func (ex *SasaranSyncExecutor) toSasaranSnapshot(
 	periodeTujuan := fmt.Sprintf("%s-%s",
 		sasaran.TahunAwal,
 		sasaran.TahunAkhir)
+	kodeTujuan := fmt.Sprintf("TUJ-OPD-%d", sasaran.IdTujuanOpd)
 	return domain.SasaranPenetapanOpd{
 		KodeOpd:        kodeOpd,
+		KodeTujuanOpd:  kodeTujuan,
 		KodeSasaranOpd: kodeSasaranOpd,
 		SasaranOpd:     sasaran.NamaSasaranOpd,
 		Periode:        periodeTujuan,

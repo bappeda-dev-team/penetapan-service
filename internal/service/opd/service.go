@@ -630,3 +630,53 @@ func (s *PenetapanOpdService) getActiveSnapshot(
 
 	return snapshot, nil
 }
+
+func (s *PenetapanOpdService) FindTujuanWithSasaran(
+	ctx context.Context,
+	req domain.PenetapanOpdRequest,
+) (web.TujuanSasaranPenetapanOpdResponse, error) {
+	s.Logger.Info("FindTujuanWithSasaran")
+
+	tujuanResp, err := s.FindTujuan(ctx, req)
+	if err != nil {
+		s.Logger.Error("FindTujuan")
+		return web.TujuanSasaranPenetapanOpdResponse{}, err
+	}
+
+	sasaranResp, err := s.FindSasaran(ctx, req)
+	if err != nil {
+		s.Logger.Error("FindSasaran")
+		return web.TujuanSasaranPenetapanOpdResponse{}, err
+	}
+
+	// Mapping kode tujuan -> daftar sasaran
+	sasaranMap := make(map[string][]web.SasaranOpdResponse)
+
+	for _, sasaran := range sasaranResp.Sasarans {
+		sasaranMap[sasaran.KodeTujuanOpd] = append(
+			sasaranMap[sasaran.KodeTujuanOpd],
+			sasaran,
+		)
+	}
+
+	tujuans := make([]web.TujuanSasaranOpdResponse, 0, len(tujuanResp.Tujuans))
+
+	for _, tujuan := range tujuanResp.Tujuans {
+		tujuans = append(tujuans, web.TujuanSasaranOpdResponse{
+			Id:            tujuan.Id,
+			KodeTujuanOpd: tujuan.KodeTujuanOpd,
+			TujuanOpd:     tujuan.TujuanOpd,
+			Periode:       tujuan.Periode,
+			Indikator:     tujuan.Indikator,
+			SasaranOpds:   sasaranMap[tujuan.KodeTujuanOpd],
+		})
+	}
+
+	return web.TujuanSasaranPenetapanOpdResponse{
+		KodeOpd:    tujuanResp.KodeOpd,
+		TahunAktif: tujuanResp.TahunAktif,
+		Versi:      tujuanResp.Versi,
+		IsLocked:   tujuanResp.IsLocked,
+		Tujuans:    tujuans,
+	}, nil
+}

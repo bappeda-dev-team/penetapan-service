@@ -225,6 +225,7 @@ func (r *PenetapanOpdRepository) SaveSasaranPenetapanOpd(
 		INSERT INTO sasaran_opd
 		(
 			kode_opd,
+			kode_tujuan_opd,
 			kode_sasaran_opd,
 			sasaran_opd,
 			periode,
@@ -234,7 +235,7 @@ func (r *PenetapanOpdRepository) SaveSasaranPenetapanOpd(
 		)
 		VALUES
 		(
-			$1, $2, $3, $4, $5, $6, $7
+			$1, $2, $3, $4, $5, $6, $7, $8
 		)
 		RETURNING id
 	`
@@ -245,6 +246,7 @@ func (r *PenetapanOpdRepository) SaveSasaranPenetapanOpd(
 		ctx,
 		query,
 		data.KodeOpd,
+		data.KodeTujuanOpd,
 		data.KodeSasaranOpd,
 		data.SasaranOpd,
 		data.Periode,
@@ -804,6 +806,7 @@ func (r *PenetapanOpdRepository) FindSasaranBySnapshot(
 		SELECT
 			sas.id,
 			sas.kode_opd,
+			sas.kode_tujuan_opd,
 			sas.kode_sasaran_opd,
 			sas.sasaran_opd,
 			sas.periode,
@@ -843,6 +846,7 @@ func (r *PenetapanOpdRepository) FindSasaranBySnapshot(
 		err := rows.Scan(
 			&item.Id,
 			&item.KodeOpd,
+			&item.KodeTujuanOpd,
 			&item.KodeSasaranOpd,
 			&item.SasaranOpd,
 			&item.Periode,

@@ -4,6 +4,7 @@ import "time"
 
 type SasaranPenetapanOpd struct {
 	Id               int64
+	KodeTujuanOpd    string
 	KodeOpd          string
 	KodeSasaranOpd   string
 	SasaranOpd       string

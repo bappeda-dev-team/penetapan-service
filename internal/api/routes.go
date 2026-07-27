@@ -45,6 +45,7 @@ func (app *Application) Routes() http.Handler {
 	// tujuan opd
 	router.HandlerFunc(http.MethodGet, "/opd/tujuan", app.TujuanOpdHandler)
 	router.HandlerFunc(http.MethodPost, "/opd/tujuan/sync", app.SyncPenetapanTujuanOpdHandler)
+	router.HandlerFunc(http.MethodGet, "/opd/tujuan-with-sasaran", app.TujuanSasaranOpdHandler)
 
 	// pemda
 	// tujuan pemda

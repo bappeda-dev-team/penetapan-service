@@ -10,6 +10,7 @@ type SasaranPenetapanOpdResponse struct {
 
 type SasaranOpdResponse struct {
 	Id             int64                               `json:"id"`
+	KodeTujuanOpd  string                              `json:"kode_tujuan_opd" example:"TUJ-OPD-123"`
 	KodeSasaranOpd string                              `json:"kode_sasaran_opd" example:"SAS-001"`
 	SasaranOpd     string                              `json:"sasaran_opd" example:"Meningkatnya Nilai SAKIP"`
 	Periode        string                              `json:"periode" example:"2025-2029"`
