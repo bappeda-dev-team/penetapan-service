@@ -545,6 +545,57 @@
                 }
             }
         },
+        "/opd/tujuan-with-sasaran": {
+            "get": {
+                "description": "Mengambil data tujuan dan sasaran OPD berdasarkan kode OPD dan tahun penetapan",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "OPD"
+                ],
+                "summary": "Get tujuan sasaran OPD penetapan",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Kode OPD",
+                        "name": "kodeOpd",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Tahun Penetapan",
+                        "name": "tahun",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Berhasil mengambil data tujuan OPD",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.Response-web_TujuanSasaranPenetapanOpdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.ValidationErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/opd/tujuan/sync": {
             "post": {
                 "description": "Sinkron data penetapan tujuan OPD berdasarkan kode OPD dan tahun dari perencanaan",
@@ -877,6 +928,10 @@
                     "type": "integer",
                     "example": 3
                 },
+                "indikator_renja_individu": {
+                    "type": "integer",
+                    "example": 6
+                },
                 "renaksi": {
                     "type": "integer",
                     "example": 3
@@ -892,6 +947,10 @@
                 "target": {
                     "type": "integer",
                     "example": 4
+                },
+                "target_renja_individu": {
+                    "type": "integer",
+                    "example": 6
                 }
             }
         },
@@ -962,6 +1021,14 @@
             "properties": {
                 "data": {
                     "$ref": "#/definitions/web.TujuanPenetapanOpdResponse"
+                }
+            }
+        },
+        "github_com_bappeda-dev-team_penetapan-service_internal_model_web.Response-web_TujuanSasaranPenetapanOpdResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/web.TujuanSasaranPenetapanOpdResponse"
                 }
             }
         },
@@ -1181,6 +1248,29 @@
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/web.TargetPkResponse"
+                    }
+                }
+            }
+        },
+        "web.IndikatorRenja": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "indikator": {
+                    "type": "string",
+                    "example": "INDIKATOR-PROGRAM-1"
+                },
+                "kode_indikator": {
+                    "type": "string",
+                    "example": "IND-RENJA-123"
+                },
+                "targets": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/web.TargetRenja"
                     }
                 }
             }
@@ -1479,9 +1569,39 @@
                     "type": "integer",
                     "example": 1
                 },
+                "indikator_kegiatans": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/web.IndikatorRenja"
+                    }
+                },
+                "indikator_programs": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/web.IndikatorRenja"
+                    }
+                },
+                "indikator_subkegiatans": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/web.IndikatorRenja"
+                    }
+                },
                 "kode_kegiatan": {
                     "type": "string",
                     "example": "8.01.05.2.01"
+                },
+                "kode_pagu_kegiatan": {
+                    "type": "string",
+                    "example": "PAGU-KEG-xxxx"
+                },
+                "kode_pagu_program": {
+                    "type": "string",
+                    "example": "PAGU-PRG-xxxx"
+                },
+                "kode_pagu_subkegiatan": {
+                    "type": "string",
+                    "example": "PAGU-SUBKEG-xxxx"
                 },
                 "kode_pk": {
                     "type": "string",
@@ -1749,6 +1869,10 @@
                     "type": "string",
                     "example": "SAS-001"
                 },
+                "kode_tujuan_opd": {
+                    "type": "string",
+                    "example": "TUJ-OPD-123"
+                },
                 "periode": {
                     "type": "string",
                     "example": "2025-2029"
@@ -1975,6 +2099,31 @@
                 }
             }
         },
+        "web.TargetRenja": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "kode_target": {
+                    "type": "string",
+                    "example": "TRG-RENJA-123"
+                },
+                "satuan": {
+                    "type": "string",
+                    "example": "%"
+                },
+                "tahun": {
+                    "type": "integer",
+                    "example": 2026
+                },
+                "target": {
+                    "type": "number",
+                    "example": 12
+                }
+            }
+        },
         "web.TujuanOpdResponse": {
             "type": "object",
             "properties": {
@@ -2079,6 +2228,66 @@
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/web.TujuanPemdaResponse"
+                    }
+                },
+                "versi": {
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
+        "web.TujuanSasaranOpdResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "indikators": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/web.IndikatorTujuanPenetapanResponse"
+                    }
+                },
+                "kode_tujuan_opd": {
+                    "type": "string",
+                    "example": "TUJ-001"
+                },
+                "periode": {
+                    "type": "string",
+                    "example": "2025-2029"
+                },
+                "sasaran_opds": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/web.SasaranOpdResponse"
+                    }
+                },
+                "tujuan_opd": {
+                    "type": "string",
+                    "example": "Meningkatkan kualitas pelayanan publik"
+                }
+            }
+        },
+        "web.TujuanSasaranPenetapanOpdResponse": {
+            "type": "object",
+            "properties": {
+                "is_locked": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "kode_opd": {
+                    "type": "string",
+                    "example": "1.02.0.00.0.00.01.0000"
+                },
+                "tahun_aktif": {
+                    "type": "integer",
+                    "example": 2025
+                },
+                "tujuan_opds": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/web.TujuanSasaranOpdResponse"
                     }
                 },
                 "versi": {

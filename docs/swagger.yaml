@@ -70,6 +70,9 @@ definitions:
       indikator:
         example: 3
         type: integer
+      indikator_renja_individu:
+        example: 6
+        type: integer
       renaksi:
         example: 3
         type: integer
@@ -81,6 +84,9 @@ definitions:
         type: integer
       target:
         example: 4
+        type: integer
+      target_renja_individu:
+        example: 6
         type: integer
     type: object
   github_com_bappeda-dev-team_penetapan-service_internal_individu_web.ValidationErrorResponse:
@@ -127,6 +133,11 @@ definitions:
     properties:
       data:
         $ref: '#/definitions/web.TujuanPenetapanOpdResponse'
+    type: object
+  github_com_bappeda-dev-team_penetapan-service_internal_model_web.Response-web_TujuanSasaranPenetapanOpdResponse:
+    properties:
+      data:
+        $ref: '#/definitions/web.TujuanSasaranPenetapanOpdResponse'
     type: object
   github_com_bappeda-dev-team_penetapan-service_internal_model_web.ValidationErrorResponse:
     properties:
@@ -273,6 +284,22 @@ definitions:
       target_pk:
         items:
           $ref: '#/definitions/web.TargetPkResponse'
+        type: array
+    type: object
+  web.IndikatorRenja:
+    properties:
+      id:
+        example: 1
+        type: integer
+      indikator:
+        example: INDIKATOR-PROGRAM-1
+        type: string
+      kode_indikator:
+        example: IND-RENJA-123
+        type: string
+      targets:
+        items:
+          $ref: '#/definitions/web.TargetRenja'
         type: array
     type: object
   web.IndikatorRenjaResponse:
@@ -483,8 +510,29 @@ definitions:
       id:
         example: 1
         type: integer
+      indikator_kegiatans:
+        items:
+          $ref: '#/definitions/web.IndikatorRenja'
+        type: array
+      indikator_programs:
+        items:
+          $ref: '#/definitions/web.IndikatorRenja'
+        type: array
+      indikator_subkegiatans:
+        items:
+          $ref: '#/definitions/web.IndikatorRenja'
+        type: array
       kode_kegiatan:
         example: 8.01.05.2.01
+        type: string
+      kode_pagu_kegiatan:
+        example: PAGU-KEG-xxxx
+        type: string
+      kode_pagu_program:
+        example: PAGU-PRG-xxxx
+        type: string
+      kode_pagu_subkegiatan:
+        example: PAGU-SUBKEG-xxxx
         type: string
       kode_pk:
         example: RK-001
@@ -672,6 +720,9 @@ definitions:
       kode_sasaran_opd:
         example: SAS-001
         type: string
+      kode_tujuan_opd:
+        example: TUJ-OPD-123
+        type: string
       periode:
         example: 2025-2029
         type: string
@@ -831,6 +882,24 @@ definitions:
         example: 95
         type: number
     type: object
+  web.TargetRenja:
+    properties:
+      id:
+        example: 1
+        type: integer
+      kode_target:
+        example: TRG-RENJA-123
+        type: string
+      satuan:
+        example: '%'
+        type: string
+      tahun:
+        example: 2026
+        type: integer
+      target:
+        example: 12
+        type: number
+    type: object
   web.TujuanOpdResponse:
     properties:
       id:
@@ -905,6 +974,48 @@ definitions:
       tujuan_pemdas:
         items:
           $ref: '#/definitions/web.TujuanPemdaResponse'
+        type: array
+      versi:
+        example: 1
+        type: integer
+    type: object
+  web.TujuanSasaranOpdResponse:
+    properties:
+      id:
+        example: 1
+        type: integer
+      indikators:
+        items:
+          $ref: '#/definitions/web.IndikatorTujuanPenetapanResponse'
+        type: array
+      kode_tujuan_opd:
+        example: TUJ-001
+        type: string
+      periode:
+        example: 2025-2029
+        type: string
+      sasaran_opds:
+        items:
+          $ref: '#/definitions/web.SasaranOpdResponse'
+        type: array
+      tujuan_opd:
+        example: Meningkatkan kualitas pelayanan publik
+        type: string
+    type: object
+  web.TujuanSasaranPenetapanOpdResponse:
+    properties:
+      is_locked:
+        example: true
+        type: boolean
+      kode_opd:
+        example: 1.02.0.00.0.00.01.0000
+        type: string
+      tahun_aktif:
+        example: 2025
+        type: integer
+      tujuan_opds:
+        items:
+          $ref: '#/definitions/web.TujuanSasaranOpdResponse'
         type: array
       versi:
         example: 1
@@ -1274,6 +1385,41 @@ paths:
           schema:
             $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.ErrorResponse'
       summary: Get tujuan OPD penetapan
+      tags:
+      - OPD
+  /opd/tujuan-with-sasaran:
+    get:
+      consumes:
+      - application/json
+      description: Mengambil data tujuan dan sasaran OPD berdasarkan kode OPD dan
+        tahun penetapan
+      parameters:
+      - description: Kode OPD
+        in: query
+        name: kodeOpd
+        required: true
+        type: string
+      - description: Tahun Penetapan
+        in: query
+        name: tahun
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Berhasil mengambil data tujuan OPD
+          schema:
+            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.Response-web_TujuanSasaranPenetapanOpdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.ValidationErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.ErrorResponse'
+      summary: Get tujuan sasaran OPD penetapan
       tags:
       - OPD
   /opd/tujuan/sync:
