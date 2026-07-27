@@ -442,39 +442,55 @@ func (s *PenetapanIndividuService) FindRenjaIndividu(
 			append(targetMap[t.IndikatorRenjaIndividuID], t)
 	}
 
-	indikatorMap := make(map[int64][]domain.IndikatorRenjaIndividu)
+	type indikatorGroup struct {
+		Programs     []web.IndikatorRenja
+		Kegiatans    []web.IndikatorRenja
+		Subkegiatans []web.IndikatorRenja
+	}
+
+	indikatorMap := map[int64]indikatorGroup{}
 
 	for _, ind := range indikators {
-		ind.Targets = targetMap[ind.ID]
-		indikatorMap[ind.RenjaIndividuID] =
-			append(indikatorMap[ind.RenjaIndividuID], ind)
+		var targets []web.TargetRenja
+
+		for _, t := range targetMap[ind.ID] {
+			targets = append(targets, web.TargetRenja{
+				Id:         t.ID,
+				KodeTarget: t.KodeTargetRenja,
+				Target:     t.Target,
+				Satuan:     t.Satuan,
+				Tahun:      t.Tahun,
+			})
+		}
+
+		dto := web.IndikatorRenja{
+			Id:            ind.ID,
+			KodeIndikator: ind.KodeIndikatorRenja,
+			Indikator:     ind.Indikator,
+			Targets:       targets,
+		}
+
+		group := indikatorMap[ind.RenjaIndividuID]
+
+		switch ind.JenisIndikator {
+		case "PROGRAM":
+			group.Programs = append(group.Programs, dto)
+
+		case "KEGIATAN":
+			group.Kegiatans = append(group.Kegiatans, dto)
+
+		case "SUB-KEGIATAN":
+			group.Subkegiatans = append(group.Subkegiatans, dto)
+		}
+
+		indikatorMap[ind.RenjaIndividuID] = group
 	}
 
 	// To Response DTO
 	// pk -> response
 	renjaIndividus := make([]web.RenjaIndividu, 0, len(renjas))
 	for _, renja := range renjas {
-		var indikatorResponses []web.IndikatorRenja
-		for _, ind := range indikatorMap[renja.Id] {
-			var targetResponses []web.TargetRenja
-
-			for _, target := range ind.Targets {
-				targetResponses = append(targetResponses, web.TargetRenja{
-					Id:         target.ID,
-					KodeTarget: target.KodeTargetRenja,
-					Target:     target.Target,
-					Satuan:     target.Satuan,
-					Tahun:      target.Tahun,
-				})
-			}
-
-			indikatorResponses = append(indikatorResponses, web.IndikatorRenja{
-				Id:            ind.ID,
-				KodeIndikator: ind.KodeIndikatorRenja,
-				Indikator:     ind.Indikator,
-				Targets:       targetResponses,
-			})
-		}
+		group := indikatorMap[renja.Id]
 
 		renjaIndividus = append(renjaIndividus, web.RenjaIndividu{
 			Id:          renja.Id,
@@ -487,17 +503,19 @@ func (s *PenetapanIndividuService) FindRenjaIndividu(
 			NamaProgram:       renja.NamaProgram,
 			KodePaguProgram:   renja.KodePaguProgram,
 			PaguProgram:       renja.PaguProgram,
-			IndikatorPrograms: indikatorResponses,
+			IndikatorPrograms: group.Programs,
 
-			KodeKegiatan:     renja.KodeKegiatan,
-			NamaKegiatan:     renja.NamaKegiatan,
-			KodePaguKegiatan: renja.KodePaguKegiatan,
-			PaguKegiatan:     renja.PaguKegiatan,
+			KodeKegiatan:       renja.KodeKegiatan,
+			NamaKegiatan:       renja.NamaKegiatan,
+			KodePaguKegiatan:   renja.KodePaguKegiatan,
+			PaguKegiatan:       renja.PaguKegiatan,
+			IndikatorKegiatans: group.Kegiatans,
 
-			KodeSubkegiatan:     renja.KodeSubkegiatan,
-			NamaSubkegiatan:     renja.NamaSubkegiatan,
-			KodePaguSubkegiatan: renja.KodePaguSubkegiatan,
-			PaguSubkegiatan:     renja.PaguSubkegiatan,
+			KodeSubkegiatan:       renja.KodeSubkegiatan,
+			NamaSubkegiatan:       renja.NamaSubkegiatan,
+			KodePaguSubkegiatan:   renja.KodePaguSubkegiatan,
+			PaguSubkegiatan:       renja.PaguSubkegiatan,
+			IndikatorSubkegiatans: group.Subkegiatans,
 		})
 	}
 

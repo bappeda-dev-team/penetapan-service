@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log/slog"
 	"strconv"
+	"strings"
 
 	"github.com/bappeda-dev-team/penetapan-service/internal/individu/client"
 	"github.com/bappeda-dev-team/penetapan-service/internal/individu/domain"
@@ -208,7 +209,7 @@ func (ex *RenjaIndividuSyncExecutor) saveIndikatorRenja(
 
 		for _, target := range ind.Targets {
 			kodeTarget := fmt.Sprintf("TGT-%s", target.Id)
-			targetFloat, err := strconv.ParseFloat(target.Target, 64)
+			targetFloat, err := ParseTargetFloat(target.Target)
 			if err != nil {
 				return fmt.Errorf(
 					"invalid target indikator %q value %q",
@@ -236,4 +237,16 @@ func (ex *RenjaIndividuSyncExecutor) saveIndikatorRenja(
 	}
 
 	return nil
+}
+
+func ParseTargetFloat(s string) (float64, error) {
+	s = strings.TrimSpace(s)
+
+	// Hanya ubah 10,5 -> 10.5
+	if strings.Count(s, ",") == 1 &&
+		!strings.Contains(s, ".") {
+		s = strings.Replace(s, ",", ".", 1)
+	}
+
+	return strconv.ParseFloat(s, 64)
 }
