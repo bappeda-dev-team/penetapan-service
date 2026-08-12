@@ -8,6 +8,7 @@ import (
 
 	"github.com/bappeda-dev-team/penetapan-service/internal/individu/client"
 	"github.com/bappeda-dev-team/penetapan-service/internal/individu/domain"
+	"github.com/bappeda-dev-team/penetapan-service/internal/individu/helper"
 	"github.com/bappeda-dev-team/penetapan-service/internal/individu/repository"
 	"github.com/bappeda-dev-team/penetapan-service/internal/individu/web"
 	"github.com/bappeda-dev-team/penetapan-service/internal/kode"
@@ -109,7 +110,7 @@ func (ex *PkSyncExecutor) Sync(
 			}
 			summary.AddIndikator(1)
 			for _, tgt := range ind.Targets {
-				targetFloat, errConv := strconv.ParseFloat(tgt.Target, 64)
+				targetFloat, errConv := helper.ParseFloat(tgt.Target)
 				if errConv != nil {
 					return web.SyncPenetapanSummary{}, errConv
 				}

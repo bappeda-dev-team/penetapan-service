@@ -190,6 +190,7 @@ func (s *PenetapanIndividuService) SyncPenetapanPkIndividu(
 
 	executor, err := s.SyncExecutor.Get(jenisPenetapan)
 	if err != nil {
+		s.Logger.Warn("ERROR-SYNC", "error", err, "service", "perencanaan", "jenisPenetapan", jenisPenetapan)
 		return web.SyncPenetapanResponse{}, err
 	}
 

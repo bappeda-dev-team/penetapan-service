@@ -52,13 +52,14 @@ func (c *Client) SyncPkPenetapan(
 	// send request
 	res, err := c.HttpClient.Do(req)
 	if err != nil {
+		log.Printf("ERROR SYNC TO PERENCANAAN: %v", err)
 		return nil, fmt.Errorf("Request gagal: %w", err)
 	}
 	defer res.Body.Close()
 
 	// response status
 	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("Request ke pk penetapan gagal. status: %d", res.StatusCode)
+		return nil, fmt.Errorf("Request ke perencanaan individu gagal. status: %d", res.StatusCode)
 	}
 
 	type wrapper struct {
