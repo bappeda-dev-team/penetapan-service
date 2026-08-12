@@ -11,6 +11,7 @@ import (
 	"github.com/bappeda-dev-team/penetapan-service/internal/common"
 	"github.com/bappeda-dev-team/penetapan-service/internal/pemda/client"
 	"github.com/bappeda-dev-team/penetapan-service/internal/pemda/domain"
+	"github.com/bappeda-dev-team/penetapan-service/internal/pemda/helper"
 	helperPemda "github.com/bappeda-dev-team/penetapan-service/internal/pemda/helper"
 	"github.com/bappeda-dev-team/penetapan-service/internal/pemda/repository"
 	"github.com/bappeda-dev-team/penetapan-service/internal/pemda/web"
@@ -122,10 +123,9 @@ func (ex *SasaranSyncExecutor) Sync(
 			summary.AddIndikator(1)
 
 			for _, target := range indikator.TargetPenetapan {
-				tahun, err := strconv.Atoi(target.Tahun)
-				if err != nil {
-					return web.SyncPenetapanSummary{}, fmt.Errorf(
-						"tahun target indikator sasaran %q tidak valid: %w", indikator.Indikator, err)
+				tahun, errTahun := helper.ParseTahun(target.Tahun)
+				if errTahun != nil {
+					return web.SyncPenetapanSummary{}, errTahun
 				}
 
 				if _, err := ex.Repo.SaveTargetIndikatorSasaranPemdaPenetapan(

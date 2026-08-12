@@ -11,6 +11,7 @@ import (
 	"github.com/bappeda-dev-team/penetapan-service/internal/model/domain"
 	"github.com/bappeda-dev-team/penetapan-service/internal/model/web"
 	"github.com/bappeda-dev-team/penetapan-service/internal/repository"
+	"github.com/bappeda-dev-team/penetapan-service/internal/service/opd/helper"
 )
 
 type SasaranSyncExecutor struct {
@@ -230,21 +231,13 @@ func (ex *SasaranSyncExecutor) toIndikatorSasaranSnapshot(ind perencanaan.Indika
 func (ex *SasaranSyncExecutor) toTargetSnapshots(targets []perencanaan.TargetResponse, namaIndikator string, createdBy *string) ([]domain.TargetIndikatorSasaranPenetapanOpd, error) {
 	result := make([]domain.TargetIndikatorSasaranPenetapanOpd, 0, len(targets))
 	for _, tgt := range targets {
-		tahunTarget, err := strconv.Atoi(tgt.Tahun)
-		if err != nil {
-			return nil, fmt.Errorf(
-				"invalid tahun indikator %q value %q",
-				namaIndikator,
-				tgt.TargetIndikator,
-			)
+		tahunTarget, errTahun := helper.ParseTahun(tgt.Tahun)
+		if errTahun != nil {
+			return nil, errTahun
 		}
-		target, err := strconv.ParseFloat(tgt.TargetIndikator, 64)
-		if err != nil {
-			return nil, fmt.Errorf(
-				"invalid target indikator %q value %q",
-				namaIndikator,
-				tgt.TargetIndikator,
-			)
+		target, errConv := helper.ParseFloat(tgt.TargetIndikator)
+		if errConv != nil {
+			return nil, errConv
 		}
 		tgtSnapshot := ex.toTargetIndikatorSasaranSnapshot(tgt, tahunTarget, target, createdBy)
 		result = append(result, tgtSnapshot)
