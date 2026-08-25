@@ -432,8 +432,8 @@ func (app *Application) RenaksiIndividuHandler(
 
 // UpdateRekinIndividuHandler godoc
 //
-// @Summary     Sync Rekin individu
-// @Description Sinkron data pk penetapan berdasarkan id_pegawai, kode OPD dan tahun penetapan
+// @Summary     Archive Rekin individu
+// @Description Arsipkan data pk penetapan berdasarkan id_pegawai, kode OPD dan tahun penetapan
 // @Tags        Individu
 // @Accept      json
 // @Produce     json
@@ -444,7 +444,7 @@ func (app *Application) RenaksiIndividuHandler(
 // @Failure     400 {object} web.ValidationErrorResponse                "Bad Request"
 // @Failure     500 {object} web.ErrorResponse                          "Internal Server Error"
 //
-// @Router      /individu/rekin/update [put]
+// @Router      /individu/rekin/archive [put]
 func (app *Application) UpdateRekinIndividuHandler(
 	w http.ResponseWriter,
 	r *http.Request,
