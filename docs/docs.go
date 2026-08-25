@@ -148,6 +148,71 @@ const docTemplate = `{
                 }
             }
         },
+        "/individu/renaksi": {
+            "get": {
+                "description": "Mengambil data rencana aksi individu berdasarkan id_pegawai, kode OPD, bulan renaksi dan tahun penetapan",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Individu"
+                ],
+                "summary": "Get rencana kinerja individu penetapan",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Id Pegawai",
+                        "name": "pegawaiId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Kode OPD",
+                        "name": "kodeOpd",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Bulan Renaksi",
+                        "name": "bulan",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Tahun Penetapan",
+                        "name": "tahun",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Berhasil mengambil data rekin individu",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_individu_web.Response-web_RenaksiPenetapanIndividuResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_individu_web.ValidationErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_individu_web.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/individu/renja": {
             "get": {
                 "description": "Mengambil data renja individu berdasarkan id_pegawai, kode OPD dan tahun penetapan",
@@ -364,7 +429,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Sync"
+                    "OPD"
                 ],
                 "summary": "Sync Penetapan Renja OPD",
                 "parameters": [
@@ -461,7 +526,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Sync"
+                    "OPD"
                 ],
                 "summary": "Sync Penetapan Sasaran OPD",
                 "parameters": [
@@ -609,7 +674,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Sync"
+                    "OPD"
                 ],
                 "summary": "Sync Penetapan Tujuan OPD",
                 "parameters": [
@@ -860,6 +925,14 @@ const docTemplate = `{
                 }
             }
         },
+        "github_com_bappeda-dev-team_penetapan-service_internal_individu_web.Response-web_RenaksiPenetapanIndividuResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/web.RenaksiPenetapanIndividuResponse"
+                }
+            }
+        },
         "github_com_bappeda-dev-team_penetapan-service_internal_individu_web.Response-web_RenjaIndividuResponse": {
             "type": "object",
             "properties": {
@@ -871,6 +944,10 @@ const docTemplate = `{
         "github_com_bappeda-dev-team_penetapan-service_internal_individu_web.SyncPenetapanRequest": {
             "type": "object",
             "properties": {
+                "bulan": {
+                    "type": "integer",
+                    "example": 5
+                },
                 "kode_opd": {
                     "type": "string",
                     "example": "1.22.33"
@@ -1505,6 +1582,37 @@ const docTemplate = `{
                 "renaksi": {
                     "type": "string",
                     "example": "terwujudnya xx"
+                }
+            }
+        },
+        "web.RenaksiPenetapanIndividuResponse": {
+            "type": "object",
+            "properties": {
+                "bulan": {
+                    "type": "integer",
+                    "example": 10
+                },
+                "kode_opd": {
+                    "type": "string",
+                    "example": "1.23.456"
+                },
+                "nama": {
+                    "type": "string",
+                    "example": "Pegawai X"
+                },
+                "pegawai_id": {
+                    "type": "string",
+                    "example": "12345"
+                },
+                "rekins": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/web.RekinIndividuResponse"
+                    }
+                },
+                "tahun_aktif": {
+                    "type": "integer",
+                    "example": 2025
                 }
             }
         },

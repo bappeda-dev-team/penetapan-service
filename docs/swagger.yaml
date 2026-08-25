@@ -22,6 +22,11 @@ definitions:
       data:
         $ref: '#/definitions/web.RekinIndividuResponse'
     type: object
+  github_com_bappeda-dev-team_penetapan-service_internal_individu_web.Response-web_RenaksiPenetapanIndividuResponse:
+    properties:
+      data:
+        $ref: '#/definitions/web.RenaksiPenetapanIndividuResponse'
+    type: object
   github_com_bappeda-dev-team_penetapan-service_internal_individu_web.Response-web_RenjaIndividuResponse:
     properties:
       data:
@@ -29,6 +34,9 @@ definitions:
     type: object
   github_com_bappeda-dev-team_penetapan-service_internal_individu_web.SyncPenetapanRequest:
     properties:
+      bulan:
+        example: 5
+        type: integer
       kode_opd:
         example: 1.22.33
         type: string
@@ -464,6 +472,28 @@ definitions:
       renaksi:
         example: terwujudnya xx
         type: string
+    type: object
+  web.RenaksiPenetapanIndividuResponse:
+    properties:
+      bulan:
+        example: 10
+        type: integer
+      kode_opd:
+        example: 1.23.456
+        type: string
+      nama:
+        example: Pegawai X
+        type: string
+      pegawai_id:
+        example: "12345"
+        type: string
+      rekins:
+        items:
+          $ref: '#/definitions/web.RekinIndividuResponse'
+        type: array
+      tahun_aktif:
+        example: 2025
+        type: integer
     type: object
   web.RenaksiPkResponse:
     properties:
@@ -1118,6 +1148,51 @@ paths:
       summary: Sync Rekin individu
       tags:
       - Individu
+  /individu/renaksi:
+    get:
+      consumes:
+      - application/json
+      description: Mengambil data rencana aksi individu berdasarkan id_pegawai, kode
+        OPD, bulan renaksi dan tahun penetapan
+      parameters:
+      - description: Id Pegawai
+        in: query
+        name: pegawaiId
+        required: true
+        type: string
+      - description: Kode OPD
+        in: query
+        name: kodeOpd
+        required: true
+        type: string
+      - description: Bulan Renaksi
+        in: query
+        name: bulan
+        required: true
+        type: integer
+      - description: Tahun Penetapan
+        in: query
+        name: tahun
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Berhasil mengambil data rekin individu
+          schema:
+            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_individu_web.Response-web_RenaksiPenetapanIndividuResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_individu_web.ValidationErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_individu_web.ErrorResponse'
+      summary: Get rencana kinerja individu penetapan
+      tags:
+      - Individu
   /individu/renja:
     get:
       consumes:
@@ -1287,7 +1362,7 @@ paths:
             $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.ErrorResponse'
       summary: Sync Penetapan Renja OPD
       tags:
-      - Sync
+      - OPD
   /opd/sasaran:
     get:
       consumes:
@@ -1352,7 +1427,7 @@ paths:
             $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.ErrorResponse'
       summary: Sync Penetapan Sasaran OPD
       tags:
-      - Sync
+      - OPD
   /opd/tujuan:
     get:
       consumes:
@@ -1452,7 +1527,7 @@ paths:
             $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.ErrorResponse'
       summary: Sync Penetapan Tujuan OPD
       tags:
-      - Sync
+      - OPD
   /pemda/sasaran:
     get:
       consumes:

@@ -533,3 +533,105 @@ func (s *PenetapanIndividuService) FindRenjaIndividu(
 
 	return resp, nil
 }
+
+func (s *PenetapanIndividuService) FindRenaksiIndividu(
+	ctx context.Context,
+	req web.SyncPenetapanRequest,
+) (web.RenaksiPenetapanIndividuResponse, error) {
+	s.Logger.Info("FindRenaksiIndividu")
+
+	snapshot := domain.SnapshotPenetapan{
+		JenisSnapshot: domain.JenisPenetapanPk,
+		PegawaiId:     req.PegawaiId,
+		KodeOpd:       req.KodeOpd,
+		Tahun:         req.Tahun,
+		Bulan:         req.Bulan,
+	}
+	activeSnapshot, err := s.getActiveSnapshot(ctx, snapshot)
+	if err != nil {
+		return web.RenaksiPenetapanIndividuResponse{}, err
+	}
+	snapshot.SnapshotId = &activeSnapshot.Id
+	snapshot.Versi = activeSnapshot.Versi
+
+	pkIndividus, err := s.Repo.FindPkIndividus(ctx, snapshot)
+	if err != nil {
+		return web.RenaksiPenetapanIndividuResponse{}, err
+	}
+	pkIndividuIds := make([]int64, 0, len(pkIndividus))
+	for _, pk := range pkIndividus {
+		pkIndividuIds = append(pkIndividuIds, pk.Id)
+	}
+	renaksis, err := s.Repo.FindRenaksiIndividuByPkIds(ctx, pkIndividuIds)
+	if err != nil {
+		return web.RenaksiPenetapanIndividuResponse{}, err
+	}
+	renaksiIds := make([]int64, 0, len(renaksis))
+	for _, ren := range renaksis {
+		renaksiIds = append(renaksiIds, ren.Id)
+	}
+	pelaksanaans, err := s.Repo.FindPelaksanaanByRenaksiIndividuIdsAndBulan(ctx, renaksiIds, snapshot.Bulan)
+	if err != nil {
+		return web.RenaksiPenetapanIndividuResponse{}, err
+	}
+
+	// To Response DTO
+	// pelaksanaan -> renaksi
+	pelaksanaanMap := make(map[int64][]web.PelaksanaanRenaksiPkResponse)
+	for _, pel := range pelaksanaans {
+		pelaksanaanMap[pel.IdRenaksiIndividu] = append(
+			pelaksanaanMap[pel.IdRenaksiIndividu],
+			web.PelaksanaanRenaksiPkResponse{
+				Id:               pel.Id,
+				KodePelaksanaan:  pel.KodePelaksanaan,
+				BulanPelaksanaan: pel.Bulan,
+				BobotPelaksanaan: pel.Bobot,
+			})
+	}
+	renaksiMap := make(map[int64][]web.RenaksiPkResponse)
+	for _, ren := range renaksis {
+		renaksiMap[ren.IdPk] = append(
+			renaksiMap[ren.IdPk],
+			web.RenaksiPkResponse{
+				Id:              ren.Id,
+				KodeRenaksi:     ren.KodeRenaksi,
+				NamaRenaksi:     ren.NamaRencanaAksi,
+				UrutanRenaksi:   ren.Urutan,
+				AnggaranRenaksi: ren.Anggaran,
+				Pelaksanaans:    pelaksanaanMap[ren.Id],
+			})
+	}
+
+	// pk -> response
+	rekins := make([]web.RekinIndividuResponse, 0, len(pkIndividus))
+
+	for _, pk := range pkIndividus {
+		rekins = append(rekins, web.RekinIndividuResponse{
+			Id:             pk.Id,
+			LevelPk:        pk.LevelPk,
+			KodeSasaranOpd: pk.KodeSasaranOpd,
+			KodePk:         pk.KodePk,
+			Rekin:          pk.NamaPk,
+			KeteranganPk:   pk.KeteranganPk,
+			NamaPemilikPk:  pk.NamaPemilikPk,
+			Versi:          pk.Versi,
+			AnggaranPk:     pk.AnggaranPk,
+			Renaksis:       renaksiMap[pk.Id],
+		})
+	}
+
+	resp := web.RenaksiPenetapanIndividuResponse{
+		IdPegawai:  snapshot.PegawaiId,
+		KodeOpd:    snapshot.KodeOpd,
+		TahunAktif: snapshot.Tahun,
+		Bulan:      snapshot.Bulan,
+		Rekins:     rekins,
+	}
+
+	// untuk cek apkaah request pegawaiId sesuai dengan nama pemilik
+	if len(pkIndividus) > 0 {
+		resp.Nama = pkIndividus[0].NamaPemilikPk
+	}
+
+	return resp, nil
+}

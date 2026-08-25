@@ -33,6 +33,7 @@ type SyncPenetapanRequest struct {
 	PegawaiId string `json:"pegawai_id" example:"199887766"`
 	KodeOpd   string `json:"kode_opd" example:"1.22.33"`
 	Tahun     int    `json:"tahun" example:"2025"`
+	Bulan     int    `json:"bulan" example:"5"`
 }
 
 func ValidateSyncPenetapanRequest(v *validator.Validator, syncRequest *SyncPenetapanRequest) {
