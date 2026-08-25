@@ -42,10 +42,11 @@ func (s *PenetapanIndividuService) FindRekinsIndividu(
 	s.Logger.Info("FindRekinsIndividu")
 
 	snapshot := domain.SnapshotPenetapan{
-		JenisSnapshot: domain.JenisPenetapanPk,
-		PegawaiId:     req.PegawaiId,
-		KodeOpd:       req.KodeOpd,
-		Tahun:         req.Tahun,
+		JenisSnapshot:  domain.JenisPenetapanPk,
+		PegawaiId:      req.PegawaiId,
+		KodeOpd:        req.KodeOpd,
+		Tahun:          req.Tahun,
+		SnapshotStatus: domain.SnapshotStatusActive,
 	}
 	activeSnapshot, err := s.getActiveSnapshot(ctx, snapshot)
 	if err != nil {
@@ -301,7 +302,12 @@ func (s *PenetapanIndividuService) getActiveSnapshot(
 	snap domain.SnapshotPenetapan,
 ) (*domain.ActiveSnapshot, error) {
 
-	snapshot, err := s.Repo.GetActiveSnapshot(ctx, snap.PegawaiId, snap.KodeOpd, snap.Tahun, snap.JenisSnapshot)
+	snapshot, err := s.Repo.GetActiveSnapshot(ctx,
+		snap.PegawaiId,
+		snap.KodeOpd,
+		snap.Tahun,
+		snap.JenisSnapshot,
+	)
 	if err != nil {
 		s.Logger.Error("GetActiveSnapshot")
 		return nil, err
@@ -634,4 +640,44 @@ func (s *PenetapanIndividuService) FindRenaksiIndividu(
 	}
 
 	return resp, nil
+}
+
+func (s *PenetapanIndividuService) UpdatePenetapanPkIndividu(
+	ctx context.Context,
+	req *web.SyncPenetapanRequest,
+) error {
+	// db transaction
+	tx, err := s.Repo.DB.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		_ = tx.Rollback()
+	}()
+
+	// find snapshot
+	snapshot := domain.SnapshotPenetapan{
+		JenisSnapshot: domain.JenisPenetapanPk,
+		PegawaiId:     req.PegawaiId,
+		KodeOpd:       req.KodeOpd,
+		Tahun:         req.Tahun,
+	}
+	activeSnapshot, err := s.getActiveSnapshot(ctx, snapshot)
+	if err != nil {
+		return err
+	}
+	snapshot.Id = activeSnapshot.Id
+	log.Printf("SNAPSHOT: %v", snapshot)
+
+	err = s.Repo.DeactivateOldSnapshot(ctx, tx, snapshot)
+	if err != nil {
+		return err
+	}
+	// commit transaction penetapan tujuan
+	err = tx.Commit()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

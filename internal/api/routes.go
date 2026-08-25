@@ -30,6 +30,7 @@ func (app *Application) Routes() http.Handler {
 	router.HandlerFunc(http.MethodGet, "/individu/renja", app.RenjaIndividuHandler)
 	router.HandlerFunc(http.MethodPost, "/individu/renja/sync", app.SyncRenjaIndividuHandler)
 	router.HandlerFunc(http.MethodGet, "/individu/renaksi", app.RenaksiIndividuHandler)
+	router.HandlerFunc(http.MethodPut, "/individu/rekin/archive", app.UpdateRekinIndividuHandler)
 
 	// opd
 	// renaksi

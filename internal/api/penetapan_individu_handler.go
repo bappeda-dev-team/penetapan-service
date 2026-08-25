@@ -429,3 +429,70 @@ func (app *Application) RenaksiIndividuHandler(
 		return
 	}
 }
+
+// UpdateRekinIndividuHandler godoc
+//
+// @Summary     Sync Rekin individu
+// @Description Sinkron data pk penetapan berdasarkan id_pegawai, kode OPD dan tahun penetapan
+// @Tags        Individu
+// @Accept      json
+// @Produce     json
+//
+// @Param       payload body web.SyncPenetapanRequest true "Payload sync penetapan individu"
+//
+// @Success     200 {object} web.Response[string] 	                "Success"
+// @Failure     400 {object} web.ValidationErrorResponse                "Bad Request"
+// @Failure     500 {object} web.ErrorResponse                          "Internal Server Error"
+//
+// @Router      /individu/rekin/update [put]
+func (app *Application) UpdateRekinIndividuHandler(
+	w http.ResponseWriter,
+	r *http.Request,
+) {
+
+	input := web.SyncPenetapanRequest{}
+	errors := map[string]string{}
+
+	err := app.ReadJSON(w, r, &input)
+	if err != nil {
+		errors["invalid_request"] = err.Error()
+		app.BadRequestResponse(
+			w,
+			r,
+			web.ValidationErrorResponse{
+				Error: errors,
+			},
+		)
+		return
+	}
+
+	request := &web.SyncPenetapanRequest{
+		PegawaiId: input.PegawaiId,
+		KodeOpd:   input.KodeOpd,
+		Tahun:     input.Tahun,
+	}
+	v := validator.New()
+	if web.ValidateSyncPenetapanRequest(v, request); !v.Valid() {
+		app.FailedValidationResponse(w, r, v.Errors)
+		return
+	}
+
+	err = app.IndividuService.UpdatePenetapanPkIndividu(
+		r.Context(),
+		request,
+	)
+	if err != nil {
+		app.ServerErrorResponse(w, r, err)
+		return
+	}
+
+	response := web.Response[string]{
+		Data: "SUCCESS",
+	}
+
+	err = app.WriteJSON(w, http.StatusOK, response, nil)
+	if err != nil {
+		app.ServerErrorResponse(w, r, err)
+		return
+	}
+}
