@@ -120,11 +120,12 @@ func (s *PenetapanIndividuService) FindRekinsIndividu(
 		targetMap[target.IdIndikatorPk] = append(
 			targetMap[target.IdIndikatorPk],
 			web.TargetPkResponse{
-				Id:           target.Id,
-				KodeTargetPk: target.KodeTargetPk,
-				Tahun:        target.Tahun,
-				Target:       target.Target,
-				Satuan:       target.Satuan,
+				Id:                   target.Id,
+				KodeTargetPk:         target.KodeTargetPk,
+				KodeTargetSasaranOpd: target.KodeTargetSasaranOpd,
+				Tahun:                target.Tahun,
+				Target:               target.Target,
+				Satuan:               target.Satuan,
 			})
 	}
 
@@ -135,13 +136,14 @@ func (s *PenetapanIndividuService) FindRekinsIndividu(
 		indikatorMap[indikator.IdPk] = append(
 			indikatorMap[indikator.IdPk],
 			web.IndikatorPkResponse{
-				Id:                  indikator.Id,
-				KodeIndikatorPk:     indikator.KodeIndikatorPk,
-				NamaIndikatorPk:     indikator.NamaIndikatorPk,
-				RumusPerhitungan:    indikator.RumusPerhitungan,
-				SumberData:          indikator.SumberData,
-				DefinisiOperasional: indikator.DefinisiOperasional,
-				TargetPkList:        targetMap[indikator.Id],
+				Id:                      indikator.Id,
+				KodeIndikatorPk:         indikator.KodeIndikatorPk,
+				NamaIndikatorPk:         indikator.NamaIndikatorPk,
+				KodeIndikatorSasaranOpd: indikator.KodeIndikatorSasaranOpd,
+				RumusPerhitungan:        indikator.RumusPerhitungan,
+				SumberData:              indikator.SumberData,
+				DefinisiOperasional:     indikator.DefinisiOperasional,
+				TargetPkList:            targetMap[indikator.Id],
 			},
 		)
 	}

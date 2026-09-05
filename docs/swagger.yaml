@@ -272,6 +272,9 @@ definitions:
       kode_indikator_pk:
         example: IKU-001
         type: string
+      kode_indikator_sasaran_opd:
+        example: IND-SAS-1
+        type: string
       nama_indikator_pk:
         example: Persentase kepuasan masyarakat
         type: string
@@ -871,6 +874,9 @@ definitions:
         type: integer
       kode_target_pk:
         example: TGT-001
+        type: string
+      kode_target_sasaran_opd:
+        example: TGT-SAS-1
         type: string
       satuan:
         example: persen

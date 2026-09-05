@@ -1232,6 +1232,10 @@
                     "type": "string",
                     "example": "IKU-001"
                 },
+                "kode_indikator_sasaran_opd": {
+                    "type": "string",
+                    "example": "IND-SAS-1"
+                },
                 "nama_indikator_pk": {
                     "type": "string",
                     "example": "Persentase kepuasan masyarakat"
@@ -2084,6 +2088,10 @@
                 "kode_target_pk": {
                     "type": "string",
                     "example": "TGT-001"
+                },
+                "kode_target_sasaran_opd": {
+                    "type": "string",
+                    "example": "TGT-SAS-1"
                 },
                 "satuan": {
                     "type": "string",

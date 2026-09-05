@@ -120,6 +120,7 @@ func (repo *PenetapanIndividuRepository) FindIndikatorPkByPkIds(
 			tahun_aktif,
 			kode_indikator_pk,
 			nama_indikator_pk,
+			kode_indikator_sasaran_opd,
 			rumus_perhitungan,
 			sumber_data,
 			definisi_operasional,
@@ -149,6 +150,7 @@ func (repo *PenetapanIndividuRepository) FindIndikatorPkByPkIds(
 			&item.TahunAktif,
 			&item.KodeIndikatorPk,
 			&item.NamaIndikatorPk,
+			&item.KodeIndikatorSasaranOpd,
 			&item.RumusPerhitungan,
 			&item.SumberData,
 			&item.DefinisiOperasional,
@@ -195,6 +197,7 @@ func (repo *PenetapanIndividuRepository) FindTargetPkByIndikatorIds(
 			id,
 			indikator_pk_id,
 			kode_target_pk,
+			kode_target_sasaran_opd,
 			tahun,
 			target,
 			satuan,
@@ -221,6 +224,7 @@ func (repo *PenetapanIndividuRepository) FindTargetPkByIndikatorIds(
 			&item.Id,
 			&item.IdIndikatorPk,
 			&item.KodeTargetPk,
+			&item.KodeTargetSasaranOpd,
 			&item.Tahun,
 			&item.Target,
 			&item.Satuan,
@@ -309,13 +313,14 @@ func (repo *PenetapanIndividuRepository) SaveIndikatorPkPenetapan(
 			tahun_aktif,
 			kode_indikator_pk,
 			nama_indikator_pk,
+			kode_indikator_sasaran_opd,
 			rumus_perhitungan,
 			sumber_data,
 			definisi_operasional,
 			created_by
 		) VALUES (
 			$1, $2, $3, $4, $5,
-			$6, $7, $8, $9
+			$6, $7, $8, $9, $10
 		)
 		RETURNING id
 	`
@@ -330,6 +335,7 @@ func (repo *PenetapanIndividuRepository) SaveIndikatorPkPenetapan(
 		req.TahunAktif,
 		req.KodeIndikatorPk,
 		req.NamaIndikatorPk,
+		req.KodeIndikatorSasaranOpd,
 		req.RumusPerhitungan,
 		req.SumberData,
 		req.DefinisiOperasional,
@@ -352,12 +358,13 @@ func (repo *PenetapanIndividuRepository) SaveTargetPkPenetapan(
 		INSERT INTO target_pk (
 			indikator_pk_id,
 			kode_target_pk,
+			kode_target_sasaran_opd,
 			tahun,
 			target,
 			satuan,
 			created_by
 		) VALUES (
-			$1, $2, $3, $4, $5, $6
+			$1, $2, $3, $4, $5, $6, $7
 		)
 		RETURNING id
 	`
@@ -369,6 +376,7 @@ func (repo *PenetapanIndividuRepository) SaveTargetPkPenetapan(
 		query,
 		req.IdIndikatorPk,
 		req.KodeTargetPk,
+		req.KodeTargetSasaranOpd,
 		req.Tahun,
 		req.Target,
 		req.Satuan,

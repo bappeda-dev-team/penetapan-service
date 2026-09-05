@@ -5,7 +5,9 @@ import (
 	"database/sql"
 	"log/slog"
 	"strconv"
+	"strings"
 
+	"github.com/bappeda-dev-team/penetapan-service/internal/common"
 	"github.com/bappeda-dev-team/penetapan-service/internal/individu/client"
 	"github.com/bappeda-dev-team/penetapan-service/internal/individu/domain"
 	"github.com/bappeda-dev-team/penetapan-service/internal/individu/helper"
@@ -48,6 +50,12 @@ func (ex *PkSyncExecutor) Sync(
 	pkPegawais, err := ex.Client.SyncPkPenetapan(ctx, request)
 	if err != nil {
 		return web.SyncPenetapanSummary{}, err
+	}
+
+	if !hasValidRekinPk(pkPegawais) {
+		return web.SyncPenetapanSummary{}, common.NewValidation(
+			"tidak ada data penetapan rekin individu yang siap disinkronkan",
+		)
 	}
 
 	// db transaction
@@ -97,12 +105,13 @@ func (ex *PkSyncExecutor) Sync(
 		summary.AddRekin(1)
 		for _, ind := range pk.Indikators {
 			indikatorPk := domain.IndikatorPk{
-				IdPk:            pkId,
-				KodeOpd:         snapshot.KodeOpd,
-				TahunAktif:      snapshot.Tahun,
-				KodeIndikatorPk: ind.IdIndikator,
-				NamaIndikatorPk: ind.Indikator,
-				CreatedBy:       &currentUser,
+				IdPk:                    pkId,
+				KodeOpd:                 snapshot.KodeOpd,
+				TahunAktif:              snapshot.Tahun,
+				KodeIndikatorPk:         ind.IdIndikator,
+				NamaIndikatorPk:         ind.Indikator,
+				KodeIndikatorSasaranOpd: kode.KodeIndikatorSasaranOpd(ind.IdIndikatorSasaranOpd),
+				CreatedBy:               &currentUser,
 			}
 			indPkId, err := ex.Repo.SaveIndikatorPkPenetapan(ctx, tx, indikatorPk)
 			if err != nil {
@@ -115,12 +124,13 @@ func (ex *PkSyncExecutor) Sync(
 					return web.SyncPenetapanSummary{}, errConv
 				}
 				targetPk := domain.TargetPk{
-					IdIndikatorPk: indPkId,
-					KodeTargetPk:  tgt.IdTarget,
-					Target:        targetFloat,
-					Satuan:        tgt.Satuan,
-					Tahun:         snapshot.Tahun,
-					CreatedBy:     &currentUser,
+					IdIndikatorPk:        indPkId,
+					KodeTargetPk:         tgt.IdTarget,
+					KodeTargetSasaranOpd: kode.KodeTargetSasaranOpd(tgt.IdTargetSasaranOpd),
+					Target:               targetFloat,
+					Satuan:               tgt.Satuan,
+					Tahun:                snapshot.Tahun,
+					CreatedBy:            &currentUser,
 				}
 				_, err := ex.Repo.SaveTargetPkPenetapan(ctx, tx, targetPk)
 				if err != nil {
@@ -198,4 +208,38 @@ func (ex *PkSyncExecutor) createActiveSnapshot(
 	}
 
 	return snapshotID, nil
+}
+
+func hasValidRekinPk(pkPegawais []client.PkPenetapanResponse) bool {
+	for _, pk := range pkPegawais {
+		if strings.TrimSpace(pk.RekinPemilikPk) == "" {
+			continue
+		}
+
+		for _, ind := range pk.Indikators {
+			if strings.TrimSpace(ind.Indikator) == "" || len(ind.Targets) == 0 {
+				continue
+			}
+			for _, tgt := range ind.Targets {
+				if isValidTargetPk(tgt) {
+					return true
+				}
+			}
+		}
+
+		for _, ren := range pk.Renaksis {
+			if strings.TrimSpace(ren.NamaRencanaAksi) != "" {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func isValidTargetPk(tgt client.TargetIndPk) bool {
+	val, err := helper.ParseFloat(tgt.Target)
+	if err != nil {
+		return false
+	}
+	return val != 0 && strings.TrimSpace(tgt.Satuan) != ""
 }
