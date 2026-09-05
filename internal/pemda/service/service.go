@@ -185,6 +185,7 @@ func (s *PenetapanPemdaService) FindSasaranPemda(
 	for _, sasaran := range sasarans {
 		response = append(response, web.SasaranPemdaResponse{
 			Id:               sasaran.Id,
+			KodeTujuanPemda:  sasaran.KodeTujuanPemda,
 			KodeSasaranPemda: sasaran.KodeSasaranPemda,
 			SasaranPemda:     sasaran.SasaranPemda,
 			Periode:          sasaran.Periode,
@@ -393,4 +394,55 @@ func (s *PenetapanPemdaService) failSync(ctx context.Context, syncId int64, caus
 		return updateErr
 	}
 	return cause
+}
+
+func (s *PenetapanPemdaService) FindTujuanSasaranPemda(
+	ctx context.Context,
+	tahun int,
+) (web.TujuanSasaranPenetapanPemdaResponse, error) {
+	tujuans, err := s.FindTujuanPemda(ctx, tahun)
+	if err != nil {
+		s.Logger.Error("FindTujuanPemda")
+		return web.TujuanSasaranPenetapanPemdaResponse{}, err
+	}
+
+	sasarans, err := s.FindSasaranPemda(ctx, tahun)
+	if err != nil {
+		s.Logger.Error("FindSasaranPemda")
+		return web.TujuanSasaranPenetapanPemdaResponse{}, err
+	}
+
+	sasaranMap := make(map[string][]web.SasaranPemdaResponse)
+
+	for _, sasaran := range sasarans.Sasarans {
+		sasaranMap[sasaran.KodeTujuanPemda] = append(
+			sasaranMap[sasaran.KodeTujuanPemda],
+			sasaran,
+		)
+	}
+
+	response := make(
+		[]web.TujuanWithSasaranPemdaResponse,
+		0,
+		len(tujuans.Tujuans),
+	)
+	for _, tujuan := range tujuans.Tujuans {
+		response = append(response, web.TujuanWithSasaranPemdaResponse{
+			Id:              tujuan.Id,
+			KodeTujuanPemda: tujuan.KodeTujuanPemda,
+			Visi:            tujuan.Visi,
+			Misi:            tujuan.Misi,
+			TujuanPemda:     tujuan.TujuanPemda,
+			Periode:         tujuan.Periode,
+			Indikator:       tujuan.Indikator,
+			SasaranPemda:    sasaranMap[tujuan.KodeTujuanPemda],
+		})
+	}
+
+	return web.TujuanSasaranPenetapanPemdaResponse{
+		TahunAktif: tahun,
+		Versi:      tujuans.Versi,
+		IsLocked:   true,
+		Tujuans:    response,
+	}, nil
 }

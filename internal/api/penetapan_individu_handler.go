@@ -353,3 +353,178 @@ func (app *Application) RenjaIndividuHandler(
 		return
 	}
 }
+
+// RenaksiIndividuHandler godoc
+//
+// @Summary     Get rencana kinerja individu penetapan
+// @Description Mengambil data rencana aksi individu berdasarkan id_pegawai, kode OPD, bulan renaksi dan tahun penetapan
+// @Tags        Individu
+// @Accept      json
+// @Produce     json
+//
+// @Param       pegawaiId query string true "Id Pegawai"
+// @Param       kodeOpd query string true "Kode OPD"
+// @Param       bulan   query int    true "Bulan Renaksi"
+// @Param       tahun   query int    true "Tahun Penetapan"
+//
+// @Success     200 {object} web.Response[web.RenaksiPenetapanIndividuResponse] 	"Berhasil mengambil data rekin individu"
+// @Failure     400 {object} web.ValidationErrorResponse                		"Bad Request"
+// @Failure     500 {object} web.ErrorResponse                          		"Internal Server Error"
+//
+// @Router      /individu/renaksi [get]
+func (app *Application) RenaksiIndividuHandler(
+	w http.ResponseWriter,
+	r *http.Request,
+) {
+
+	query := r.URL.Query()
+
+	errors := map[string]string{}
+
+	pegawaiId := query.Get("pegawaiId")
+
+	kodeOpd := query.Get("kodeOpd")
+
+	bulanStr := query.Get("bulan")
+
+	tahunStr := query.Get("tahun")
+
+	var bulan, tahun int
+
+	if pegawaiId == "" {
+		errors["pegawaiId"] = "required"
+	}
+
+	if kodeOpd == "" {
+		errors["kodeOpd"] = "required"
+	}
+
+	if bulanStr == "" {
+		errors["bulan"] = "required"
+	} else {
+		parsedBulan, err := strconv.Atoi(bulanStr)
+		if err != nil {
+			errors["bulan"] = "bulan tidak valid"
+		} else {
+			if bulan < 1 || bulan > 12 {
+				errors["bulan"] = "bulan tidak valid"
+			}
+			bulan = parsedBulan
+		}
+	}
+
+	if tahunStr == "" {
+		errors["tahun"] = "required"
+	} else {
+		parsedTahun, err := strconv.Atoi(tahunStr)
+		if err != nil {
+			errors["tahun"] = "tahun tidak valid"
+		} else {
+			tahun = parsedTahun
+		}
+	}
+
+	if len(errors) > 0 {
+		app.BadRequestResponse(
+			w,
+			r,
+			web.ValidationErrorResponse{
+				Error: errors,
+			},
+		)
+		return
+	}
+
+	request := web.SyncPenetapanRequest{
+		PegawaiId: pegawaiId,
+		KodeOpd:   kodeOpd,
+		Tahun:     tahun,
+		Bulan:     bulan,
+	}
+
+	result, err := app.IndividuService.FindRenaksiIndividu(
+		r.Context(),
+		request,
+	)
+	if err != nil {
+		app.ServerErrorResponse(w, r, err)
+		return
+	}
+
+	response := web.Response[web.RenaksiPenetapanIndividuResponse]{
+		Data: result,
+	}
+
+	err = app.WriteJSON(w, http.StatusOK, response, nil)
+	if err != nil {
+		app.ServerErrorResponse(w, r, err)
+		return
+	}
+}
+
+// UpdateRekinIndividuHandler godoc
+//
+// @Summary     Archive Rekin individu
+// @Description Arsipkan data pk penetapan berdasarkan id_pegawai, kode OPD dan tahun penetapan
+// @Tags        Individu
+// @Accept      json
+// @Produce     json
+//
+// @Param       payload body web.SyncPenetapanRequest true "Payload sync penetapan individu"
+//
+// @Success     200 {object} web.Response[string] 	                "Success"
+// @Failure     400 {object} web.ValidationErrorResponse                "Bad Request"
+// @Failure     500 {object} web.ErrorResponse                          "Internal Server Error"
+//
+// @Router      /individu/rekin/archive [put]
+func (app *Application) UpdateRekinIndividuHandler(
+	w http.ResponseWriter,
+	r *http.Request,
+) {
+
+	input := web.SyncPenetapanRequest{}
+	errors := map[string]string{}
+
+	err := app.ReadJSON(w, r, &input)
+	if err != nil {
+		errors["invalid_request"] = err.Error()
+		app.BadRequestResponse(
+			w,
+			r,
+			web.ValidationErrorResponse{
+				Error: errors,
+			},
+		)
+		return
+	}
+
+	request := &web.SyncPenetapanRequest{
+		PegawaiId: input.PegawaiId,
+		KodeOpd:   input.KodeOpd,
+		Tahun:     input.Tahun,
+	}
+	v := validator.New()
+	if web.ValidateSyncPenetapanRequest(v, request); !v.Valid() {
+		app.FailedValidationResponse(w, r, v.Errors)
+		return
+	}
+
+	err = app.IndividuService.UpdatePenetapanPkIndividu(
+		r.Context(),
+		request,
+	)
+	if err != nil {
+		app.ServerErrorResponse(w, r, err)
+		return
+	}
+
+	response := web.Response[string]{
+		Data: "SUCCESS",
+	}
+
+	err = app.WriteJSON(w, http.StatusOK, response, nil)
+	if err != nil {
+		app.ServerErrorResponse(w, r, err)
+		return
+	}
+}

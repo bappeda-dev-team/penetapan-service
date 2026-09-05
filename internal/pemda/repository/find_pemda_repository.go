@@ -144,7 +144,7 @@ func (repo *PenetapanPemdaRepository) FindSasaranPemdaBySnapshot(
 	tahun int,
 ) ([]domain.SasaranPemdaPenetapan, error) {
 	const query = `
-		SELECT id, kode_sasaran_pemda, sasaran_pemda, periode, tahun_aktif,
+		SELECT id, kode_tujuan_pemda, kode_sasaran_pemda, sasaran_pemda, periode, tahun_aktif,
 			created_date, last_modified_date, created_by, penetapan_pemda_id
 		FROM sasaran_pemda_penetapan
 		WHERE penetapan_pemda_id = $1 AND tahun_aktif = $2
@@ -161,6 +161,7 @@ func (repo *PenetapanPemdaRepository) FindSasaranPemdaBySnapshot(
 		var item domain.SasaranPemdaPenetapan
 		if err := rows.Scan(
 			&item.Id,
+			&item.KodeTujuanPemda,
 			&item.KodeSasaranPemda,
 			&item.SasaranPemda,
 			&item.Periode,

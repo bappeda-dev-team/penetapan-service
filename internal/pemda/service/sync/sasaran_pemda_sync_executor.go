@@ -80,6 +80,7 @@ func (ex *SasaranSyncExecutor) Sync(
 
 	summary := SummaryCounter{}
 	for _, sasaran := range sasarans {
+		kodeTujuan := fmt.Sprintf("TUJ-PEMDA-%d", sasaran.TujuanPemdaId)
 		kodeSasaran := fmt.Sprintf("SAS-PEMDA-%d", sasaran.Id)
 		periodeSasaran := fmt.Sprintf("%s-%s",
 			sasaran.Periode.TahunAwal,
@@ -87,6 +88,7 @@ func (ex *SasaranSyncExecutor) Sync(
 		tahunAktif := req.Tahun
 		sasaranClean := helperPemda.TextCleaner(sasaran.SasaranPemda)
 		sasaranPemda := domain.SasaranPemdaPenetapan{
+			KodeTujuanPemda:  kodeTujuan,
 			KodeSasaranPemda: kodeSasaran,
 			SasaranPemda:     sasaranClean,
 			Periode:          periodeSasaran,

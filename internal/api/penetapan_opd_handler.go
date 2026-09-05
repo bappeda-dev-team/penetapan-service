@@ -15,7 +15,7 @@ import (
 //
 // @Summary     Sync Penetapan Sasaran OPD
 // @Description Sinkron data penetapan sasaran OPD berdasarkan kode OPD dan tahun dari perencanaan
-// @Tags        Sync
+// @Tags        OPD
 // @Accept      json
 // @Produce     json
 //
@@ -94,7 +94,7 @@ func (app *Application) SyncPenetapanSasaranOpdHandler(
 //
 // @Summary     Sync Penetapan Tujuan OPD
 // @Description Sinkron data penetapan tujuan OPD berdasarkan kode OPD dan tahun dari perencanaan
-// @Tags        Sync
+// @Tags        OPD
 // @Accept      json
 // @Produce     json
 //
@@ -351,7 +351,7 @@ func (app *Application) SasaranOpdHandler(
 //
 // @Summary     Sync Penetapan Renja OPD
 // @Description Sinkron data penetapan renja OPD berdasarkan kode OPD dan tahun dari perencanaan
-// @Tags        Sync
+// @Tags        OPD
 // @Accept      json
 // @Produce     json
 //

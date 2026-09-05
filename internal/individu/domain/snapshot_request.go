@@ -14,6 +14,7 @@ type SnapshotPenetapan struct {
 	GeneratedAt    time.Time
 	GeneratedBy    *string
 	IsActive       bool
+	Bulan          int
 }
 
 type ActiveSnapshot struct {

@@ -15,14 +15,15 @@ func (repo *PenetapanPemdaRepository) SaveSasaranPemdaPenetapan(
 ) (int64, error) {
 	const query = `
 		INSERT INTO sasaran_pemda_penetapan
-			(penetapan_pemda_id, kode_sasaran_pemda, sasaran_pemda, periode, tahun_aktif, created_by)
-		VALUES ($1, $2, $3, $4, $5, $6)
+			(penetapan_pemda_id, kode_tujuan_pemda, kode_sasaran_pemda, sasaran_pemda, periode, tahun_aktif, created_by)
+		VALUES ($1, $2, $3, $4, $5, $6, $7)
 		RETURNING id`
 
 	var id int64
 	if err := tx.QueryRowContext(
 		ctx, query,
 		sasaran.PenetapanPemdaId,
+		sasaran.KodeTujuanPemda,
 		sasaran.KodeSasaranPemda,
 		sasaran.SasaranPemda,
 		sasaran.Periode,

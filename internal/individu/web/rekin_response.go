@@ -8,6 +8,15 @@ type RekinPenetapanIndividuResponse struct {
 	Rekins     []RekinIndividuResponse `json:"rekins"`
 }
 
+type RenaksiPenetapanIndividuResponse struct {
+	IdPegawai  string                  `json:"pegawai_id" example:"12345"`
+	Nama       string                  `json:"nama" example:"Pegawai X"`
+	KodeOpd    string                  `json:"kode_opd" example:"1.23.456"`
+	TahunAktif int                     `json:"tahun_aktif" example:"2025"`
+	Bulan      int                     `json:"bulan" example:"10"`
+	Rekins     []RekinIndividuResponse `json:"rekins"`
+}
+
 type RekinIndividuResponse struct {
 	Id              int64                 `json:"id" example:"1"`
 	LevelPk         int                   `json:"level_pk" example:"2"`

@@ -214,7 +214,7 @@ func (ex *TujuanSyncExecutor) toTujuanSnapshot(
 }
 
 func (ex *TujuanSyncExecutor) toIndikatorTujuanSnapshot(ind perencanaan.IndikatorResponse, kodeOpd string, createdBy *string, tahunAktif int) (domain.IndikatorTujuanPenetapanOpd, error) {
-	targets, err := ex.toTargetSnapshots(ind.Target, ind.NamaIndikator, createdBy)
+	targets, err := ex.toTargetSnapshots(ind.Target, createdBy)
 	if err != nil {
 		return domain.IndikatorTujuanPenetapanOpd{}, err
 	}
@@ -232,7 +232,7 @@ func (ex *TujuanSyncExecutor) toIndikatorTujuanSnapshot(ind perencanaan.Indikato
 	}, nil
 }
 
-func (ex *TujuanSyncExecutor) toTargetSnapshots(targets []perencanaan.TargetResponse, namaIndikator string, createdBy *string) ([]domain.TargetIndikatorTujuanPenetapanOpd, error) {
+func (ex *TujuanSyncExecutor) toTargetSnapshots(targets []perencanaan.TargetResponse, createdBy *string) ([]domain.TargetIndikatorTujuanPenetapanOpd, error) {
 	result := make([]domain.TargetIndikatorTujuanPenetapanOpd, 0, len(targets))
 	for _, tgt := range targets {
 		tahunTarget, errTahun := helper.ParseTahun(tgt.Tahun)

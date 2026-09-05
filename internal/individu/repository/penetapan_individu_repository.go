@@ -597,3 +597,68 @@ func (repo *PenetapanIndividuRepository) FindPelaksanaanByRenaksiIndividuIds(
 
 	return result, nil
 }
+
+func (repo *PenetapanIndividuRepository) FindPelaksanaanByRenaksiIndividuIdsAndBulan(
+	ctx context.Context,
+	renaksiIds []int64,
+	bulan int,
+) ([]domain.PelaksanaanRenaksi, error) {
+	if len(renaksiIds) == 0 {
+		return []domain.PelaksanaanRenaksi{}, nil
+	}
+
+	placeholders := make([]string, len(renaksiIds))
+	args := make([]any, 0, len(renaksiIds)+1)
+
+	for i, id := range renaksiIds {
+		placeholders[i] = fmt.Sprintf("$%d", i+1)
+		args = append(args, id)
+	}
+
+	// bulan menjadi parameter terakhir
+	args = append(args, bulan)
+	bulanPlaceholder := fmt.Sprintf("$%d", len(args))
+
+	query := fmt.Sprintf(`
+		SELECT
+			id,
+			kode_pelaksanaan,
+			renaksi_individu_id,
+			bulan,
+			bobot
+		FROM renaksi_individu_pelaksanaan
+		WHERE renaksi_individu_id IN (%s)
+		  AND bulan = %s
+		ORDER BY renaksi_individu_id, bulan
+	`, strings.Join(placeholders, ","), bulanPlaceholder)
+
+	rows, err := repo.DB.QueryContext(ctx, query, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	result := make([]domain.PelaksanaanRenaksi, 0)
+
+	for rows.Next() {
+		var item domain.PelaksanaanRenaksi
+
+		if err := rows.Scan(
+			&item.Id,
+			&item.KodePelaksanaan,
+			&item.IdRenaksiIndividu,
+			&item.Bulan,
+			&item.Bobot,
+		); err != nil {
+			return nil, err
+		}
+
+		result = append(result, item)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
