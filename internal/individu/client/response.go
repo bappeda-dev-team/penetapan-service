@@ -18,17 +18,19 @@ type PkPenetapanResponse struct {
 }
 
 type IndikatorPk struct {
-	IdRekin     string        `json:"id_rekin"`
-	IdIndikator string        `json:"id_indikator"`
-	Indikator   string        `json:"indikator"`
-	Targets     []TargetIndPk `json:"targets"`
+	IdRekin               string        `json:"id_rekin"`
+	IdIndikator           string        `json:"id_indikator"`
+	Indikator             string        `json:"indikator"`
+	IdIndikatorSasaranOpd string        `json:"id_indikator_sasaran_opd"`
+	Targets               []TargetIndPk `json:"targets"`
 }
 
 type TargetIndPk struct {
-	IdIndikator string `json:"id_indikator"`
-	IdTarget    string `json:"id_target"`
-	Target      string `json:"target"`
-	Satuan      string `json:"satuan"`
+	IdIndikator        string `json:"id_indikator"`
+	IdTarget           string `json:"id_target"`
+	IdTargetSasaranOpd string `json:"id_target_sasaran_opd"`
+	Target             string `json:"target"`
+	Satuan             string `json:"satuan"`
 }
 
 type RenaksiItem struct {

@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/bappeda-dev-team/penetapan-service/internal/common"
 	"github.com/bappeda-dev-team/penetapan-service/internal/individu/client"
 	"github.com/bappeda-dev-team/penetapan-service/internal/individu/domain"
 	"github.com/bappeda-dev-team/penetapan-service/internal/individu/repository"
@@ -47,6 +48,12 @@ func (ex *RenjaIndividuSyncExecutor) Sync(
 	renjaIndividus, err := ex.Client.SyncRenjaIndividu(ctx, request)
 	if err != nil {
 		return web.SyncPenetapanSummary{}, err
+	}
+
+	if !hasValidRenjaIndividu(renjaIndividus) {
+		return web.SyncPenetapanSummary{}, common.NewValidation(
+			"tidak ada data penetapan renja individu yang siap disinkronkan",
+		)
 	}
 
 	// db transaction
@@ -249,4 +256,39 @@ func ParseTargetFloat(s string) (float64, error) {
 	}
 
 	return strconv.ParseFloat(s, 64)
+}
+
+func hasValidRenjaIndividu(renjaIndividus []client.RenjaIndividuResponse) bool {
+	for _, renja := range renjaIndividus {
+		if hasRenjaIndividuContent(renja.NamaProgram, renja.PaguProgram, renja.IndikatorPrograms) ||
+			hasRenjaIndividuContent(renja.NamaKegiatan, renja.PaguKegiatan, renja.IndikatorKegiatans) ||
+			hasRenjaIndividuContent(renja.NamaSubkegiatan, renja.PaguSubkegiatan, renja.IndikatorSubkegiatans) {
+			return true
+		}
+	}
+	return false
+}
+
+func hasRenjaIndividuContent(nama string, pagu int64, indikators []client.IndikatorRenja) bool {
+	if strings.TrimSpace(nama) == "" {
+		return false
+	}
+	if pagu > 0 {
+		return true
+	}
+	for _, ind := range indikators {
+		if strings.TrimSpace(ind.Indikator) == "" || len(ind.Targets) == 0 {
+			continue
+		}
+		for _, tgt := range ind.Targets {
+			target, err := ParseTargetFloat(tgt.Target)
+			if err != nil {
+				continue
+			}
+			if target != 0 && strings.TrimSpace(tgt.Satuan) != "" {
+				return true
+			}
+		}
+	}
+	return false
 }
