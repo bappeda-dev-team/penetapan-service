@@ -4,8 +4,10 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"strings"
 
 	"github.com/bappeda-dev-team/penetapan-service/internal/client/perencanaan"
+	"github.com/bappeda-dev-team/penetapan-service/internal/common"
 	"github.com/bappeda-dev-team/penetapan-service/internal/model/domain"
 	"github.com/bappeda-dev-team/penetapan-service/internal/model/web"
 	"github.com/bappeda-dev-team/penetapan-service/internal/repository"
@@ -46,6 +48,12 @@ func (ex *TujuanSyncExecutor) Sync(
 	tujuanPerencanaan, err := ex.PerencanaanClient.GetPenetapanTujuanOpd(ctx, perencanaanRequest)
 	if err != nil {
 		return web.SyncPenetapanOpdSummary{}, err
+	}
+
+	if !hasValidTujuanOpd(tujuanPerencanaan) {
+		return web.SyncPenetapanOpdSummary{}, common.NewValidation(
+			"tidak ada data penetapan tujuan OPD yang siap disinkronkan",
+		)
 	}
 
 	// mulai butuh tx
@@ -251,4 +259,36 @@ func (ex *TujuanSyncExecutor) toTargetIndikatorTujuanSnapshot(tgt perencanaan.Ta
 		CreatedBy:  createdBy,
 	}
 
+}
+
+func hasValidTujuanOpd(tujuanPerencanaans []perencanaan.PerencanaanTujuanOpdResponse) bool {
+	for _, per := range tujuanPerencanaans {
+		for _, tujuan := range per.TujuanOpd {
+			if strings.TrimSpace(tujuan.Tujuan) == "" {
+				continue
+			}
+			for _, indikator := range tujuan.Indikator {
+				if strings.TrimSpace(indikator.NamaIndikator) == "" || len(indikator.Target) == 0 {
+					continue
+				}
+				for _, target := range indikator.Target {
+					if isValidTargetOpd(target) {
+						return true
+					}
+				}
+			}
+		}
+	}
+	return false
+}
+
+func isValidTargetOpd(target perencanaan.TargetResponse) bool {
+	val, err := helper.ParseFloat(target.TargetIndikator)
+	if err != nil {
+		return false
+	}
+	if _, errTahun := helper.ParseTahun(target.Tahun); errTahun != nil {
+		return false
+	}
+	return val != 0 && strings.TrimSpace(target.SatuanIndikator) != ""
 }

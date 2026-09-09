@@ -32,8 +32,9 @@ type IndikatorPk struct {
 	KodeOpd    string
 	TahunAktif int
 
-	KodeIndikatorPk string
-	NamaIndikatorPk string
+	KodeIndikatorPk         string
+	NamaIndikatorPk         string
+	KodeIndikatorSasaranOpd string
 
 	RumusPerhitungan    *string
 	SumberData          *string
@@ -50,10 +51,11 @@ type TargetPk struct {
 	Id            int64
 	IdIndikatorPk int64
 
-	KodeTargetPk string
-	Tahun        int
-	Target       float64
-	Satuan       string
+	KodeTargetPk         string
+	KodeTargetSasaranOpd string
+	Tahun                int
+	Target               float64
+	Satuan               string
 
 	CreatedDate      time.Time
 	LastModifiedDate time.Time

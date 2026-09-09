@@ -32,21 +32,23 @@ type RekinIndividuResponse struct {
 }
 
 type IndikatorPkResponse struct {
-	Id                  int64              `json:"id" example:"1"`
-	KodeIndikatorPk     string             `json:"kode_indikator_pk" example:"IKU-001"`
-	NamaIndikatorPk     string             `json:"nama_indikator_pk" example:"Persentase kepuasan masyarakat"`
-	RumusPerhitungan    *string            `json:"rumus_perhitungan,omitempty" example:"Jumlah puas / total responden x 100%"`
-	SumberData          *string            `json:"sumber_data,omitempty" example:"Survei Kepuasan Masyarakat"`
-	DefinisiOperasional *string            `json:"definisi_operasional,omitempty" example:"Persentase responden yang menyatakan puas"`
-	TargetPkList        []TargetPkResponse `json:"target_pk"`
+	Id                      int64              `json:"id" example:"1"`
+	KodeIndikatorSasaranOpd string             `json:"kode_indikator_sasaran_opd" example:"IND-SAS-1"`
+	KodeIndikatorPk         string             `json:"kode_indikator_pk" example:"IKU-001"`
+	NamaIndikatorPk         string             `json:"nama_indikator_pk" example:"Persentase kepuasan masyarakat"`
+	RumusPerhitungan        *string            `json:"rumus_perhitungan,omitempty" example:"Jumlah puas / total responden x 100%"`
+	SumberData              *string            `json:"sumber_data,omitempty" example:"Survei Kepuasan Masyarakat"`
+	DefinisiOperasional     *string            `json:"definisi_operasional,omitempty" example:"Persentase responden yang menyatakan puas"`
+	TargetPkList            []TargetPkResponse `json:"target_pk"`
 }
 
 type TargetPkResponse struct {
-	Id           int64   `json:"id" example:"1"`
-	KodeTargetPk string  `json:"kode_target_pk" example:"TGT-001"`
-	Tahun        int     `json:"tahun" example:"2025"`
-	Target       float64 `json:"target" example:"95"`
-	Satuan       string  `json:"satuan" example:"persen"`
+	Id                   int64   `json:"id" example:"1"`
+	KodeTargetSasaranOpd string  `json:"kode_target_sasaran_opd" example:"TGT-SAS-1"`
+	KodeTargetPk         string  `json:"kode_target_pk" example:"TGT-001"`
+	Tahun                int     `json:"tahun" example:"2025"`
+	Target               float64 `json:"target" example:"95"`
+	Satuan               string  `json:"satuan" example:"persen"`
 }
 
 type RenaksiPkResponse struct {

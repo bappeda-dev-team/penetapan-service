@@ -1,9 +1,11 @@
 package api
 
 import (
+	"errors"
 	"net/http"
 	"strconv"
 
+	"github.com/bappeda-dev-team/penetapan-service/internal/common"
 	"github.com/bappeda-dev-team/penetapan-service/internal/individu/web"
 	"github.com/bappeda-dev-team/penetapan-service/internal/validator"
 )
@@ -119,16 +121,16 @@ func (app *Application) SyncRekinIndividuHandler(
 ) {
 
 	input := web.SyncPenetapanRequest{}
-	errors := map[string]string{}
+	errorRequests := map[string]string{}
 
 	err := app.ReadJSON(w, r, &input)
 	if err != nil {
-		errors["invalid_request"] = err.Error()
+		errorRequests["invalid_request"] = err.Error()
 		app.BadRequestResponse(
 			w,
 			r,
 			web.ValidationErrorResponse{
-				Error: errors,
+				Error: errorRequests,
 			},
 		)
 		return
@@ -150,6 +152,21 @@ func (app *Application) SyncRekinIndividuHandler(
 		request,
 	)
 	if err != nil {
+		var appErr common.AppError
+		if errors.As(err, &appErr) {
+			switch appErr.Type {
+			case common.Validation:
+				app.UnprocessableResponse(w, r, appErr.Message)
+				return
+			case common.NotFound:
+				app.NotFoundResponse(w, r)
+				return
+			default:
+				app.ServerErrorResponse(w, r, err)
+				return
+			}
+		}
+
 		app.ServerErrorResponse(w, r, err)
 		return
 	}
@@ -186,16 +203,16 @@ func (app *Application) SyncRenjaIndividuHandler(
 ) {
 
 	input := web.SyncPenetapanRequest{}
-	errors := map[string]string{}
+	errorRequests := map[string]string{}
 
 	err := app.ReadJSON(w, r, &input)
 	if err != nil {
-		errors["invalid_request"] = err.Error()
+		errorRequests["invalid_request"] = err.Error()
 		app.BadRequestResponse(
 			w,
 			r,
 			web.ValidationErrorResponse{
-				Error: errors,
+				Error: errorRequests,
 			},
 		)
 		return
@@ -217,6 +234,21 @@ func (app *Application) SyncRenjaIndividuHandler(
 		request,
 	)
 	if err != nil {
+		var appErr common.AppError
+		if errors.As(err, &appErr) {
+			switch appErr.Type {
+			case common.Validation:
+				app.UnprocessableResponse(w, r, appErr.Message)
+				return
+			case common.NotFound:
+				app.NotFoundResponse(w, r)
+				return
+			default:
+				app.ServerErrorResponse(w, r, err)
+				return
+			}
+		}
+
 		app.ServerErrorResponse(w, r, err)
 		return
 	}

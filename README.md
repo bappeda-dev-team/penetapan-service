@@ -29,7 +29,7 @@ Postgresql
 Folder: db/migration
 
 ``` sh
-flyway -user=postgres -password=postgres -url=jdbc:postgresql://localhost:5432/penetapan_service_db -locations="filesystem:./db/migration" migrate
+flyway -user=postgres -password=root -url=jdbc:postgresql://localhost:5432/penetapan_local -locations="filesystem:./db/migration" migrate
 ```
 
 # Generate Docs
@@ -54,4 +54,3 @@ atau
 ``` sh
 make test
 ```
-

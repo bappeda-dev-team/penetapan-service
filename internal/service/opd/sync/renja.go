@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"log/slog"
 	"strconv"
+	"strings"
 
 	"github.com/bappeda-dev-team/penetapan-service/internal/client/perencanaan"
+	"github.com/bappeda-dev-team/penetapan-service/internal/common"
 	"github.com/bappeda-dev-team/penetapan-service/internal/model/domain"
 	"github.com/bappeda-dev-team/penetapan-service/internal/model/web"
 	"github.com/bappeda-dev-team/penetapan-service/internal/repository"
@@ -43,6 +45,12 @@ func (ex *RenjaSyncExecutor) Sync(
 	perencanaanResponse, err := ex.PerencanaanClient.GetPenetapanRenjaOpd(ctx, perencanaanRequest)
 	if err != nil {
 		return web.SyncPenetapanOpdSummary{}, err
+	}
+
+	if !hasValidRenja(perencanaanResponse) {
+		return web.SyncPenetapanOpdSummary{}, common.NewValidation(
+			"tidak ada data penetapan renja OPD yang siap disinkronkan",
+		)
 	}
 
 	// mulai butuh tx
@@ -590,4 +598,54 @@ func (ex *RenjaSyncExecutor) toSubkegiatanSnapshot(
 		Indikators:      indikators,
 		PaguAnggaran:    paguAnggarans,
 	}, nil
+}
+
+func hasValidRenja(renjaPerencanaans []perencanaan.UrusanDetailResponse) bool {
+	for _, renja := range renjaPerencanaans {
+		for _, urusan := range renja.Urusan {
+			if !hasRenjaContent(urusan.Nama, urusan.Indikator, urusan.Anggaran) {
+				continue
+			}
+			for _, bidur := range urusan.BidangUrusan {
+				if !hasRenjaContent(bidur.Nama, bidur.Indikator, bidur.Anggaran) {
+					continue
+				}
+				for _, prog := range bidur.Program {
+					if !hasRenjaContent(prog.Nama, prog.Indikator, prog.Anggaran) {
+						continue
+					}
+					for _, keg := range prog.Kegiatan {
+						if !hasRenjaContent(keg.Nama, keg.Indikator, keg.Anggaran) {
+							continue
+						}
+						for _, sub := range keg.SubKegiatan {
+							if hasRenjaContent(sub.Nama, sub.Indikator, sub.Anggaran) {
+								return true
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return false
+}
+
+func hasRenjaContent(nama string, indikators []perencanaan.IndikatorMatrixResponse, anggarans []perencanaan.PaguAnggaranTotalResponse) bool {
+	if strings.TrimSpace(nama) == "" {
+		return false
+	}
+	if len(anggarans) > 0 {
+		return true
+	}
+	for _, ind := range indikators {
+		if strings.TrimSpace(ind.Indikator) == "" || strings.TrimSpace(ind.Satuan) == "" {
+			continue
+		}
+		if _, err := strconv.ParseFloat(ind.Target, 64); err != nil {
+			continue
+		}
+		return true
+	}
+	return false
 }
