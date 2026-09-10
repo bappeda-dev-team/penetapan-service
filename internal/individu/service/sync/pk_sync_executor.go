@@ -203,7 +203,7 @@ func (ex *PkSyncExecutor) createActiveSnapshot(
 
 	snapshotID, err := ex.Repo.SaveSnapshot(ctx, tx, snapshot)
 	if err != nil {
-		ex.Logger.Error("save penetapan individu error", "snapshot", snapshot)
+		ex.Logger.Error("save penetapan individu error", "snapshot", snapshot, "err", err)
 		return 0, err
 	}
 
