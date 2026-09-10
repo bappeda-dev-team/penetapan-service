@@ -45,15 +45,22 @@ func (r *PenetapanIndividuRepository) DeactivateOldSnapshot(
 	snapshotStatus := domain.SnapshotStatusArchived
 	query := `UPDATE penetapan_individu
 		  SET
-		    snapshot_status = $2,
+		    snapshot_status = $1,
 		    is_active = FALSE
- 		  WHERE id = $1
+		  WHERE pegawai_id = $2
+		    AND kode_opd = $3
+		    AND tahun = $4
+		    AND jenis_penetapan = $5
+		    AND is_active = TRUE
 		`
 	_, err := tx.ExecContext(
 		ctx,
 		query,
-		req.Id,
 		snapshotStatus,
+		req.PegawaiId,
+		req.KodeOpd,
+		req.Tahun,
+		req.JenisSnapshot,
 	)
 	if err != nil {
 		return err
