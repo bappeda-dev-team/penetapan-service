@@ -182,7 +182,7 @@ func (ex *RenjaIndividuSyncExecutor) createActiveSnapshot(
 
 	snapshotID, err := ex.Repo.SaveSnapshot(ctx, tx, snapshot)
 	if err != nil {
-		ex.Logger.Error("save renja individu error", "snapshot", snapshot, "err", err)
+		ex.Logger.Error("save renja individu error", "snapshot", snapshot)
 		return 0, err
 	}
 
