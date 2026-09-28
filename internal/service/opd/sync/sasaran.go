@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"slices"
 	"strings"
 
 	"github.com/bappeda-dev-team/penetapan-service/internal/client/perencanaan"
@@ -217,7 +218,7 @@ func (ex *SasaranSyncExecutor) toSasaranSnapshot(
 }
 
 func (ex *SasaranSyncExecutor) toIndikatorSasaranSnapshot(ind perencanaan.IndikatorSasaranResponse, kodeOpd string, createdBy *string, tahunAktif int) (domain.IndikatorSasaranPenetapanOpd, error) {
-	targets, err := ex.toTargetSnapshots(ind.Target, ind.NamaIndikator, createdBy)
+	targets, err := ex.toTargetSnapshots(ind.Target, createdBy)
 	if err != nil {
 		return domain.IndikatorSasaranPenetapanOpd{}, err
 	}
@@ -235,7 +236,7 @@ func (ex *SasaranSyncExecutor) toIndikatorSasaranSnapshot(ind perencanaan.Indika
 	}, nil
 }
 
-func (ex *SasaranSyncExecutor) toTargetSnapshots(targets []perencanaan.TargetResponse, namaIndikator string, createdBy *string) ([]domain.TargetIndikatorSasaranPenetapanOpd, error) {
+func (ex *SasaranSyncExecutor) toTargetSnapshots(targets []perencanaan.TargetResponse, createdBy *string) ([]domain.TargetIndikatorSasaranPenetapanOpd, error) {
 	result := make([]domain.TargetIndikatorSasaranPenetapanOpd, 0, len(targets))
 	for _, tgt := range targets {
 		tahunTarget, errTahun := helper.ParseTahun(tgt.Tahun)
@@ -273,10 +274,8 @@ func hasValidSasaranOpd(sasaranPerencanaans []perencanaan.PerencanaanSasaranOpdR
 				if strings.TrimSpace(indikator.NamaIndikator) == "" || len(indikator.Target) == 0 {
 					continue
 				}
-				for _, target := range indikator.Target {
-					if isValidTargetOpd(target) {
-						return true
-					}
+				if slices.ContainsFunc(indikator.Target, isValidTargetOpd) {
+					return true
 				}
 			}
 		}

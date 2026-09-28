@@ -65,11 +65,19 @@ func buildApplication(
 		logger,
 	)
 
+	/// renaksi
+	renaksiSyncExecutor := syncOpd.NewRenaksiSyncExecutor(
+		penetapanOpdRepo,
+		perencanaanClient,
+		logger,
+	)
+
 	// register executor
 	syncRegistry := &syncOpd.Registry{
 		TujuanSyncExecutor:  tujuanSyncExecutor,
 		SasaranSyncExecutor: sasaranSyncExecutor,
 		RenjaSyncExecutor:   renjaSyncExecutor,
+		RenaksiSyncExecutor: renaksiSyncExecutor,
 	}
 
 	// service

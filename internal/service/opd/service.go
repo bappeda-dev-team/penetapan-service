@@ -45,6 +45,7 @@ func (s *PenetapanOpdService) SyncPenetapanOpd(
 
 	executor, err := s.SyncExecutor.Get(jenisPenetapan)
 	if err != nil {
+		s.Logger.Error("ERROR GET EXECUTOR", "err", err)
 		return web.SyncPenetapanOpdResponse{}, err
 	}
 
@@ -547,17 +548,50 @@ func (s *PenetapanOpdService) FindRenja(
 	}, nil
 }
 
-func (s *PenetapanOpdService) FindRenaksi(ctx context.Context, req domain.PenetapanOpdRequest) (web.RenaksiOpdPenetapanResponse, error) {
-	renaksi := make([]web.RenaksiOpdResponse, 0)
-	renaksi = append(renaksi, web.RenaksiOpdResponse{
-		Renaksi: "RENAKSI OPD X",
-	})
+func (s *PenetapanOpdService) FindRenaksi(
+	ctx context.Context,
+	req domain.PenetapanOpdRequest,
+) (web.RenaksiOpdPenetapanResponse, error) {
+	s.Logger.Info("FindRenaksi")
+
+	jenisPenetapan := domain.JenisPenetapanRenaksi
+	snapshot, err := s.getActiveSnapshot(
+		ctx,
+		req.KodeOpd,
+		jenisPenetapan,
+		req.Tahun,
+	)
+	if err != nil {
+		return web.RenaksiOpdPenetapanResponse{}, err
+	}
+
+	req.SnapshotId = &snapshot.Id
+
+	renaksis, err := s.Repo.FindRencanaAksiOpdBySnapshot(ctx, req)
+	if err != nil {
+		s.Logger.Error("FindRencanaAksiOpdBySnapshot")
+		return web.RenaksiOpdPenetapanResponse{}, err
+	}
+
+	renaksiResponse := make(
+		[]web.RenaksiOpdResponse,
+		0,
+		len(renaksis),
+	)
+
+	for _, renaksi := range renaksis {
+		renaksiResponse = append(
+			renaksiResponse,
+			ToRenaksiOpdResponse(renaksi),
+		)
+	}
+
 	return web.RenaksiOpdPenetapanResponse{
 		KodeOpd:     req.KodeOpd,
 		TahunAktif:  req.Tahun,
-		Versi:       1,
+		Versi:       snapshot.Versi,
 		IsLocked:    true,
-		RenaksiOpds: renaksi,
+		RenaksiOpds: renaksiResponse,
 	}, nil
 }
 

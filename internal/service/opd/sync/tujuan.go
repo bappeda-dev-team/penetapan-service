@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"slices"
 	"strings"
 
 	"github.com/bappeda-dev-team/penetapan-service/internal/client/perencanaan"
@@ -271,10 +272,8 @@ func hasValidTujuanOpd(tujuanPerencanaans []perencanaan.PerencanaanTujuanOpdResp
 				if strings.TrimSpace(indikator.NamaIndikator) == "" || len(indikator.Target) == 0 {
 					continue
 				}
-				for _, target := range indikator.Target {
-					if isValidTargetOpd(target) {
-						return true
-					}
+				if slices.ContainsFunc(indikator.Target, isValidTargetOpd) {
+					return true
 				}
 			}
 		}
