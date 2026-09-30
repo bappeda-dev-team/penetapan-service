@@ -4,7 +4,7 @@ type RencanaAksiOpdResponse struct {
 	Id              int    `json:"id"`
 	KodeOpd         string `json:"kode_opd"`
 	Tahun           string `json:"tahun"`
-	SasaranId       int    `json:"sasaran_id"`
+	SasaranId       string `json:"sasaran_id"`
 	RekinId         string `json:"rekin_id"`
 	AksiKegiatan    string `json:"aksi_kegiatan"`
 	KodeSubkegiatan string `json:"kode_sub_kegiatan"`

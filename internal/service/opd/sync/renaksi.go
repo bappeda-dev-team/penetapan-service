@@ -142,7 +142,7 @@ func (ex *RenaksiSyncExecutor) toRenaksiSnapshots(
 			PenetapanId:        penetapanId,
 			KodeRencanaAksiOpd: kode.KodeRenaksiOpd(ren.Id),
 			KodeOpd:            kodeOpd,
-			KodeSasaranOpd:     kode.KodeSasaranOpdInt(ren.SasaranId),
+			KodeSasaranOpd:     kode.KodeSasaranOpd(ren.SasaranId),
 			KodePk:             ren.RekinId,
 			NamaPk:             ren.AksiKegiatan,
 			PegawaiId:          ren.NamaPemilik,
