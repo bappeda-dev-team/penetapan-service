@@ -582,6 +582,85 @@ func (app *Application) RenaksiOpdHandler(
 	}
 }
 
+// SyncPenetapanRenaksiOpdHandler godoc
+//
+// @Summary     Sync Penetapan Renaksi OPD
+// @Description Sinkron data renaksi OPD berdasarkan kode OPD dan tahun dari perencanaan
+// @Tags        OPD
+// @Accept      json
+// @Produce     json
+//
+// @Param       payload body web.SyncPenetapanOpdRequest true "Payload sinkronisasi penetapan OPD"
+//
+// @Success     200 {object} web.Response[web.SyncPenetapanOpdResponse] "Success"
+// @Failure     422 {object} web.ValidationErrorResponse                "Unprocessable Entity"
+// @Failure     500 {object} web.ErrorResponse                          "Internal Server Error"
+//
+// @Router      /opd/renaksi/sync [post]
+func (app *Application) SyncPenetapanRenaksiOpdHandler(
+	w http.ResponseWriter,
+	r *http.Request,
+) {
+	input := web.SyncPenetapanOpdRequest{}
+	errorRequests := map[string]string{}
+
+	err := app.ReadJSON(w, r, &input)
+	if err != nil {
+		errorRequests["invalid_request"] = err.Error()
+		app.BadRequestResponse(
+			w,
+			r,
+			web.ValidationErrorResponse{
+				Error: errorRequests,
+			},
+		)
+		return
+	}
+
+	request := &web.SyncPenetapanOpdRequest{
+		KodeOpd: input.KodeOpd,
+		Tahun:   input.Tahun,
+	}
+	v := validator.New()
+	if web.ValidateSyncPenetapanRequest(v, request); !v.Valid() {
+		app.FailedValidationResponse(w, r, v.Errors)
+		return
+	}
+
+	result, err := app.PenetapanOpdService.SyncPenetapanOpd(
+		r.Context(),
+		request,
+		domain.JenisPenetapanRenaksi,
+	)
+	if err != nil {
+		var appErr common.AppError
+		if errors.As(err, &appErr) {
+			switch appErr.Type {
+			case common.Validation:
+				app.UnprocessableResponse(w, r, appErr.Message)
+				return
+			case common.NotFound:
+				app.NotFoundResponse(w, r)
+				return
+			default:
+				app.ServerErrorResponse(w, r, err)
+				return
+			}
+		}
+
+		app.ServerErrorResponse(w, r, err)
+		return
+	}
+
+	response := web.Response[web.SyncPenetapanOpdResponse]{
+		Data: result,
+	}
+	err = app.WriteJSON(w, http.StatusOK, response, nil)
+	if err != nil {
+		app.ServerErrorResponse(w, r, err)
+	}
+}
+
 // TujuanSasaranOpdHandler godoc
 //
 // @Summary     Get tujuan sasaran OPD penetapan

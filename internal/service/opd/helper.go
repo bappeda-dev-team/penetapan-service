@@ -74,6 +74,26 @@ func ToTargetIndikatorSasaranOpdResponse(target domain.TargetIndikatorSasaranPen
 	}
 }
 
+func ToRenaksiOpdResponse(
+	renaksiOpd domain.RencanaAksiOpd,
+) web.RenaksiOpdResponse {
+	return web.RenaksiOpdResponse{
+		KodeRencanaAksiOpd: renaksiOpd.KodeRencanaAksiOpd,
+		KodeSasaranOpd:     renaksiOpd.KodeSasaranOpd,
+		KodePk:             renaksiOpd.KodePk,
+		NamaPk:             renaksiOpd.NamaPk,
+		PegawaiId:          renaksiOpd.PegawaiId,
+		KodeSubkegiatan:    renaksiOpd.KodeSubkegiatan,
+		NamaSubkegiatan:    renaksiOpd.NamaSubkegiatan,
+		AnggaranRenaksi:    renaksiOpd.AnggaranRenaksi,
+		Tahun:              renaksiOpd.Tahun,
+		Tw1:                renaksiOpd.Tw1,
+		Tw2:                renaksiOpd.Tw2,
+		Tw3:                renaksiOpd.Tw3,
+		Tw4:                renaksiOpd.Tw4,
+	}
+}
+
 func (s *PenetapanOpdService) findIndikatorRenjaProgram(
 	ctx context.Context,
 	programs *[]domain.RenjaProgram,

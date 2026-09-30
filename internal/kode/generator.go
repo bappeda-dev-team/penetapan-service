@@ -11,6 +11,12 @@ func KodeSasaranOpd(sasaranId string) string {
 	return kodeSasaran
 }
 
+func KodeSasaranOpdInt(sasaranId int) string {
+	kodeSasaran := fmt.Sprintf("SAS-OPD-%d", sasaranId)
+
+	return kodeSasaran
+}
+
 func KodeIndikatorSasaranOpd(indikatorSasaranId string) string {
 	if strings.TrimSpace(indikatorSasaranId) == "" {
 		return ""
@@ -23,4 +29,8 @@ func KodeTargetSasaranOpd(targetSasaranId string) string {
 		return ""
 	}
 	return fmt.Sprintf("TGT-%s", targetSasaranId)
+}
+
+func KodeRenaksiOpd(renaksiId int) string {
+	return fmt.Sprintf("REN-OPD-%d", renaksiId)
 }

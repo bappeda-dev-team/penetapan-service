@@ -10,6 +10,7 @@ type Registry struct {
 	TujuanSyncExecutor  PenetapanSyncExecutor
 	SasaranSyncExecutor PenetapanSyncExecutor
 	RenjaSyncExecutor   PenetapanSyncExecutor
+	RenaksiSyncExecutor PenetapanSyncExecutor
 }
 
 func (r *Registry) Get(
@@ -26,6 +27,9 @@ func (r *Registry) Get(
 
 	case domain.JenisPenetapanRenja:
 		return r.RenjaSyncExecutor, nil
+
+	case domain.JenisPenetapanRenaksi:
+		return r.RenaksiSyncExecutor, nil
 	}
 
 	return nil, errors.New(

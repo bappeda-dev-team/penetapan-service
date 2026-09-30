@@ -33,9 +33,6 @@ func (app *Application) Routes() http.Handler {
 	router.HandlerFunc(http.MethodPut, "/individu/rekin/archive", app.UpdateRekinIndividuHandler)
 
 	// opd
-	// renaksi
-	router.HandlerFunc(http.MethodGet, "/opd/renaksi", app.RenaksiOpdHandler)
-
 	// renja
 	router.HandlerFunc(http.MethodGet, "/opd/renja", app.RenjaOpdHandler)
 	router.HandlerFunc(http.MethodPost, "/opd/renja/sync", app.SyncPenetapanRenjaOpdHandler)
@@ -48,6 +45,10 @@ func (app *Application) Routes() http.Handler {
 	router.HandlerFunc(http.MethodGet, "/opd/tujuan", app.TujuanOpdHandler)
 	router.HandlerFunc(http.MethodPost, "/opd/tujuan/sync", app.SyncPenetapanTujuanOpdHandler)
 	router.HandlerFunc(http.MethodGet, "/opd/tujuan-with-sasaran", app.TujuanSasaranOpdHandler)
+
+	// renaksi opd
+	router.HandlerFunc(http.MethodGet, "/opd/renaksi", app.RenaksiOpdHandler)
+	router.HandlerFunc(http.MethodPost, "/opd/renaksi/sync", app.SyncPenetapanRenaksiOpdHandler)
 
 	// pemda
 	// tujuan pemda

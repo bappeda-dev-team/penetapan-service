@@ -154,3 +154,51 @@ func (c *PerencanaanClient) GetPenetapanRenjaOpd(ctx context.Context, request Pe
 
 	return result.Data, nil
 }
+
+func (c *PerencanaanClient) GetPenetapanRenaksiOpd(
+	ctx context.Context,
+	request PerencanaanRequest,
+) ([]RencanaAksiOpdResponse, error) {
+	// url penetapan tujuan opd
+	url := fmt.Sprintf("%s/lock-renaksi-opd/lock/%s/%d", c.BaseURL, request.KodeOpd, request.Tahun)
+
+	// request
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return nil, fmt.Errorf("Gagal membuat request: %w", err)
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	sessionID := client.GetSessionID(ctx)
+	if sessionID != "" {
+		req.Header.Set("X-Session-Id", sessionID)
+	} else {
+		log.Printf("Tidak ada X-Session-Id ditemukan, mungkin akan 401")
+	}
+
+	// send request
+	res, err := c.HttpClient.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("Request ke perencanaan gagal: %w", err)
+	}
+	defer res.Body.Close()
+
+	// response status
+	if res.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("Renaksi Opd Penetapan: gagal sync. status: %d", res.StatusCode)
+	}
+
+	// safe, response pasti ada
+	type wrapper struct {
+		Code   int                      `json:"code"`
+		Status string                   `json:"status"`
+		Data   []RencanaAksiOpdResponse `json:"data"`
+	}
+
+	var result wrapper
+	if err := json.NewDecoder(res.Body).Decode(&result); err != nil {
+		return nil, fmt.Errorf("gagal decode response: %w", err)
+	}
+
+	return result.Data, nil
+}
