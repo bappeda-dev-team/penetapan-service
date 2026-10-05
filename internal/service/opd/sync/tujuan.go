@@ -214,7 +214,7 @@ func (ex *TujuanSyncExecutor) toTujuanSnapshot(
 	}
 }
 
-func (ex *TujuanSyncExecutor) toIndikatorTujuanSnapshot(ind perencanaan.IndikatorResponse, kodeOpd string, createdBy *string, tahunAktif int) (domain.IndikatorTujuanPenetapanOpd, error) {
+func (ex *TujuanSyncExecutor) toIndikatorTujuanSnapshot(ind perencanaan.IndikatorTujuanResponse, kodeOpd string, createdBy *string, tahunAktif int) (domain.IndikatorTujuanPenetapanOpd, error) {
 	targets, err := ex.toTargetSnapshots(ind.Target, createdBy)
 	if err != nil {
 		return domain.IndikatorTujuanPenetapanOpd{}, err
@@ -233,7 +233,7 @@ func (ex *TujuanSyncExecutor) toIndikatorTujuanSnapshot(ind perencanaan.Indikato
 	}, nil
 }
 
-func (ex *TujuanSyncExecutor) toTargetSnapshots(targets []perencanaan.TargetResponse, createdBy *string) ([]domain.TargetIndikatorTujuanPenetapanOpd, error) {
+func (ex *TujuanSyncExecutor) toTargetSnapshots(targets []perencanaan.TargetTujuanResponse, createdBy *string) ([]domain.TargetIndikatorTujuanPenetapanOpd, error) {
 	result := make([]domain.TargetIndikatorTujuanPenetapanOpd, 0, len(targets))
 	for _, tgt := range targets {
 		tahunTarget, errTahun := helper.ParseTahun(tgt.Tahun)
@@ -250,7 +250,7 @@ func (ex *TujuanSyncExecutor) toTargetSnapshots(targets []perencanaan.TargetResp
 	return result, nil
 }
 
-func (ex *TujuanSyncExecutor) toTargetIndikatorTujuanSnapshot(tgt perencanaan.TargetResponse, tahunTarget int, target float64, createdBy *string) domain.TargetIndikatorTujuanPenetapanOpd {
+func (ex *TujuanSyncExecutor) toTargetIndikatorTujuanSnapshot(tgt perencanaan.TargetTujuanResponse, tahunTarget int, target float64, createdBy *string) domain.TargetIndikatorTujuanPenetapanOpd {
 	kodeTarget := fmt.Sprintf("TGT-%s", tgt.Id)
 	return domain.TargetIndikatorTujuanPenetapanOpd{
 		KodeTarget: kodeTarget,
@@ -281,7 +281,7 @@ func hasValidTujuanOpd(tujuanPerencanaans []perencanaan.PerencanaanTujuanOpdResp
 	return false
 }
 
-func isValidTargetOpd(target perencanaan.TargetResponse) bool {
+func isValidTargetOpd(target perencanaan.TargetTujuanResponse) bool {
 	val, err := helper.ParseFloat(target.TargetIndikator)
 	if err != nil {
 		return false

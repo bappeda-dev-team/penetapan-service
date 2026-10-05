@@ -11,18 +11,37 @@ type PerencanaanTujuanOpdResponse struct {
 }
 
 type TujuanOpdResponse struct {
-	Id               int                 `json:"id_tujuan_opd"`
-	KodeBidangUrusan string              `json:"kode_bidang_urusan,omitempty"`
-	NamaBidangUrusan string              `json:"nama_bidang_urusan,omitempty"`
-	KodeOpd          string              `json:"kode_opd,omitempty"`
-	NamaOpd          string              `json:"nama_opd,omitempty"`
-	Tujuan           string              `json:"tujuan,omitempty"`
-	RumusPerhitungan string              `json:"rumus_perhitungan,omitempty"`
-	SumberData       string              `json:"sumber_data,omitempty"`
-	TahunAwal        string              `json:"tahun_awal,omitempty"`
-	TahunAkhir       string              `json:"tahun_akhir,omitempty"`
-	JenisPeriode     string              `json:"jenis_periode,omitempty"`
-	Indikator        []IndikatorResponse `json:"indikator"`
+	Id               int                       `json:"id_tujuan_opd"`
+	KodeBidangUrusan string                    `json:"kode_bidang_urusan,omitempty"`
+	NamaBidangUrusan string                    `json:"nama_bidang_urusan,omitempty"`
+	KodeOpd          string                    `json:"kode_opd,omitempty"`
+	NamaOpd          string                    `json:"nama_opd,omitempty"`
+	Tujuan           string                    `json:"tujuan,omitempty"`
+	RumusPerhitungan string                    `json:"rumus_perhitungan,omitempty"`
+	SumberData       string                    `json:"sumber_data,omitempty"`
+	TahunAwal        string                    `json:"tahun_awal,omitempty"`
+	TahunAkhir       string                    `json:"tahun_akhir,omitempty"`
+	JenisPeriode     string                    `json:"jenis_periode,omitempty"`
+	Indikator        []IndikatorTujuanResponse `json:"indikator"`
+}
+
+type IndikatorTujuanResponse struct {
+	Id                  string                 `json:"id"`
+	KodeIndikator       string                 `json:"kode_indikator"`
+	NamaIndikator       string                 `json:"indikator"`
+	RumusPerhitungan    string                 `json:"rumus_perhitungan"`
+	SumberData          string                 `json:"sumber_data"`
+	Jenis               string                 `json:"jenis"`
+	DefinisiOperasional string                 `json:"definisi_operasional"`
+	Target              []TargetTujuanResponse `json:"target_penetapan"`
+}
+
+type TargetTujuanResponse struct {
+	Id              string `json:"id"`
+	IndikatorId     string `json:"indikator_id"`
+	Tahun           string `json:"tahun"`
+	TargetIndikator string `json:"target"`
+	SatuanIndikator string `json:"satuan"`
 }
 
 type PerencanaanSasaranOpdResponse struct {

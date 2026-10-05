@@ -146,12 +146,39 @@ func (ex *SasaranSyncExecutor) Sync(
 	}, nil
 }
 
-func (ex *SasaranSyncExecutor) toSasaranSnapshots(sasaranPerencanaans []perencanaan.PerencanaanSasaranOpdResponse, currentUser string, penetapanId int64, tahunAktif int) ([]domain.SasaranPenetapanOpd, error) {
+func (ex *SasaranSyncExecutor) toSasaranSnapshots(
+	sasaranPerencanaans []perencanaan.PerencanaanSasaranOpdResponse,
+	currentUser string,
+	penetapanId int64,
+	tahunAktif int,
+) ([]domain.SasaranPenetapanOpd, error) {
 
 	createdBy := &currentUser
-	var penetapanSasaranOpds = []domain.SasaranPenetapanOpd{}
+
+	penetapanSasaranOpds := make([]domain.SasaranPenetapanOpd, 0)
+
+	// Mencegah sasaran yang sama ditambahkan lebih dari sekali.
+	seen := make(map[string]struct{})
+
 	for _, per := range sasaranPerencanaans {
 		for _, sasaran := range per.SasaranOpd {
+
+			// Hanya proses sasaran yang memiliki indikator.
+			if len(sasaran.Indikator) == 0 {
+				continue
+			}
+
+			key := fmt.Sprintf(
+				"%s:%d:%s",
+				per.KodeOpd,
+				sasaran.IdTujuanOpd,
+				strings.TrimSpace(sasaran.NamaSasaranOpd),
+			)
+
+			if _, exists := seen[key]; exists {
+				continue
+			}
+			seen[key] = struct{}{}
 
 			indikators := make(
 				[]domain.IndikatorSasaranPenetapanOpd,
@@ -161,19 +188,18 @@ func (ex *SasaranSyncExecutor) toSasaranSnapshots(sasaranPerencanaans []perencan
 
 			for _, ind := range sasaran.Indikator {
 				indSnapshot, err := ex.toIndikatorSasaranSnapshot(
-					ind, per.KodeOpd,
+					ind,
+					per.KodeOpd,
 					createdBy,
 					tahunAktif,
 				)
 				if err != nil {
 					return nil, err
 				}
-				indikators = append(
-					indikators,
-					indSnapshot,
-				)
 
+				indikators = append(indikators, indSnapshot)
 			}
+
 			sasSnapshot := ex.toSasaranSnapshot(
 				sasaran,
 				per.KodeOpd,
@@ -182,7 +208,9 @@ func (ex *SasaranSyncExecutor) toSasaranSnapshots(sasaranPerencanaans []perencan
 				createdBy,
 				indikators,
 			)
-			penetapanSasaranOpds = append(penetapanSasaranOpds,
+
+			penetapanSasaranOpds = append(
+				penetapanSasaranOpds,
 				sasSnapshot,
 			)
 		}
@@ -274,11 +302,22 @@ func hasValidSasaranOpd(sasaranPerencanaans []perencanaan.PerencanaanSasaranOpdR
 				if strings.TrimSpace(indikator.NamaIndikator) == "" || len(indikator.Target) == 0 {
 					continue
 				}
-				if slices.ContainsFunc(indikator.Target, isValidTargetOpd) {
+				if slices.ContainsFunc(indikator.Target, isValidTargetSasaranOpd) {
 					return true
 				}
 			}
 		}
 	}
 	return false
+}
+
+func isValidTargetSasaranOpd(target perencanaan.TargetResponse) bool {
+	val, err := helper.ParseFloat(target.TargetIndikator)
+	if err != nil {
+		return false
+	}
+	if _, errTahun := helper.ParseTahun(target.Tahun); errTahun != nil {
+		return false
+	}
+	return val != 0 && strings.TrimSpace(target.SatuanIndikator) != ""
 }
