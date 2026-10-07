@@ -7,8 +7,8 @@ type RencanaAksiOpdResponse struct {
 	SasaranId       string `json:"sasaran_id"`
 	RekinId         string `json:"rekin_id"`
 	AksiKegiatan    string `json:"aksi_kegiatan"`
-	KodeSubkegiatan string `json:"kode_sub_kegiatan"`
-	NamaSubKegiatan string `json:"nama_sub_kegiatan"`
+	KodeSubkegiatan string `json:"kode_subkegiatan"`
+	NamaSubKegiatan string `json:"nama_subkegiatan"`
 	Anggaran        int64  `json:"anggaran"`
 	NamaPemilik     string `json:"nama_pemilik"`
 	Tw1             int    `json:"tw1"`
