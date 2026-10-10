@@ -250,7 +250,7 @@ func (ex *SasaranSyncExecutor) toIndikatorSasaranSnapshot(ind perencanaan.Indika
 	if err != nil {
 		return domain.IndikatorSasaranPenetapanOpd{}, err
 	}
-	kodeIndikator := fmt.Sprintf("IND-%s", ind.Id)
+	kodeIndikator := kode.KodeIndikatorSasaranOpd(ind.Id)
 	return domain.IndikatorSasaranPenetapanOpd{
 		KodeIndikator:       kodeIndikator,
 		KodeOpd:             kodeOpd,
@@ -282,7 +282,7 @@ func (ex *SasaranSyncExecutor) toTargetSnapshots(targets []perencanaan.TargetRes
 }
 
 func (ex *SasaranSyncExecutor) toTargetIndikatorSasaranSnapshot(tgt perencanaan.TargetResponse, tahunTarget int, target float64, createdBy *string) domain.TargetIndikatorSasaranPenetapanOpd {
-	kodeTarget := fmt.Sprintf("TGT-%s", tgt.Id)
+	kodeTarget := kode.KodeTargetSasaranOpd(tgt.Id)
 	return domain.TargetIndikatorSasaranPenetapanOpd{
 		KodeTarget: kodeTarget,
 		Tahun:      tahunTarget,

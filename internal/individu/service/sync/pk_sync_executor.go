@@ -110,7 +110,7 @@ func (ex *PkSyncExecutor) Sync(
 				TahunAktif:              snapshot.Tahun,
 				KodeIndikatorPk:         ind.IdIndikator,
 				NamaIndikatorPk:         ind.Indikator,
-				KodeIndikatorSasaranOpd: kode.KodeIndikatorSasaranOpd(ind.IdIndikatorSasaranOpd),
+				KodeIndikatorSasaranOpd: ind.IdIndikator,
 				CreatedBy:               &currentUser,
 			}
 			indPkId, err := ex.Repo.SaveIndikatorPkPenetapan(ctx, tx, indikatorPk)
@@ -126,7 +126,7 @@ func (ex *PkSyncExecutor) Sync(
 				targetPk := domain.TargetPk{
 					IdIndikatorPk:        indPkId,
 					KodeTargetPk:         tgt.IdTarget,
-					KodeTargetSasaranOpd: kode.KodeTargetSasaranOpd(tgt.IdTargetSasaranOpd),
+					KodeTargetSasaranOpd: tgt.IdIndikator,
 					Target:               targetFloat,
 					Satuan:               tgt.Satuan,
 					Tahun:                snapshot.Tahun,
