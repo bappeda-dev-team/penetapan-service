@@ -81,6 +81,7 @@ func (ex *PkSyncExecutor) Sync(
 
 	// SAVE PK
 	summary := SummaryCounter{}
+
 	for _, pk := range pkPegawais {
 		sasaranOpdIdStr := strconv.Itoa(int(pk.SasaranOpdId))
 		kodeSasaranOpd := kode.KodeSasaranOpd(sasaranOpdIdStr)
@@ -105,13 +106,12 @@ func (ex *PkSyncExecutor) Sync(
 		summary.AddRekin(1)
 		for _, ind := range pk.Indikators {
 			indikatorPk := domain.IndikatorPk{
-				IdPk:                    pkId,
-				KodeOpd:                 snapshot.KodeOpd,
-				TahunAktif:              snapshot.Tahun,
-				KodeIndikatorPk:         ind.IdIndikator,
-				NamaIndikatorPk:         ind.Indikator,
-				KodeIndikatorSasaranOpd: ind.IdIndikator,
-				CreatedBy:               &currentUser,
+				IdPk:            pkId,
+				KodeOpd:         snapshot.KodeOpd,
+				TahunAktif:      snapshot.Tahun,
+				KodeIndikatorPk: ind.IdIndikator,
+				NamaIndikatorPk: ind.Indikator,
+				CreatedBy:       &currentUser,
 			}
 			indPkId, err := ex.Repo.SaveIndikatorPkPenetapan(ctx, tx, indikatorPk)
 			if err != nil {
@@ -124,13 +124,12 @@ func (ex *PkSyncExecutor) Sync(
 					return web.SyncPenetapanSummary{}, errConv
 				}
 				targetPk := domain.TargetPk{
-					IdIndikatorPk:        indPkId,
-					KodeTargetPk:         tgt.IdTarget,
-					KodeTargetSasaranOpd: tgt.IdIndikator,
-					Target:               targetFloat,
-					Satuan:               tgt.Satuan,
-					Tahun:                snapshot.Tahun,
-					CreatedBy:            &currentUser,
+					IdIndikatorPk: indPkId,
+					KodeTargetPk:  tgt.IdTarget,
+					Target:        targetFloat,
+					Satuan:        tgt.Satuan,
+					Tahun:         snapshot.Tahun,
+					CreatedBy:     &currentUser,
 				}
 				_, err := ex.Repo.SaveTargetPkPenetapan(ctx, tx, targetPk)
 				if err != nil {

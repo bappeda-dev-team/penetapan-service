@@ -290,9 +290,6 @@ definitions:
       kode_indikator_pk:
         example: IKU-001
         type: string
-      kode_indikator_sasaran_opd:
-        example: IND-1
-        type: string
       nama_indikator_pk:
         example: Persentase kepuasan masyarakat
         type: string
@@ -482,9 +479,48 @@ definitions:
     type: object
   web.RenaksiOpdResponse:
     properties:
-      renaksi:
-        example: terwujudnya xx
+      anggaran_renaksi:
+        example: 24000000
+        type: integer
+      kode_opd:
+        example: 5.01.5.05.0.00.01.0000
         type: string
+      kode_pk:
+        example: REKIN-PEG-2026-88731
+        type: string
+      kode_rencana_aksi_opd:
+        example: RA-2026-000001
+        type: string
+      kode_sasaran_opd:
+        example: "96623"
+        type: string
+      kode_subkegiatan:
+        example: 5.01.03.2.03.0002
+        type: string
+      nama_pk:
+        example: Pendampingan penyusunan Renstra Perangkat Daerah
+        type: string
+      nama_subkegiatan:
+        example: 5.01.03.2.03.0002
+        type: string
+      pegawai_id:
+        example: "198610022015052001"
+        type: string
+      tahun:
+        example: 2026
+        type: integer
+      tw1:
+        example: 0
+        type: integer
+      tw2:
+        example: 30
+        type: integer
+      tw3:
+        example: 54
+        type: integer
+      tw4:
+        example: 10
+        type: integer
     type: object
   web.RenaksiPenetapanIndividuResponse:
     properties:
@@ -866,6 +902,9 @@ definitions:
       indikator:
         example: 3
         type: integer
+      renaksi:
+        example: 1
+        type: integer
       renja:
         example: 1
         type: integer
@@ -917,9 +956,6 @@ definitions:
         type: integer
       kode_target_pk:
         example: TGT-001
-        type: string
-      kode_target_sasaran_opd:
-        example: TGT-1
         type: string
       satuan:
         example: persen
@@ -1391,6 +1427,36 @@ paths:
           schema:
             $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.ErrorResponse'
       summary: Get renaksi OPD penetapan
+      tags:
+      - OPD
+  /opd/renaksi/sync:
+    post:
+      consumes:
+      - application/json
+      description: Sinkron data renaksi OPD berdasarkan kode OPD dan tahun dari perencanaan
+      parameters:
+      - description: Payload sinkronisasi penetapan OPD
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/web.SyncPenetapanOpdRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.Response-web_SyncPenetapanOpdResponse'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.ValidationErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_bappeda-dev-team_penetapan-service_internal_model_web.ErrorResponse'
+      summary: Sync Penetapan Renaksi OPD
       tags:
       - OPD
   /opd/renja:
