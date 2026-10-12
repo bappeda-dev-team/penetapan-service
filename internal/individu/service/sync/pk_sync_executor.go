@@ -3,6 +3,7 @@ package sync
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"log/slog"
 	"strconv"
 	"strings"
@@ -121,7 +122,12 @@ func (ex *PkSyncExecutor) Sync(
 			for _, tgt := range ind.Targets {
 				targetFloat, errConv := helper.ParseFloat(tgt.Target)
 				if errConv != nil {
-					return web.SyncPenetapanSummary{}, errConv
+					return web.SyncPenetapanSummary{}, common.NewValidation(
+						fmt.Sprintf(
+							"Nilai target yang anda sinkronisasi pada nip : %s, opd : %s, rekin : %s, indikator : %s, target : %s bukan berupa angka",
+							req.PegawaiId, req.KodeOpd, pk.RekinPemilikPk, ind.Indikator, tgt.Target,
+						),
+					)
 				}
 				targetPk := domain.TargetPk{
 					IdIndikatorPk: indPkId,
