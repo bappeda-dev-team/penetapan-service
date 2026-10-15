@@ -6,6 +6,13 @@ import (
 )
 
 func KodeSasaranOpd(sasaranId string) string {
+	sasaranId = strings.TrimSpace(sasaranId)
+	if sasaranId == "" {
+		return ""
+	}
+	if strings.HasPrefix(sasaranId, "SAS-OPD-") {
+		return sasaranId
+	}
 	kodeSasaran := fmt.Sprintf("SAS-OPD-%s", sasaranId)
 
 	return kodeSasaran
@@ -18,17 +25,31 @@ func KodeSasaranOpdInt(sasaranId int) string {
 }
 
 func KodeIndikatorSasaranOpd(indikatorSasaranId string) string {
-	if strings.TrimSpace(indikatorSasaranId) == "" {
+	indikatorSasaranId = strings.TrimSpace(indikatorSasaranId)
+	if indikatorSasaranId == "" {
 		return ""
+	}
+	for strings.HasPrefix(indikatorSasaranId, "IND-IND-") {
+		indikatorSasaranId = strings.TrimPrefix(indikatorSasaranId, "IND-")
+	}
+	if strings.HasPrefix(indikatorSasaranId, "IND-") {
+		return indikatorSasaranId
 	}
 	return fmt.Sprintf("IND-%s", indikatorSasaranId)
 }
 
 func KodeTargetSasaranOpd(targetSasaranId string) string {
-	if strings.TrimSpace(targetSasaranId) == "" {
+	targetSasaranId = strings.TrimSpace(targetSasaranId)
+	if targetSasaranId == "" {
 		return ""
 	}
-	return fmt.Sprintf("TGT-%s", targetSasaranId)
+	if strings.HasPrefix(targetSasaranId, "TGT-TRG-") {
+		targetSasaranId = strings.TrimPrefix(targetSasaranId, "TGT-")
+	}
+	if strings.HasPrefix(targetSasaranId, "TRG-") || strings.HasPrefix(targetSasaranId, "TGT-") {
+		return targetSasaranId
+	}
+	return fmt.Sprintf("TRG-%s", targetSasaranId)
 }
 
 func KodeRenaksiOpd(renaksiId int) string {
