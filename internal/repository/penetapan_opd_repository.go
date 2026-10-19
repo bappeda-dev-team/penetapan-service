@@ -2203,15 +2203,15 @@ func (r *PenetapanOpdRepository) FindIndikatorRenjaSubkegiatan(
 	query := fmt.Sprintf(`
 	SELECT
 		id,
-		kegiatan_id,
+		subkegiatan_id,
 		kode_indikator,
 		indikator,
 		tahun,
 		created_date,
 		last_modified_date,
 		created_by
-	FROM indikator_renja_kegiatan
-	WHERE kegiatan_id IN (%s)
+	FROM indikator_renja_subkegiatan
+	WHERE subkegiatan_id IN (%s)
 	ORDER BY id
 	`, strings.Join(placeholders, ","))
 
